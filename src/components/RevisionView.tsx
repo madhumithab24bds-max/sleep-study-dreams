@@ -6,9 +6,10 @@ import { revisionBySubject } from "@/lib/revisionData";
 interface Props {
   subject: string;
   onClose: () => void;
+  onCompleted?: () => void;
 }
 
-const RevisionView = ({ subject, onClose }: Props) => {
+const RevisionView = ({ subject, onClose, onCompleted }: Props) => {
   const items = revisionBySubject[subject] || [];
   const [index, setIndex] = useState(0);
   const [flipped, setFlipped] = useState(false);
@@ -28,8 +29,12 @@ const RevisionView = ({ subject, onClose }: Props) => {
   const progress = ((completed.size / items.length) * 100).toFixed(0);
 
   const goNext = () => {
-    setCompleted((prev) => new Set(prev).add(index));
+    const newCompleted = new Set(completed).add(index);
+    setCompleted(newCompleted);
     setFlipped(false);
+    if (newCompleted.size === items.length) {
+      onCompleted?.();
+    }
     if (index < items.length - 1) setIndex((i) => i + 1);
   };
 

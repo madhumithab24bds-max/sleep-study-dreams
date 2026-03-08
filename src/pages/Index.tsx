@@ -13,6 +13,13 @@ const Index = () => {
   const [activeTab, setActiveTab] = useState<TabId>("home");
   const [selectedCourse, setSelectedCourse] = useState<string | null>(null);
   const [selectedSubject, setSelectedSubject] = useState<string | null>(null);
+  const [studiedSubjects, setStudiedSubjects] = useState<string[]>([]);
+
+  const handleSubjectStudied = (subject: string) => {
+    setStudiedSubjects((prev) =>
+      prev.includes(subject) ? prev : [...prev, subject]
+    );
+  };
 
   const renderScreen = () => {
     switch (activeTab) {
@@ -23,12 +30,19 @@ const Index = () => {
           <StudyScreen
             onCourseChange={setSelectedCourse}
             onSubjectChange={setSelectedSubject}
+            onSubjectStudied={handleSubjectStudied}
           />
         );
       case "sleep":
         return <SleepScreen selectedSubject={selectedSubject} />;
       case "memory":
-        return <MemoryScreen selectedCourse={selectedCourse} selectedSubject={selectedSubject} />;
+        return (
+          <MemoryScreen
+            selectedCourse={selectedCourse}
+            selectedSubject={selectedSubject}
+            studiedSubjects={studiedSubjects}
+          />
+        );
       case "profile":
         return <ProfileScreen />;
       default:

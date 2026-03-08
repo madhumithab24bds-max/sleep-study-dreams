@@ -178,9 +178,10 @@ const courses: Course[] = [
 interface StudyScreenProps {
   onCourseChange?: (courseId: string) => void;
   onSubjectChange?: (subject: string | null) => void;
+  onSubjectStudied?: (subject: string) => void;
 }
 
-const StudyScreen = ({ onCourseChange, onSubjectChange }: StudyScreenProps) => {
+const StudyScreen = ({ onCourseChange, onSubjectChange, onSubjectStudied }: StudyScreenProps) => {
   const [selectedCourse, setSelectedCourse] = useState<string | null>(null);
   const [showCourseList, setShowCourseList] = useState(true);
   const [language, setLanguage] = useState<"Tamil" | "English">("English");
@@ -328,7 +329,11 @@ const StudyScreen = ({ onCourseChange, onSubjectChange }: StudyScreenProps) => {
 
       {revisionSubject && (
         <div className="mt-4">
-          <RevisionView subject={revisionSubject} onClose={() => setRevisionSubject(null)} />
+          <RevisionView
+            subject={revisionSubject}
+            onClose={() => setRevisionSubject(null)}
+            onCompleted={() => onSubjectStudied?.(revisionSubject)}
+          />
         </div>
       )}
 
