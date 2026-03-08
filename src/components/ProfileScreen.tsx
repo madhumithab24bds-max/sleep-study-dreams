@@ -1,10 +1,9 @@
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import {
-  Settings, Moon, Globe, Bell, LogOut,
-  User, Vibrate, BarChart3, Clock, Palette, GraduationCap, BookOpen,
-  Pencil, Check, X
+  Settings, Globe, Bell, LogOut,
+  User, Vibrate, Clock, Palette, Pencil, Check, Smartphone
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { Switch } from "@/components/ui/switch";
 import { Input } from "@/components/ui/input";
@@ -12,6 +11,7 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue
 } from "@/components/ui/select";
 import logo from "@/assets/logo.png";
+import { themes, applyTheme, loadSavedTheme } from "@/lib/themeEngine";
 
 const languages = [
   { value: "tamil", label: "Tamil", flag: "🇮🇳" },
@@ -22,27 +22,16 @@ const languages = [
   { value: "japanese", label: "Japanese", flag: "🇯🇵" },
 ];
 
-const grades = [
-  "LKG", "UKG",
-  ...Array.from({ length: 12 }, (_, i) => `Class ${i + 1}`),
-];
-
-const professionalCourses = [
-  { value: "bds", label: "BDS", emoji: "🦷" },
-  { value: "mbbs", label: "MBBS", emoji: "🩺" },
-  { value: "bed", label: "B.Ed", emoji: "🎓" },
-  { value: "engineering", label: "Engineering", emoji: "⚙" },
-  { value: "arts-science", label: "Arts & Science", emoji: "📖" },
-  { value: "allied-health", label: "Allied Health Science", emoji: "🧬" },
-  { value: "pharmacy", label: "Pharmacy", emoji: "💊" },
-  { value: "nursing", label: "Nursing", emoji: "👩‍⚕" },
-  { value: "physiotherapy", label: "Physiotherapy", emoji: "🏃" },
-];
-
-const themes = [
-  { id: "night-blue", label: "Night Blue", emoji: "🌙", color: "from-[hsl(240,35%,15%)] to-[hsl(220,55%,25%)]" },
-  { id: "lavender-calm", label: "Lavender Calm", emoji: "💜", color: "from-[hsl(260,40%,20%)] to-[hsl(280,45%,30%)]" },
-  { id: "dream-white", label: "Dream White", emoji: "☁", color: "from-[hsl(240,20%,25%)] to-[hsl(240,15%,35%)]" },
+const academicLevels = [
+  { group: "School", items: [
+    "LKG", "UKG",
+    ...Array.from({ length: 12 }, (_, i) => `Class ${i + 1}`),
+  ]},
+  { group: "Professional Courses", items: [
+    "🦷 BDS", "🩺 MBBS", "🎓 B.Ed", "⚙ Engineering",
+    "📖 Arts & Science", "🧬 Allied Health Science",
+    "💊 Pharmacy", "👩‍⚕ Nursing", "🏃 Physiotherapy",
+  ]},
 ];
 
 const sectionVariants = {
@@ -63,20 +52,22 @@ const ProfileScreen = ({ onLanguageChange }: ProfileScreenProps) => {
   const [notificationsOn, setNotificationsOn] = useState(true);
   const [vibrationOn, setVibrationOn] = useState(true);
   const [sleepReminderOn, setSleepReminderOn] = useState(true);
-  const [selectedTheme, setSelectedTheme] = useState("night-blue");
-  const [grade, setGrade] = useState("Class 10");
-  const [course, setCourse] = useState("");
-  const [plan] = useState("Basic ₹50/mo");
+  const [selectedTheme, setSelectedTheme] = useState(loadSavedTheme());
+  const [academicLevel, setAcademicLevel] = useState("Class 10");
 
-  const screenTimeData = [
-    { label: "Study", value: 65, emoji: "📱" },
-    { label: "Sleep AI", value: 45, emoji: "😴" },
-    { label: "Break", value: 20, emoji: "☕" },
-  ];
-  const maxTime = Math.max(...screenTimeData.map((d) => d.value));
+  useEffect(() => {
+    applyTheme(selectedTheme);
+  }, []);
 
   const handleSave = (field: string) => {
     toast.success(`${field} updated`);
+  };
+
+  const handleThemeChange = (themeId: string) => {
+    setSelectedTheme(themeId);
+    applyTheme(themeId);
+    const t = themes.find(th => th.id === themeId);
+    toast.success(`Theme: ${t?.label}`);
   };
 
   return (
@@ -88,13 +79,7 @@ const ProfileScreen = ({ onLanguageChange }: ProfileScreenProps) => {
       </motion.div>
 
       {/* User Card */}
-      <motion.div
-        className="glass-card p-5 flex items-center gap-4"
-        custom={0}
-        initial="hidden"
-        animate="visible"
-        variants={sectionVariants}
-      >
+      <motion.div className="glass-card p-5 flex items-center gap-4" custom={0} initial="hidden" animate="visible" variants={sectionVariants}>
         <div className="relative">
           <img src={logo} alt="Avatar" className="w-16 h-16 rounded-2xl bg-muted glow-moonlight" />
           <span className="absolute -bottom-1 -right-1 bg-primary text-primary-foreground rounded-full w-6 h-6 flex items-center justify-center text-xs">
@@ -104,7 +89,7 @@ const ProfileScreen = ({ onLanguageChange }: ProfileScreenProps) => {
         <div className="flex-1 min-w-0">
           <h2 className="font-display font-bold text-foreground text-lg truncate">{name}</h2>
           <p className="text-xs text-muted-foreground font-display">@{username}</p>
-          <p className="text-xs text-primary font-display mt-1">{plan} · 5 day streak 🔥</p>
+          <p className="text-xs text-primary font-display mt-1">5 day streak 🔥</p>
         </div>
       </motion.div>
 
@@ -118,19 +103,10 @@ const ProfileScreen = ({ onLanguageChange }: ProfileScreenProps) => {
         <div className="space-y-1.5">
           <label className="text-xs text-muted-foreground font-display">🪪 Name</label>
           <div className="flex gap-2">
-            <Input
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              disabled={!editingName}
-              className="bg-muted/50 border-border/50 text-foreground font-display h-9 text-sm rounded-xl"
-            />
-            <button
-              onClick={() => {
-                if (editingName) handleSave("Name");
-                setEditingName(!editingName);
-              }}
-              className="glass-card px-3 flex items-center text-primary hover:text-foreground transition-colors"
-            >
+            <Input value={name} onChange={(e) => setName(e.target.value)} disabled={!editingName}
+              className="bg-muted/50 border-border/50 text-foreground font-display h-9 text-sm rounded-xl" />
+            <button onClick={() => { if (editingName) handleSave("Name"); setEditingName(!editingName); }}
+              className="glass-card px-3 flex items-center text-primary hover:text-foreground transition-colors">
               {editingName ? <Check size={16} /> : <Pencil size={14} />}
             </button>
           </div>
@@ -140,51 +116,30 @@ const ProfileScreen = ({ onLanguageChange }: ProfileScreenProps) => {
         <div className="space-y-1.5">
           <label className="text-xs text-muted-foreground font-display">👤 Username</label>
           <div className="flex gap-2">
-            <Input
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              disabled={!editingUsername}
-              className="bg-muted/50 border-border/50 text-foreground font-display h-9 text-sm rounded-xl"
-            />
-            <button
-              onClick={() => {
-                if (editingUsername) handleSave("Username");
-                setEditingUsername(!editingUsername);
-              }}
-              className="glass-card px-3 flex items-center text-primary hover:text-foreground transition-colors"
-            >
+            <Input value={username} onChange={(e) => setUsername(e.target.value)} disabled={!editingUsername}
+              className="bg-muted/50 border-border/50 text-foreground font-display h-9 text-sm rounded-xl" />
+            <button onClick={() => { if (editingUsername) handleSave("Username"); setEditingUsername(!editingUsername); }}
+              className="glass-card px-3 flex items-center text-primary hover:text-foreground transition-colors">
               {editingUsername ? <Check size={16} /> : <Pencil size={14} />}
             </button>
           </div>
         </div>
 
-        {/* Grade */}
+        {/* Combined Academic Level (Grade + Course) */}
         <div className="space-y-1.5">
-          <label className="text-xs text-muted-foreground font-display">🎓 Grade Selection</label>
-          <Select value={grade} onValueChange={(v) => { setGrade(v); toast.success(`Grade set to ${v}`); }}>
+          <label className="text-xs text-muted-foreground font-display">🎓 Grade / Course</label>
+          <Select value={academicLevel} onValueChange={(v) => { setAcademicLevel(v); toast.success(`Set to ${v}`); }}>
             <SelectTrigger className="bg-muted/50 border-border/50 text-foreground font-display h-9 text-sm rounded-xl">
               <SelectValue />
             </SelectTrigger>
-            <SelectContent className="bg-card border-border">
-              {grades.map((g) => (
-                <SelectItem key={g} value={g} className="font-display text-sm">{g}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-
-        {/* Course */}
-        <div className="space-y-1.5">
-          <label className="text-xs text-muted-foreground font-display">📚 Course Selection</label>
-          <Select value={course} onValueChange={(v) => { setCourse(v); toast.success(`Course: ${v}`); }}>
-            <SelectTrigger className="bg-muted/50 border-border/50 text-foreground font-display h-9 text-sm rounded-xl">
-              <SelectValue placeholder="Select course" />
-            </SelectTrigger>
-            <SelectContent className="bg-card border-border">
-              {professionalCourses.map((c) => (
-                <SelectItem key={c.value} value={c.value} className="font-display text-sm">
-                  {c.emoji} {c.label}
-                </SelectItem>
+            <SelectContent className="bg-card border-border max-h-64">
+              {academicLevels.map((group) => (
+                <div key={group.group}>
+                  <p className="px-2 py-1.5 text-[10px] font-display font-bold text-muted-foreground uppercase tracking-wider">{group.group}</p>
+                  {group.items.map((item) => (
+                    <SelectItem key={item} value={item} className="font-display text-sm">{item}</SelectItem>
+                  ))}
+                </div>
               ))}
             </SelectContent>
           </Select>
@@ -209,9 +164,7 @@ const ProfileScreen = ({ onLanguageChange }: ProfileScreenProps) => {
             </SelectTrigger>
             <SelectContent className="bg-card border-border">
               {languages.map((l) => (
-                <SelectItem key={l.value} value={l.value} className="font-display text-sm">
-                  {l.flag} {l.label}
-                </SelectItem>
+                <SelectItem key={l.value} value={l.value} className="font-display text-sm">{l.flag} {l.label}</SelectItem>
               ))}
             </SelectContent>
           </Select>
@@ -225,10 +178,7 @@ const ProfileScreen = ({ onLanguageChange }: ProfileScreenProps) => {
             <Bell size={18} className="text-primary" />
             <span className="text-sm font-display text-foreground">Notifications</span>
           </div>
-          <Switch
-            checked={notificationsOn}
-            onCheckedChange={(v) => { setNotificationsOn(v); toast.success(`Notifications ${v ? "on" : "off"}`); }}
-          />
+          <Switch checked={notificationsOn} onCheckedChange={(v) => { setNotificationsOn(v); toast.success(`Notifications ${v ? "on" : "off"}`); }} />
         </div>
 
         <div className="border-t border-border/30" />
@@ -239,38 +189,21 @@ const ProfileScreen = ({ onLanguageChange }: ProfileScreenProps) => {
             <Vibrate size={18} className="text-primary" />
             <span className="text-sm font-display text-foreground">Vibration</span>
           </div>
-          <Switch
-            checked={vibrationOn}
-            onCheckedChange={(v) => { setVibrationOn(v); toast.success(`Vibration ${v ? "on" : "off"}`); }}
-          />
+          <Switch checked={vibrationOn} onCheckedChange={(v) => { setVibrationOn(v); toast.success(`Vibration ${v ? "on" : "off"}`); }} />
         </div>
-
       </motion.div>
 
       {/* Screen Time */}
       <motion.div className="glass-card p-4" custom={3} initial="hidden" animate="visible" variants={sectionVariants}>
-        <h3 className="font-display font-semibold text-foreground flex items-center gap-2 mb-4">
-          <BarChart3 size={16} className="text-primary" /> Screen Time Today
+        <h3 className="font-display font-semibold text-foreground flex items-center gap-2 mb-3">
+          <Smartphone size={16} className="text-primary" /> Screen Time
         </h3>
-        <div className="space-y-3">
-          {screenTimeData.map((item, idx) => (
-            <div key={item.label} className="space-y-1">
-              <div className="flex justify-between text-xs font-display">
-                <span className="text-muted-foreground">{item.emoji} {item.label}</span>
-                <span className="text-foreground">{item.value} min</span>
-              </div>
-              <div className="h-3 bg-muted/50 rounded-full overflow-hidden">
-                <motion.div
-                  className={`h-full rounded-full ${
-                    idx === 0 ? "bg-primary" : idx === 1 ? "bg-secondary" : "bg-accent"
-                  }`}
-                  initial={{ width: 0 }}
-                  animate={{ width: `${(item.value / maxTime) * 100}%` }}
-                  transition={{ duration: 0.8, delay: idx * 0.15, ease: "easeOut" }}
-                />
-              </div>
-            </div>
-          ))}
+        <div className="glass-card bg-muted/30 p-4 rounded-xl text-center space-y-2">
+          <Smartphone size={28} className="mx-auto text-muted-foreground" />
+          <p className="text-xs text-muted-foreground font-display">
+            Screen time data requires the native mobile app. Install this app on your device to track usage automatically from your phone's Digital Wellbeing / Screen Time settings.
+          </p>
+          <p className="text-[10px] text-primary font-display font-semibold">Coming soon with native app</p>
         </div>
       </motion.div>
 
@@ -284,10 +217,7 @@ const ProfileScreen = ({ onLanguageChange }: ProfileScreenProps) => {
               <span className="text-xs text-muted-foreground">"Time to prepare for sleep learning"</span>
             </div>
           </div>
-          <Switch
-            checked={sleepReminderOn}
-            onCheckedChange={(v) => { setSleepReminderOn(v); toast.success(`Sleep reminder ${v ? "on" : "off"}`); }}
-          />
+          <Switch checked={sleepReminderOn} onCheckedChange={(v) => { setSleepReminderOn(v); toast.success(`Sleep reminder ${v ? "on" : "off"}`); }} />
         </div>
       </motion.div>
 
@@ -296,34 +226,20 @@ const ProfileScreen = ({ onLanguageChange }: ProfileScreenProps) => {
         <h3 className="font-display font-semibold text-foreground flex items-center gap-2 mb-3">
           <Palette size={16} className="text-primary" /> Theme
         </h3>
-        <div className="grid grid-cols-3 gap-3">
+        <div className="grid grid-cols-4 gap-2">
           {themes.map((theme) => (
             <button
               key={theme.id}
-              onClick={() => { setSelectedTheme(theme.id); toast.success(`Theme: ${theme.label}`); }}
-              className={`rounded-xl p-3 text-center transition-all ${
-                selectedTheme === theme.id
-                  ? "ring-2 ring-primary glow-primary"
-                  : "ring-1 ring-border/30"
+              onClick={() => handleThemeChange(theme.id)}
+              className={`rounded-xl p-2 text-center transition-all ${
+                selectedTheme === theme.id ? "ring-2 ring-primary glow-primary" : "ring-1 ring-border/30"
               }`}
             >
-              <div className={`w-full h-10 rounded-lg bg-gradient-to-br ${theme.color} mb-2`} />
-              <span className="text-lg">{theme.emoji}</span>
-              <p className="text-[10px] text-muted-foreground font-display mt-1">{theme.label}</p>
+              <div className={`w-full h-8 rounded-lg bg-gradient-to-br ${theme.preview} mb-1.5`} />
+              <span className="text-sm">{theme.emoji}</span>
+              <p className="text-[9px] text-muted-foreground font-display mt-0.5 leading-tight">{theme.label}</p>
             </button>
           ))}
-        </div>
-      </motion.div>
-
-      {/* Stats */}
-      <motion.div className="grid grid-cols-2 gap-3" custom={6} initial="hidden" animate="visible" variants={sectionVariants}>
-        <div className="glass-card p-4 text-center">
-          <p className="text-2xl font-display font-bold text-primary">42h</p>
-          <p className="text-xs text-muted-foreground font-display">Sleep Learning</p>
-        </div>
-        <div className="glass-card p-4 text-center">
-          <p className="text-2xl font-display font-bold text-secondary">156</p>
-          <p className="text-xs text-muted-foreground font-display">Items Learned</p>
         </div>
       </motion.div>
 
@@ -331,16 +247,12 @@ const ProfileScreen = ({ onLanguageChange }: ProfileScreenProps) => {
       <motion.button
         onClick={() => toast.success("Logged out (demo)")}
         className="w-full glass-card p-4 flex items-center justify-center gap-3 text-destructive"
-        custom={7}
-        initial="hidden"
-        animate="visible"
-        variants={sectionVariants}
+        custom={6} initial="hidden" animate="visible" variants={sectionVariants}
         whileTap={{ scale: 0.97 }}
       >
         <LogOut size={18} />
         <span className="text-sm font-display font-semibold">Log Out</span>
       </motion.button>
-
     </div>
   );
 };
