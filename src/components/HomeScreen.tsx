@@ -16,13 +16,6 @@ interface HomeScreenProps {
   onNavigate: (tab: TabId) => void;
 }
 
-const features = [
-  { title: "Study Before Sleep", desc: "Review vocabulary, formulas & concepts", emoji: "📖" },
-  { title: "Sleep Learning Mode", desc: "Gentle audio cues while you rest", emoji: "😴" },
-  { title: "Morning Memory Test", desc: "Quick quizzes to check retention", emoji: "🧠" },
-  { title: "Dream Journal", desc: "Record your dreams after waking", emoji: "✍️" },
-  { title: "Exam Boost Mode", desc: "Intensive revision for exam prep", emoji: "🎯" },
-];
 
 const quickActions: { emoji: string; label: string; tab: TabId; note?: string }[] = [
   { emoji: "😴", label: "Sleep Now", tab: "sleep" },
