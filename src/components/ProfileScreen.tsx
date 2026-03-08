@@ -1,8 +1,8 @@
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  Settings, Moon, Globe, Bell, CreditCard, LogOut, ChevronRight,
+  Settings, Moon, Globe, Bell, LogOut,
   User, Vibrate, BarChart3, Clock, Palette, GraduationCap, BookOpen,
-  Pencil, Check, X, IndianRupee, Copy, ExternalLink
+  Pencil, Check, X
 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
