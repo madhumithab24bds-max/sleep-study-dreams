@@ -77,6 +77,19 @@ const ProfileScreen = ({ onLanguageChange }: ProfileScreenProps) => {
 
   useEffect(() => {
     applyTheme(selectedTheme);
+    // Load avatar from profile
+    const loadAvatar = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user) {
+        const { data } = await supabase
+          .from("profiles")
+          .select("avatar_url")
+          .eq("user_id", session.user.id)
+          .maybeSingle();
+        if (data?.avatar_url) setAvatarUrl(data.avatar_url);
+      }
+    };
+    loadAvatar();
   }, []);
 
   const handleSave = (field: string) => {
@@ -88,6 +101,35 @@ const ProfileScreen = ({ onLanguageChange }: ProfileScreenProps) => {
     applyTheme(themeId);
     const t = themes.find(th => th.id === themeId);
     toast.success(`Theme: ${t?.label}`);
+  };
+
+  const selectAvatar = async (url: string) => {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session?.user) return;
+    const { error } = await supabase
+      .from("profiles")
+      .update({ avatar_url: url })
+      .eq("user_id", session.user.id);
+    if (error) { toast.error("Failed to update avatar"); return; }
+    setAvatarUrl(url);
+    setShowAvatarPicker(false);
+    toast.success("Avatar updated!");
+  };
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session?.user) return;
+    setUploadingAvatar(true);
+    const ext = file.name.split(".").pop();
+    const path = `${session.user.id}/avatar.${ext}`;
+    const { error } = await supabase.storage.from("avatars").upload(path, file, { upsert: true });
+    if (error) { toast.error("Upload failed"); setUploadingAvatar(false); return; }
+    const { data: urlData } = supabase.storage.from("avatars").getPublicUrl(path);
+    const publicUrl = urlData.publicUrl + "?t=" + Date.now();
+    await selectAvatar(publicUrl);
+    setUploadingAvatar(false);
   };
 
   return (
