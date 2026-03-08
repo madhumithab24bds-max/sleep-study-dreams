@@ -44,7 +44,7 @@ const AuthScreen = () => {
         />
 
         <h1 className="mb-2 text-3xl font-display font-bold text-gradient-dream text-center">
-          ThukkamTutor
+          ThookamTutor
         </h1>
         <p className="text-sm font-display italic text-muted-foreground mb-10 text-center">
           "Learn Smart… Even While You Sleep"

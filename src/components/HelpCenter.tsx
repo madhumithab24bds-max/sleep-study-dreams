@@ -104,7 +104,7 @@ const HelpCenter = ({ onBack }: { onBack: () => void }) => {
 
       <motion.div className="glass-card p-5 mt-6 text-center" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }}>
         <p className="text-xs text-muted-foreground font-display">
-          Still need help? Contact us at <span className="text-primary font-semibold">support@thukkamtutor.app</span>
+          Still need help? Contact us at <span className="text-primary font-semibold">support@thookamtutor.app</span>
         </p>
       </motion.div>
     </div>

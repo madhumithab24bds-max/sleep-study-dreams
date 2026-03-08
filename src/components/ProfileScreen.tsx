@@ -145,7 +145,7 @@ const ProfileScreen = ({ onLanguageChange }: ProfileScreenProps) => {
     <div className="min-h-screen pb-28 pt-6 px-4 space-y-5">
       {/* Header */}
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center mb-2">
-        <p className="text-xs text-muted-foreground font-display tracking-widest">🌙 ThukkamTutor</p>
+        <p className="text-xs text-muted-foreground font-display tracking-widest">🌙 ThookamTutor</p>
         <h1 className="text-2xl font-display font-bold text-foreground">👤 Profile</h1>
       </motion.div>
 

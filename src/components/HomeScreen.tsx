@@ -252,7 +252,7 @@ const HomeScreen = ({ onNavigate }: HomeScreenProps) => {
               </div>
 
               <a
-                href={`upi://pay?pa=${UPI_ID}&pn=ThukkamTutor&am=${UPI_AMOUNT}&cu=INR&tn=ThukkamTutor%20Subscription`}
+                href={`upi://pay?pa=${UPI_ID}&pn=ThookamTutor&am=${UPI_AMOUNT}&cu=INR&tn=ThookamTutor%20Subscription`}
                 className="w-full rounded-xl bg-primary text-primary-foreground font-display font-semibold text-sm py-3 flex items-center justify-center gap-2 active:scale-95 transition-transform"
               >
                 <ExternalLink size={14} /> Open UPI App to Pay ₹50

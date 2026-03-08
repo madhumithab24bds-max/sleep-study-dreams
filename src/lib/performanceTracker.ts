@@ -17,7 +17,7 @@ export interface PerformanceData {
   lastQuizDate: string;
 }
 
-const STORAGE_KEY = "thukkamtutor_performance";
+const STORAGE_KEY = "thookamtutor_performance";
 
 export function loadPerformance(): PerformanceData {
   try {

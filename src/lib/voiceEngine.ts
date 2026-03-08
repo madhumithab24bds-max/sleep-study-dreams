@@ -10,7 +10,7 @@ interface VoiceState {
   rate: number; // 0.5-1.5
 }
 
-const STORAGE_KEY = "thukkamtutor_voice";
+const STORAGE_KEY = "thookamtutor_voice";
 
 let currentUtterance: SpeechSynthesisUtterance | null = null;
 

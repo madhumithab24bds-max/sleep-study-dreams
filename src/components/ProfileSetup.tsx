@@ -105,7 +105,7 @@ const ProfileSetup = ({ userId, defaultName, onComplete }: ProfileSetupProps) =>
       >
         <motion.img
           src={logo}
-          alt="ThukkamTutor"
+          alt="ThookamTutor"
           className="mb-4 h-20 w-20 drop-shadow-2xl"
           initial={{ scale: 0.8, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}

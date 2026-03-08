@@ -65,7 +65,7 @@ function collectActivity(): ActivityItem[] {
 
   // Daily journal entries
   try {
-    const journal = localStorage.getItem("thukkam_daily_journal");
+    const journal = localStorage.getItem("thookam_daily_journal");
     if (journal) {
       JSON.parse(journal).forEach((j: any) => {
         items.push({
