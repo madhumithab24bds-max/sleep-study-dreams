@@ -268,7 +268,7 @@ const ProfileScreen = ({ onLanguageChange }: ProfileScreenProps) => {
             <Globe size={18} className="text-primary" />
             <span className="text-sm font-display text-foreground">Language</span>
           </div>
-          <Select value={language} onValueChange={(v) => { setLanguage(v); onLanguageChange?.(v); toast.success(`Language: ${languages.find(l => l.value === v)?.label}`); }}>
+          <Select value={language} onValueChange={(v) => { setLanguage(v); onLanguageChange?.(v); handleSave("Language", v, "language"); }}>
             <SelectTrigger className="w-32 bg-muted/50 border-border/50 text-foreground font-display h-8 text-xs rounded-xl">
               <SelectValue />
             </SelectTrigger>
