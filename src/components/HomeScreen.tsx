@@ -4,6 +4,7 @@ import { X, Moon, BookOpen, Activity, HelpCircle, IndianRupee, Copy, ExternalLin
 import logo from "@/assets/logo.png";
 import nightSkyBg from "@/assets/night-sky-bg.jpg";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 import DreamJournal from "./DreamJournal";
 import DailyJournal from "./DailyJournal";
 import ActivityScreen from "./ActivityScreen";
@@ -256,12 +257,22 @@ const HomeScreen = ({ onNavigate }: HomeScreenProps) => {
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-full rounded-xl bg-primary text-primary-foreground font-display font-semibold text-sm py-3 flex items-center justify-center gap-2 active:scale-95 transition-transform"
-                onClick={(e) => {
+                onClick={async (e) => {
+                  e.preventDefault();
+                  // Log payment attempt
+                  const { data: { session } } = await supabase.auth.getSession();
+                  if (session?.user) {
+                    await supabase.from("payment_logs").insert({
+                      user_id: session.user.id,
+                      amount: Number(UPI_AMOUNT),
+                      upi_id: UPI_ID,
+                      plan: "Basic Monthly",
+                      status: "initiated",
+                    });
+                  }
                   const upiUrl = `upi://pay?pa=${UPI_ID}&pn=ThookamTutor&am=${UPI_AMOUNT}&cu=INR&tn=ThookamTutor%20Subscription`;
                   window.location.href = upiUrl;
-                  e.preventDefault();
                   setTimeout(() => {
-                    // Fallback: try intent scheme for Android
                     window.location.href = `intent://pay?pa=${UPI_ID}&pn=ThookamTutor&am=${UPI_AMOUNT}&cu=INR&tn=ThookamTutor%20Subscription#Intent;scheme=upi;package=com.google.android.apps.nbu.paisa.user;end`;
                   }, 1500);
                 }}
