@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronDown, GraduationCap, BookOpen, Languages, School, Building2 } from "lucide-react";
+import { ChevronDown, GraduationCap, BookOpen, Languages, School, Building2, CheckCircle2 } from "lucide-react";
 import { useState, useMemo } from "react";
 import { toast } from "sonner";
 import RevisionView from "./RevisionView";
