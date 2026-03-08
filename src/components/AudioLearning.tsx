@@ -111,6 +111,7 @@ const AudioLearning = () => {
     if (!playingRef.current || index >= lines.length) {
       const elapsed = Date.now() - startTimeRef.current;
       if (playingRef.current && elapsed < duration.seconds * 1000) {
+        // Loop back to start
         speakLine(lines, 0);
         return;
       }
@@ -130,9 +131,13 @@ const AudioLearning = () => {
     setProgress(Math.min(100, (elapsed / (duration.seconds * 1000)) * 100));
 
     const voiceSettings = loadVoiceSettings();
+
+    // Cancel any pending speech first
+    speechSynthesis.cancel();
+
     const utterance = new SpeechSynthesisUtterance(lines[index]);
-    utterance.volume = Math.max(0, Math.min(1, volume / 100));
-    utterance.rate = 0.85;
+    utterance.volume = Math.max(0.1, Math.min(1, volume / 100));
+    utterance.rate = 0.8;
     utterance.pitch = voiceSettings.gender === "female" ? 1.05 : 0.85;
 
     const voices = speechSynthesis.getVoices();
@@ -141,16 +146,24 @@ const AudioLearning = () => {
 
     utterance.onend = () => {
       if (!playingRef.current) return;
-      timerRef.current = setTimeout(() => speakLine(lines, index + 1), 1500);
+      timerRef.current = setTimeout(() => speakLine(lines, index + 1), 800);
     };
 
-    utterance.onerror = () => {
+    utterance.onerror = (e) => {
+      console.warn("TTS error on line", index, e.error);
       if (!playingRef.current) return;
-      timerRef.current = setTimeout(() => speakLine(lines, index + 1), 1000);
+      // Retry the same line once, then skip
+      timerRef.current = setTimeout(() => speakLine(lines, index + 1), 500);
     };
 
     utteranceRef.current = utterance;
-    speechSynthesis.speak(utterance);
+    
+    // Small delay to ensure cancel() completed
+    setTimeout(() => {
+      if (playingRef.current) {
+        speechSynthesis.speak(utterance);
+      }
+    }, 50);
   }, [volume, duration, stopPlayback]);
 
   const startPlayback = useCallback(() => {
@@ -159,22 +172,44 @@ const AudioLearning = () => {
       return;
     }
 
-    const lines = buildRevisionScript(selectedTopics);
-    
-    // Add uploaded material content
+    // Cancel any existing speech
+    speechSynthesis.cancel();
+
+    const lines: string[] = [];
+
+    // Add uploaded material content FIRST (priority)
     if (uploadedText.trim()) {
-      lines.unshift("Let's begin with your uploaded study material.");
-      const sentences = uploadedText.split(/[.!?\n]+/).filter((s) => s.trim().length > 3);
-      sentences.forEach((s) => lines.push(s.trim() + "."));
-      lines.push("That completes your uploaded material.");
+      lines.push("Let's begin with your uploaded study material.");
+      // Split by sentences more carefully, keeping chunks readable
+      const cleaned = uploadedText.replace(/\s+/g, " ").trim();
+      const sentences = cleaned.split(/(?<=[.!?])\s+/).filter((s) => s.trim().length > 2);
+      
+      if (sentences.length > 0) {
+        // Group into chunks of ~100 chars for natural TTS pacing
+        let chunk = "";
+        for (const sentence of sentences) {
+          if (chunk.length + sentence.length > 150 && chunk.length > 0) {
+            lines.push(chunk.trim());
+            chunk = sentence;
+          } else {
+            chunk += (chunk ? " " : "") + sentence;
+          }
+        }
+        if (chunk.trim()) lines.push(chunk.trim());
+      }
+      lines.push("That completes your uploaded material. Well done!");
     }
+
+    // Add revision from selected topics
+    const topicLines = buildRevisionScript(selectedTopics);
+    lines.push(...topicLines);
 
     // Add custom notes as spoken content
     if (customNote.trim()) {
       lines.push("Now let's go through your personal study notes.");
-      const sentences = customNote.split(/[.!?\n]+/).filter((s) => s.trim());
+      const sentences = customNote.split(/[.!?\n]+/).filter((s) => s.trim().length > 2);
       sentences.forEach((s) => lines.push(s.trim() + "."));
-      lines.push("Those were your personal notes.");
+      lines.push("Those were your personal notes. Great job revising!");
     }
 
     if (lines.length === 0) {
@@ -182,24 +217,27 @@ const AudioLearning = () => {
       return;
     }
 
+    console.log(`[AudioLearning] Starting with ${lines.length} lines`);
+    
     linesRef.current = lines;
     playingRef.current = true;
     startTimeRef.current = Date.now();
     setIsPlaying(true);
     setCurrentLineIdx(0);
 
+    // Start background audio
     playAudio(bgSound, bgVolume);
 
-    // Chrome workaround: periodically resume speech synthesis to prevent it from stopping
+    // Chrome workaround: periodically resume speech synthesis
     resumeIntervalRef.current = setInterval(() => {
       if (speechSynthesis.speaking && speechSynthesis.paused) {
         speechSynthesis.resume();
       }
-    }, 5000);
+    }, 3000);
 
-    // Start speaking immediately (no delay to preserve user gesture context)
+    // Start speaking immediately
     speakLine(lines, 0);
-    toast.success(`Audio learning started for ${duration.label}`);
+    toast.success(`Audio learning started — ${lines.length} sections for ${duration.label}`);
   }, [selectedTopics, customNote, uploadedText, bgSound, bgVolume, duration, speakLine]);
 
   // Update background sound while playing
