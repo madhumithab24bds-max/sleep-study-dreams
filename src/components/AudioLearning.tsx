@@ -106,10 +106,17 @@ const AudioLearning = () => {
   useEffect(() => {
     if (bgEnabled && narrationState !== "idle") {
       playAudio(bgSound, bgVolume);
-    } else {
+    } else if (!bgEnabled) {
       stopAudio();
     }
-  }, [bgEnabled, bgSound, bgVolume, narrationState]);
+  }, [bgEnabled, bgSound, narrationState]);
+
+  // Live background volume update
+  useEffect(() => {
+    if (bgEnabled && narrationState !== "idle") {
+      updateVolume(bgVolume);
+    }
+  }, [bgVolume, bgEnabled, narrationState]);
 
   // --- Narration helpers ---
   const stopNarration = useCallback(() => {
