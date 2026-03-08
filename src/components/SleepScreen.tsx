@@ -24,15 +24,21 @@ interface SleepScreenProps {
 const SleepScreen = ({ selectedSubject }: SleepScreenProps) => {
   const [isActive, setIsActive] = useState(false);
 
-  // Auto-select audio based on subject
-  const subjectAudio = selectedSubject
-    ? (() => {
-        const { subjectAudioMap } = require("@/lib/quizData");
-        return subjectAudioMap[selectedSubject] || "whisper";
-      })()
-    : "whisper";
+  const defaultAudio = useMemo(() => {
+    if (selectedSubject && subjectAudioMap[selectedSubject]) {
+      return subjectAudioMap[selectedSubject];
+    }
+    return "whisper";
+  }, [selectedSubject]);
 
-  const [selectedAudio, setSelectedAudio] = useState(subjectAudio);
+  const [selectedAudio, setSelectedAudio] = useState(defaultAudio);
+
+  // Update audio when subject changes
+  useEffect(() => {
+    if (selectedSubject && subjectAudioMap[selectedSubject]) {
+      setSelectedAudio(subjectAudioMap[selectedSubject]);
+    }
+  }, [selectedSubject]);
   const [showAudioPicker, setShowAudioPicker] = useState(false);
   const [volume, setVolume] = useState(35);
   const [durationIndex, setDurationIndex] = useState(4);
