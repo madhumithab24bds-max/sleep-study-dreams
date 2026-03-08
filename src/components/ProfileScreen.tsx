@@ -238,7 +238,7 @@ const ProfileScreen = ({ onLanguageChange }: ProfileScreenProps) => {
         {/* Combined Academic Level (Grade + Course) */}
         <div className="space-y-1.5">
           <label className="text-xs text-muted-foreground font-display">🎓 Grade / Course</label>
-          <Select value={academicLevel} onValueChange={(v) => { setAcademicLevel(v); toast.success(`Set to ${v}`); }}>
+          <Select value={academicLevel} onValueChange={(v) => { setAcademicLevel(v); handleSave("Grade", v, "academic_level"); }}>
             <SelectTrigger className="bg-muted/50 border-border/50 text-foreground font-display h-9 text-sm rounded-xl">
               <SelectValue />
             </SelectTrigger>
