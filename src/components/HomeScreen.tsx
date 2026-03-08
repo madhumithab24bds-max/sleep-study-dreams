@@ -253,10 +253,32 @@ const HomeScreen = ({ onNavigate }: HomeScreenProps) => {
 
               <a
                 href={`upi://pay?pa=${UPI_ID}&pn=ThookamTutor&am=${UPI_AMOUNT}&cu=INR&tn=ThookamTutor%20Subscription`}
+                target="_blank"
+                rel="noopener noreferrer"
                 className="w-full rounded-xl bg-primary text-primary-foreground font-display font-semibold text-sm py-3 flex items-center justify-center gap-2 active:scale-95 transition-transform"
+                onClick={(e) => {
+                  const upiUrl = `upi://pay?pa=${UPI_ID}&pn=ThookamTutor&am=${UPI_AMOUNT}&cu=INR&tn=ThookamTutor%20Subscription`;
+                  window.location.href = upiUrl;
+                  e.preventDefault();
+                  setTimeout(() => {
+                    // Fallback: try intent scheme for Android
+                    window.location.href = `intent://pay?pa=${UPI_ID}&pn=ThookamTutor&am=${UPI_AMOUNT}&cu=INR&tn=ThookamTutor%20Subscription#Intent;scheme=upi;package=com.google.android.apps.nbu.paisa.user;end`;
+                  }, 1500);
+                }}
               >
                 <ExternalLink size={14} /> Open UPI App to Pay ₹50
               </a>
+
+              <div className="glass-card p-3 space-y-1.5 bg-accent/5 border border-accent/20">
+                <p className="text-xs font-display font-semibold text-foreground text-center">Payment Details</p>
+                <div className="grid grid-cols-2 gap-1 text-[11px] text-muted-foreground">
+                  <span>Payee:</span><span className="text-foreground font-medium">ThookamTutor</span>
+                  <span>UPI ID:</span><span className="text-foreground font-medium">{UPI_ID}</span>
+                  <span>Amount:</span><span className="text-foreground font-medium">₹{UPI_AMOUNT}</span>
+                  <span>Plan:</span><span className="text-foreground font-medium">Basic Monthly</span>
+                  <span>Note:</span><span className="text-foreground font-medium">ThookamTutor Subscription</span>
+                </div>
+              </div>
 
               <p className="text-[10px] text-muted-foreground text-center">
                 After payment, share screenshot to confirm subscription activation
