@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import { supabase } from "@/integrations/supabase/client";
 import {
   Settings, Globe, Bell, LogOut,
   User, Vibrate, Clock, Palette, Pencil, Check, Smartphone
@@ -245,7 +246,10 @@ const ProfileScreen = ({ onLanguageChange }: ProfileScreenProps) => {
 
       {/* Logout */}
       <motion.button
-        onClick={() => toast.success("Logged out (demo)")}
+        onClick={async () => {
+          await supabase.auth.signOut();
+          toast.success("Logged out successfully");
+        }}
         className="w-full glass-card p-4 flex items-center justify-center gap-3 text-destructive"
         custom={6} initial="hidden" animate="visible" variants={sectionVariants}
         whileTap={{ scale: 0.97 }}
