@@ -185,6 +185,7 @@ const StudyScreen = ({ onCourseChange, onSubjectChange }: StudyScreenProps) => {
   const [showCourseList, setShowCourseList] = useState(true);
   const [language, setLanguage] = useState<"Tamil" | "English">("English");
   const [activeSubject, setActiveSubject] = useState<string | null>(null);
+  const [revisionSubject, setRevisionSubject] = useState<string | null>(null);
 
   const currentCourse = courses.find((c) => c.id === selectedCourse);
 
