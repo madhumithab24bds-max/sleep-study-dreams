@@ -4,6 +4,100 @@ export interface RevisionItem {
   back: string;
 }
 
+// Fallback mapping: chapter name keywords → revisionBySubject key
+const chapterFallbacks: Record<string, string> = {
+  // Math chapters
+  "Numbers": "Basic Math", "Addition": "Basic Math", "Subtraction": "Basic Math",
+  "Shapes": "Colors & Shapes", "Patterns": "Basic Math",
+  "Numbers & Operations": "Basic Math", "Fractions": "Mathematics", "Measurement": "Mathematics",
+  "Geometry": "Mathematics", "Data Handling": "Mathematics", "Money": "Basic Math",
+  "Time & Calendar": "Basic Math", "Number System": "Mathematics", "Algebra": "Mathematics",
+  "Mensuration": "Mathematics", "Statistics": "Mathematics", "Ratio & Proportion": "Mathematics",
+  "Profit & Loss": "Mathematics", "Simple Interest": "Mathematics",
+  "Real Numbers": "Mathematics", "Polynomials": "Mathematics", "Linear Equations": "Mathematics",
+  "Quadratic Equations": "Mathematics", "Coordinate Geometry": "Mathematics",
+  "Trigonometry": "Maths", "Statistics & Probability": "Mathematics",
+  "Circles": "Mathematics", "Surface Area & Volume": "Mathematics",
+  "Sets & Functions": "Maths", "Calculus": "Maths", "Matrices & Determinants": "Maths",
+  "Probability": "Maths", "Vectors": "Maths", "Differential Equations": "Maths",
+  // Science chapters
+  "Living & Non-living": "EVS Basics", "Plants": "EVS Basics", "Animals": "EVS Basics",
+  "Our Body": "Science", "Water & Air": "EVS Basics", "Food & Nutrition": "Science",
+  "Force & Motion": "Physics", "Heat & Temperature": "Physics", "Light": "Physics",
+  "Electricity": "Physics", "Plant Kingdom": "Science", "Human Body Systems": "Science",
+  "Acids & Bases": "Chemistry", "Laws of Motion": "Physics", "Atomic Structure": "Chemistry",
+  "Chemical Reactions": "Chemistry", "Heredity & Evolution": "Science",
+  "Optics": "Physics", "Electricity & Magnetism": "Physics", "Carbon Compounds": "Chemistry",
+  "Reproduction": "Science",
+  // Tamil chapters
+  "Tamil Alphabets": "Tamil Letters", "Simple Words": "Tamil",
+  "Sentences": "Tamil", "Poems": "Tamil", "Stories": "Tamil",
+  "Prose": "Literature", "Poetry": "Literature", "Grammar": "English",
+  "Comprehension": "English", "Letter Writing": "English", "Essay": "English",
+  "Grammar - Phonetics": "Tamil", "Grammar - Syntax": "Tamil", "Literature": "Literature",
+  "Essay & Letter": "English",
+  // English chapters
+  "Alphabets & Phonics": "English Words", "Reading Comprehension": "English",
+  "Simple Grammar": "English", "Vocabulary": "English Words",
+  "Stories & Poems": "Literature", "Writing Skills": "English",
+  "Grammar & Usage": "English", "Writing": "English",
+  // Social Science chapters
+  "My Family": "Social Science", "My Neighbourhood": "Social Science",
+  "Our Country India": "Social Science", "Festivals": "Social Science",
+  "Maps & Directions": "Social Science",
+  "History - Ancient India": "History", "History - Medieval India": "History",
+  "Geography": "Social Science", "Civics": "Political Science",
+  "Indian National Movement": "History", "World History": "History",
+  "Indian Geography": "Social Science", "Indian Constitution": "Political Science",
+  "Disaster Management": "Science",
+  // EVS chapters
+  "Plants Around Us": "EVS Basics", "Animals Around Us": "EVS Basics",
+  "Weather & Seasons": "EVS Basics", "Clean Environment": "EVS Basics",
+  "Our Helpers": "EVS Basics",
+  // Physics 11-12
+  "Kinematics": "Physics", "Work, Energy & Power": "Physics",
+  "Gravitation": "Physics", "Waves": "Physics", "Electrostatics": "Physics",
+  "Current Electricity": "Physics",
+  // Chemistry 11-12
+  "Chemical Bonding": "Chemistry", "Thermodynamics": "Thermodynamics",
+  "Solutions": "Chemistry", "Organic Chemistry": "Chemistry", "Electrochemistry": "Chemistry",
+  // Biology
+  "Cell Biology": "Science", "Plant Biology": "Science",
+  "Human Physiology": "Physiology", "Genetics": "Science", "Ecology": "Science",
+  // Pre-school
+  "Letters A-F": "Alphabets (A-Z)", "Letters G-L": "Alphabets (A-Z)",
+  "Letters M-R": "Alphabets (A-Z)", "Letters S-Z": "Alphabets (A-Z)",
+  "Numbers 1-5": "Numbers (1-10)", "Numbers 6-10": "Numbers (1-10)",
+  "Numbers 11-20": "Numbers (1-10)",
+  "Vowels (உயிர் எழுத்துக்கள்)": "Tamil Letters",
+  "Consonants (மெய் எழுத்துக்கள்)": "Tamil Letters",
+  "Primary Colors": "Colors & Shapes",
+  "English Rhymes": "Rhymes & Songs", "Tamil Rhymes": "Rhymes & Songs",
+  // Higher ed
+  "Engineering Maths": "Engineering Maths", "Data Structures": "Data Structures",
+  "Circuit Theory": "Circuit Theory", "Programming": "Programming",
+};
+
+export function getRevisionItems(subject: string): RevisionItem[] {
+  // Exact match first
+  if (revisionBySubject[subject] && revisionBySubject[subject].length > 0) {
+    return revisionBySubject[subject];
+  }
+  // Fallback mapping
+  const fallbackKey = chapterFallbacks[subject];
+  if (fallbackKey && revisionBySubject[fallbackKey]) {
+    return revisionBySubject[fallbackKey];
+  }
+  // Partial match: find any key that contains the subject name or vice versa
+  const lowerSubject = subject.toLowerCase();
+  for (const key of Object.keys(revisionBySubject)) {
+    if (key.toLowerCase().includes(lowerSubject) || lowerSubject.includes(key.toLowerCase())) {
+      return revisionBySubject[key];
+    }
+  }
+  return [];
+}
+
 export const revisionBySubject: Record<string, RevisionItem[]> = {
   "Alphabets (A-Z)": [
     { front: "A", back: "🍎 Apple" }, { front: "B", back: "🏀 Ball" }, { front: "C", back: "🐱 Cat" },
@@ -847,5 +941,54 @@ export const revisionBySubject: Record<string, RevisionItem[]> = {
     { front: "Glasgow Coma Scale", back: "Eye + Verbal + Motor (3-15)" },
     { front: "IV fluid types", back: "Normal Saline, Ringer's Lactate, D5W" },
     { front: "Medication rights", back: "Right patient, drug, dose, route, time" },
+  ],
+  "EVS": [
+    { front: "What do plants need to grow?", back: "Sunlight, Water, Air, Soil 🌱" },
+    { front: "3 states of water", back: "Solid (ice), Liquid (water), Gas (steam)" },
+    { front: "Parts of a plant", back: "Root, Stem, Leaf, Flower, Fruit" },
+    { front: "Water cycle steps", back: "Evaporation → Condensation → Precipitation" },
+    { front: "Which season is hottest?", back: "Summer ☀️" },
+    { front: "Name 3 domestic animals", back: "Dog, Cow, Cat" },
+    { front: "What is recycling?", back: "Reusing waste materials ♻️" },
+    { front: "What gives us rain?", back: "Clouds ☁️" },
+    { front: "Who helps when we are sick?", back: "Doctor 👨‍⚕️" },
+    { front: "Why should we plant trees?", back: "For oxygen, shade, and clean air 🌳" },
+  ],
+  "Biology": [
+    { front: "Cell is the", back: "Basic unit of life" },
+    { front: "DNA full form", back: "Deoxyribonucleic Acid" },
+    { front: "Mitochondria function", back: "Powerhouse of the cell — produces ATP" },
+    { front: "Cell division types", back: "Mitosis (growth) and Meiosis (gametes)" },
+    { front: "Chromosomes in humans", back: "46 (23 pairs)" },
+    { front: "Photosynthesis equation", back: "6CO₂ + 6H₂O → C₆H₁₂O₆ + 6O₂" },
+    { front: "Blood groups", back: "A, B, AB, O" },
+    { front: "Universal donor", back: "O negative" },
+    { front: "Krebs cycle location", back: "Mitochondrial matrix" },
+    { front: "Mendel is father of", back: "Genetics" },
+    { front: "RNA full form", back: "Ribonucleic Acid" },
+    { front: "Ecosystem components", back: "Biotic (living) + Abiotic (non-living)" },
+    { front: "Food chain order", back: "Producer → Primary → Secondary → Tertiary consumer" },
+    { front: "Endocrine system", back: "Hormone-producing glands" },
+  ],
+  "Tamil Basics": [
+    { front: "அ", back: "First vowel — 'a' sound" },
+    { front: "ஆ", back: "Long 'aa' sound" },
+    { front: "இ", back: "Short 'i' sound" },
+    { front: "உ", back: "Short 'u' sound" },
+    { front: "க", back: "First consonant — 'ka' sound" },
+    { front: "How many Tamil vowels?", back: "12 (உயிர் எழுத்துக்கள்)" },
+    { front: "How many Tamil consonants?", back: "18 (மெய் எழுத்துக்கள்)" },
+    { front: "அம்மா", back: "Mother 👩" },
+    { front: "அப்பா", back: "Father 👨" },
+    { front: "பூ", back: "Flower 🌸" },
+  ],
+  "Numbers (1-20)": [
+    { front: "1", back: "One ☝️" }, { front: "2", back: "Two ✌️" },
+    { front: "5", back: "Five 🖐️" }, { front: "10", back: "Ten 🔟" },
+    { front: "11", back: "Eleven" }, { front: "15", back: "Fifteen" },
+    { front: "20", back: "Twenty" },
+    { front: "What comes after 15?", back: "16" },
+    { front: "12 + 8 = ?", back: "20" },
+    { front: "20 - 7 = ?", back: "13" },
   ],
 };

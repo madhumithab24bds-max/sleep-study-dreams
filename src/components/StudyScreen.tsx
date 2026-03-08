@@ -99,9 +99,9 @@ const StudyScreen = ({ onCourseChange, onSubjectChange, onSubjectStudied, langua
     onSubjectChange?.(subject.en);
   };
 
-  const handleStartRevision = (subjectName: string) => {
-    setRevisionSubject(subjectName);
-    toast.success(`${lk(ui.startRevision)} ${subjectName}`);
+  const handleStartRevision = (englishName: string, displayName?: string) => {
+    setRevisionSubject(englishName);
+    toast.success(`${lk(ui.startRevision)} ${displayName || englishName}`);
   };
 
   const cycleMedium = () => {
@@ -266,7 +266,7 @@ const StudyScreen = ({ onCourseChange, onSubjectChange, onSubjectStudied, langua
                                     <span className="text-xs font-display text-primary font-bold w-6">{ci + 1}</span>
                                     <span className={`font-display text-sm flex-1 ${progress.isCompleted(ch.id) ? "line-through text-muted-foreground" : "text-foreground"}`}>{lk(ch)}</span>
                                     <button
-                                      onClick={(e) => { e.stopPropagation(); handleStartRevision(lk(ch)); }}
+                                      onClick={(e) => { e.stopPropagation(); handleStartRevision(ch.en, lk(ch)); }}
                                       className="text-xs font-display font-semibold text-primary bg-primary/10 px-2 py-1 rounded-lg"
                                     >
                                       {lk(ui.study_btn)}
@@ -274,7 +274,7 @@ const StudyScreen = ({ onCourseChange, onSubjectChange, onSubjectStudied, langua
                                   </motion.div>
                                 ))}
                                 <button
-                                  onClick={() => handleStartRevision(lk(subject))}
+                                  onClick={() => handleStartRevision(subject.en, lk(subject))}
                                   className="w-full rounded-lg bg-primary/10 border border-primary/20 px-3 py-2 text-xs font-display font-semibold text-primary active:scale-95 transition-transform mt-2"
                                 >
                                   {lk(ui.fullRevision)} — {lk(subject)}
@@ -422,8 +422,8 @@ const StudyScreen = ({ onCourseChange, onSubjectChange, onSubjectStudied, langua
                                   />
                                   <span className="text-xs font-display text-primary font-bold w-6">{ti + 1}</span>
                                   <span className={`font-display text-sm flex-1 ${progress.isCompleted(topic.id) ? "line-through text-muted-foreground" : "text-foreground"}`}>{lk(topic)}</span>
-                                  <button
-                                    onClick={(e) => { e.stopPropagation(); handleStartRevision(lk(topic)); }}
+                                   <button
+                                    onClick={(e) => { e.stopPropagation(); handleStartRevision(topic.en, lk(topic)); }}
                                     className="text-xs font-display font-semibold text-primary bg-primary/10 px-2 py-1 rounded-lg"
                                   >
                                     {lk(ui.study_btn)}
@@ -431,7 +431,7 @@ const StudyScreen = ({ onCourseChange, onSubjectChange, onSubjectStudied, langua
                                 </motion.div>
                               ))}
                               <button
-                                onClick={() => handleStartRevision(lk(subject))}
+                                onClick={() => handleStartRevision(subject.en, lk(subject))}
                                 className="w-full rounded-lg bg-primary/10 border border-primary/20 px-3 py-2 text-xs font-display font-semibold text-primary active:scale-95 transition-transform mt-2"
                               >
                                 {lk(ui.fullRevision)} — {lk(subject)}
