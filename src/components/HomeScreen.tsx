@@ -101,6 +101,13 @@ const HomeScreen = ({ onNavigate }: HomeScreenProps) => {
       <div className="relative overflow-hidden rounded-b-3xl">
         <img src={nightSkyBg} alt="Night sky" className="absolute inset-0 h-full w-full object-cover opacity-60" />
         <div className="absolute inset-0 bg-gradient-to-b from-background/30 via-background/50 to-background" />
+        {/* Menu button */}
+        <button
+          onClick={() => setMenuOpen(true)}
+          className="absolute top-4 right-4 z-20 glass-card p-2.5 rounded-xl"
+        >
+          <Menu size={20} className="text-foreground" />
+        </button>
         <div className="relative z-10 flex flex-col items-center px-6 pb-10 pt-12 text-center">
           <motion.img
             src={logo}
