@@ -47,7 +47,7 @@ function collectActivity(): ActivityItem[] {
 
   // Dream journal entries
   try {
-    const dreams = localStorage.getItem("thukkam_dream_journal");
+    const dreams = localStorage.getItem("thookam_dream_journal");
     if (dreams) {
       JSON.parse(dreams).forEach((d: any) => {
         items.push({
