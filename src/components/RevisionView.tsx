@@ -6,6 +6,7 @@ import { revisionBySubject } from "@/lib/revisionData";
 interface Props {
   subject: string;
   onClose: () => void;
+  onCompleted?: () => void;
 }
 
 const RevisionView = ({ subject, onClose }: Props) => {
