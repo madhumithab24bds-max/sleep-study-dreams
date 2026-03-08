@@ -212,6 +212,7 @@ const StudyScreen = ({ onCourseChange, onSubjectChange, onSubjectStudied }: Stud
   const [language, setLanguage] = useState<"Tamil" | "English">("English");
   const [activeSubject, setActiveSubject] = useState<string | null>(null);
   const [revisionSubject, setRevisionSubject] = useState<string | null>(null);
+  const [studyMode, setStudyMode] = useState<"quick" | "syllabus">("quick");
 
   const currentCourse = courses.find((c) => c.id === selectedCourse);
 
