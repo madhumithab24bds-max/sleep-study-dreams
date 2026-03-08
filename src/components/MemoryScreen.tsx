@@ -1,9 +1,12 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { CheckCircle, XCircle, Trophy, Volume2, VolumeX, BookOpen, Upload, BarChart3, Target, RefreshCw, Zap, FileText, Camera, Mic, MicOff, User, Settings2, MessageCircle } from "lucide-react";
+import { CheckCircle, XCircle, Trophy, Volume2, VolumeX, BookOpen, Upload, BarChart3, Target, RefreshCw, Zap, FileText, Camera, Mic, MicOff, User, Settings2, MessageCircle, Brain, Lightbulb, TrendingUp, Clock, ChevronRight, Sparkles } from "lucide-react";
 import { useState, useMemo, useEffect, useCallback, useRef } from "react";
 import { quizBySubject, quizByCourse, subjectAudioMap, getRandomQuiz, getWeakTopicQuiz, type QuizQuestion } from "@/lib/quizData";
+import { revisionBySubject } from "@/lib/revisionData";
 import { playAudio, stopAudio, playSfx } from "@/lib/audioEngine";
 import ConversationMode from "./ConversationMode";
+import RevisionView from "./RevisionView";
+import StudyMaterialUpload from "./StudyMaterialUpload";
 import { recordQuizResult, loadPerformance, getWeakSubjects, getOverallAccuracy, getSubjectAccuracy } from "@/lib/performanceTracker";
 import {
   loadVoiceSettings,
@@ -26,11 +29,11 @@ interface Props {
   studiedSubjects: string[];
 }
 
+type MainTab = "revision" | "chat" | "quiz" | "upload";
 type QuizMode = "current" | "studied" | "weak" | "upload";
-type TabView = "quiz" | "performance" | "upload" | "conversation";
 
 const MemoryScreen = ({ selectedCourse, selectedSubject, studiedSubjects }: Props) => {
-  const [tabView, setTabView] = useState<TabView>("quiz");
+  const [mainTab, setMainTab] = useState<MainTab>("revision");
   const [quizSource, setQuizSource] = useState<QuizMode>("current");
   const [studiedPick, setStudiedPick] = useState<string | null>(null);
   const [quizCount, setQuizCount] = useState(10);
@@ -50,7 +53,7 @@ const MemoryScreen = ({ selectedCourse, selectedSubject, studiedSubjects }: Prop
   // Voice state
   const [voiceSettings, setVoiceSettings] = useState(loadVoiceSettings);
   const [showVoicePanel, setShowVoicePanel] = useState(false);
-  const [voiceActive, setVoiceActive] = useState(false); // is currently speaking
+  const [voiceActive, setVoiceActive] = useState(false);
   const [waitingForExplanation, setWaitingForExplanation] = useState(false);
   const advanceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -58,8 +61,12 @@ const MemoryScreen = ({ selectedCourse, selectedSubject, studiedSubjects }: Prop
   const [perfData, setPerfData] = useState(loadPerformance());
   const weakSubjects = useMemo(() => getWeakSubjects(3), [perfData]);
 
+  // Revision state
+  const [revisionSubject, setRevisionSubject] = useState<string | null>(null);
+  const [showSmartInsights, setShowSmartInsights] = useState(true);
+
   // Upload state
-  const [uploadedFiles, setUploadedFiles] = useState<{ name: string; type: string }[]>([]);
+  const [extractedText, setExtractedText] = useState("");
 
   // Preload speech synthesis voices
   useEffect(() => {
@@ -76,6 +83,18 @@ const MemoryScreen = ({ selectedCourse, selectedSubject, studiedSubjects }: Prop
       return next;
     });
   };
+
+  const label = activeQuizSubject || (selectedCourse ? selectedCourse.charAt(0).toUpperCase() + selectedCourse.slice(1) : "General");
+
+  const audioType = useMemo(() => {
+    if (activeQuizSubject && subjectAudioMap[activeQuizSubject]) return subjectAudioMap[activeQuizSubject];
+    return "whisper";
+  }, [activeQuizSubject]);
+
+  const toggleAudio = useCallback(() => {
+    if (audioPlaying) { stopAudio(); setAudioPlaying(false); }
+    else { playAudio(audioType, 30); setAudioPlaying(true); }
+  }, [audioPlaying, audioType]);
 
   const startQuiz = useCallback((source: QuizMode) => {
     let questions: QuizQuestion[] = [];
@@ -116,7 +135,6 @@ const MemoryScreen = ({ selectedCourse, selectedSubject, studiedSubjects }: Prop
       setVoiceActive(true);
       readQuestion(fullText, voiceSettings, () => setVoiceActive(false));
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [current, quizStarted, done, quizzes.length]);
 
   useEffect(() => {
@@ -126,18 +144,6 @@ const MemoryScreen = ({ selectedCourse, selectedSubject, studiedSubjects }: Prop
       if (advanceTimerRef.current) clearTimeout(advanceTimerRef.current);
     };
   }, []);
-
-  const label = activeQuizSubject || (selectedCourse ? selectedCourse.charAt(0).toUpperCase() + selectedCourse.slice(1) : "General");
-
-  const audioType = useMemo(() => {
-    if (activeQuizSubject && subjectAudioMap[activeQuizSubject]) return subjectAudioMap[activeQuizSubject];
-    return "whisper";
-  }, [activeQuizSubject]);
-
-  const toggleAudio = useCallback(() => {
-    if (audioPlaying) { stopAudio(); setAudioPlaying(false); }
-    else { playAudio(audioType, 30); setAudioPlaying(true); }
-  }, [audioPlaying, audioType]);
 
   const advanceToNext = useCallback(() => {
     setWaitingForExplanation(false);
@@ -163,11 +169,9 @@ const MemoryScreen = ({ selectedCourse, selectedSubject, studiedSubjects }: Prop
     if (isCorrect) setScore((s) => s + 1);
     setRoundHistory((prev) => [...prev, { correct: isCorrect, question: quizzes[current].q }]);
 
-    // Voice explanation
     if (voiceSettings.enabled) {
       setWaitingForExplanation(true);
       setVoiceActive(true);
-      // Small delay so SFX plays first
       setTimeout(() => {
         explainAnswer(
           quizzes[current].q,
@@ -177,7 +181,6 @@ const MemoryScreen = ({ selectedCourse, selectedSubject, studiedSubjects }: Prop
           () => {
             setVoiceActive(false);
             setTappedIdx(null);
-            // Advance after explanation ends
             advanceTimerRef.current = setTimeout(() => {
               if (current < quizzes.length - 1) {
                 setCurrent((c) => c + 1);
@@ -197,7 +200,6 @@ const MemoryScreen = ({ selectedCourse, selectedSubject, studiedSubjects }: Prop
         );
       }, 400);
     } else {
-      // No voice — advance after delay
       setTimeout(() => {
         setTappedIdx(null);
         if (current < quizzes.length - 1) {
@@ -218,13 +220,6 @@ const MemoryScreen = ({ selectedCourse, selectedSubject, studiedSubjects }: Prop
   const handleNextRound = () => {
     stopVoice();
     startQuiz(quizSource);
-  };
-
-  const handleUploadFile = (type: "pdf" | "image") => {
-    const name = type === "pdf" ? `StudyNotes_${Date.now()}.pdf` : `Photo_${Date.now()}.jpg`;
-    setUploadedFiles((prev) => [...prev, { name, type }]);
-    toast.success(`${type === "pdf" ? "PDF" : "Image"} uploaded! AI will analyze it for quiz generation.`);
-    toast.info("💡 Enable Lovable Cloud for AI-powered quiz generation from your uploads", { duration: 5000 });
   };
 
   const overallAccuracy = getOverallAccuracy();
@@ -255,26 +250,94 @@ const MemoryScreen = ({ selectedCourse, selectedSubject, studiedSubjects }: Prop
     advanceToNext();
   };
 
+  // Get available revision subjects
+  const availableRevisionSubjects = useMemo(() => {
+    const allSubjects = Object.keys(revisionBySubject);
+    // Prioritize studied subjects, then weak, then all
+    const prioritized: string[] = [];
+    studiedSubjects.forEach(s => { if (allSubjects.includes(s) && !prioritized.includes(s)) prioritized.push(s); });
+    weakSubjects.forEach(s => { if (allSubjects.includes(s) && !prioritized.includes(s)) prioritized.push(s); });
+    allSubjects.forEach(s => { if (!prioritized.includes(s)) prioritized.push(s); });
+    return prioritized;
+  }, [studiedSubjects, weakSubjects]);
+
+  // Smart recommendations
+  const recommendations = useMemo(() => {
+    const recs: { icon: React.ReactNode; title: string; desc: string; action: () => void; color: string }[] = [];
+
+    if (weakSubjects.length > 0) {
+      recs.push({
+        icon: <Target size={16} />,
+        title: `Focus on ${weakSubjects[0]}`,
+        desc: `${getSubjectAccuracy(weakSubjects[0])}% accuracy — needs practice`,
+        action: () => { setMainTab("quiz"); setQuizSource("weak"); },
+        color: "text-destructive",
+      });
+    }
+
+    if (studiedSubjects.length > 0) {
+      const lastStudied = studiedSubjects[studiedSubjects.length - 1];
+      if (revisionBySubject[lastStudied]) {
+        recs.push({
+          icon: <BookOpen size={16} />,
+          title: `Revise ${lastStudied}`,
+          desc: "Recently studied — revise before sleep",
+          action: () => { setMainTab("revision"); setRevisionSubject(lastStudied); },
+          color: "text-primary",
+        });
+      }
+    }
+
+    if (perfData.totalQuizzesTaken > 0) {
+      recs.push({
+        icon: <TrendingUp size={16} />,
+        title: "Take a quiz",
+        desc: `${overallAccuracy}% overall — keep improving!`,
+        action: () => setMainTab("quiz"),
+        color: "text-accent",
+      });
+    }
+
+    if (recs.length === 0) {
+      recs.push({
+        icon: <Sparkles size={16} />,
+        title: "Start learning",
+        desc: "Begin with revision cards to build your memory",
+        action: () => setMainTab("revision"),
+        color: "text-primary",
+      });
+    }
+
+    return recs;
+  }, [weakSubjects, studiedSubjects, perfData, overallAccuracy]);
+
+  const tabIcons = [
+    { id: "revision" as MainTab, label: "📚 Revision", icon: BookOpen },
+    { id: "chat" as MainTab, label: "💬 Chat", icon: MessageCircle },
+    { id: "quiz" as MainTab, label: "📝 Quiz", icon: Zap },
+    { id: "upload" as MainTab, label: "📤 Upload", icon: Upload },
+  ];
+
   return (
     <div className="min-h-screen pb-24 pt-6 px-4">
       {/* Header */}
-      <div className="flex items-center justify-between mb-4">
-        <h1 className="text-2xl font-display font-bold text-foreground">🧠 Smart Quiz</h1>
+      <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
-          {/* Voice toggle */}
+          <Brain size={22} className="text-accent" />
+          <h1 className="text-xl font-display font-bold text-foreground">Memory</h1>
+        </div>
+        <div className="flex items-center gap-2">
           <button
             onClick={() => setShowVoicePanel(!showVoicePanel)}
-            className={`glass-card px-3 py-1.5 flex items-center gap-1.5 text-xs font-display transition-colors ${
+            className={`glass-card px-2.5 py-1.5 flex items-center gap-1.5 text-xs font-display transition-colors ${
               voiceSettings.enabled ? "text-accent border-accent/30" : "text-muted-foreground"
             }`}
           >
             {voiceSettings.enabled ? <Mic size={14} /> : <MicOff size={14} />}
-            Voice
           </button>
-          {/* Ambient audio toggle */}
           <button
             onClick={toggleAudio}
-            className={`glass-card px-3 py-1.5 flex items-center gap-1.5 text-xs font-display transition-colors ${
+            className={`glass-card px-2.5 py-1.5 flex items-center gap-1.5 text-xs font-display transition-colors ${
               audioPlaying ? "text-primary border-primary/30" : "text-muted-foreground"
             }`}
           >
@@ -282,6 +345,58 @@ const MemoryScreen = ({ selectedCourse, selectedSubject, studiedSubjects }: Prop
           </button>
         </div>
       </div>
+
+      {/* Smart Insights Banner */}
+      {showSmartInsights && mainTab === "revision" && !revisionSubject && (
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-4 space-y-2"
+        >
+          {/* Quick stats row */}
+          <div className="grid grid-cols-3 gap-2">
+            <div className="glass-card p-2.5 text-center">
+              <p className="text-lg font-display font-bold text-primary">{overallAccuracy}%</p>
+              <p className="text-[9px] text-muted-foreground font-display">Accuracy</p>
+            </div>
+            <div className="glass-card p-2.5 text-center">
+              <p className="text-lg font-display font-bold text-secondary">{perfData.totalQuizzesTaken}</p>
+              <p className="text-[9px] text-muted-foreground font-display">Quizzes</p>
+            </div>
+            <div className="glass-card p-2.5 text-center">
+              <p className="text-lg font-display font-bold text-accent">{perfData.streak}🔥</p>
+              <p className="text-[9px] text-muted-foreground font-display">Streak</p>
+            </div>
+          </div>
+
+          {/* AI Recommendations */}
+          <div className="glass-card p-3">
+            <div className="flex items-center gap-2 mb-2">
+              <Lightbulb size={14} className="text-accent" />
+              <span className="text-xs font-display font-bold text-foreground">Smart Suggestions</span>
+            </div>
+            <div className="space-y-1.5">
+              {recommendations.map((rec, i) => (
+                <motion.button
+                  key={i}
+                  onClick={rec.action}
+                  className="w-full flex items-center gap-3 p-2 rounded-xl bg-muted/30 hover:bg-muted/50 transition-all text-left"
+                  whileTap={{ scale: 0.98 }}
+                >
+                  <div className={`w-8 h-8 rounded-lg bg-muted/50 flex items-center justify-center shrink-0 ${rec.color}`}>
+                    {rec.icon}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs font-display font-semibold text-foreground truncate">{rec.title}</p>
+                    <p className="text-[10px] text-muted-foreground font-display truncate">{rec.desc}</p>
+                  </div>
+                  <ChevronRight size={14} className="text-muted-foreground shrink-0" />
+                </motion.button>
+              ))}
+            </div>
+          </div>
+        </motion.div>
+      )}
 
       {/* Voice Control Panel */}
       <AnimatePresence>
@@ -307,10 +422,8 @@ const MemoryScreen = ({ selectedCourse, selectedSubject, studiedSubjects }: Prop
                   }}
                 />
               </div>
-
               {voiceSettings.enabled && (
                 <>
-                  {/* Gender */}
                   <div>
                     <p className="text-[10px] text-muted-foreground font-display mb-2">Voice Type</p>
                     <div className="grid grid-cols-2 gap-2">
@@ -319,7 +432,6 @@ const MemoryScreen = ({ selectedCourse, selectedSubject, studiedSubjects }: Prop
                           key={g}
                           onClick={() => {
                             updateVoiceSetting("gender", g);
-                            // Preview the voice
                             speak("Hello! I'll be your study companion.", { ...voiceSettings, gender: g });
                           }}
                           className={`py-2.5 rounded-xl text-xs font-display font-semibold transition-all flex items-center justify-center gap-2 ${
@@ -334,8 +446,6 @@ const MemoryScreen = ({ selectedCourse, selectedSubject, studiedSubjects }: Prop
                       ))}
                     </div>
                   </div>
-
-                  {/* Volume */}
                   <div>
                     <div className="flex items-center justify-between mb-2">
                       <p className="text-[10px] text-muted-foreground font-display">Volume</p>
@@ -344,14 +454,9 @@ const MemoryScreen = ({ selectedCourse, selectedSubject, studiedSubjects }: Prop
                     <Slider
                       value={[voiceSettings.volume]}
                       onValueChange={([v]) => updateVoiceSetting("volume", v)}
-                      min={10}
-                      max={100}
-                      step={5}
-                      className="w-full"
+                      min={10} max={100} step={5} className="w-full"
                     />
                   </div>
-
-                  {/* Speed */}
                   <div>
                     <div className="flex items-center justify-between mb-2">
                       <p className="text-[10px] text-muted-foreground font-display">Speed</p>
@@ -360,14 +465,9 @@ const MemoryScreen = ({ selectedCourse, selectedSubject, studiedSubjects }: Prop
                     <Slider
                       value={[voiceSettings.rate * 100]}
                       onValueChange={([v]) => updateVoiceSetting("rate", v / 100)}
-                      min={50}
-                      max={150}
-                      step={5}
-                      className="w-full"
+                      min={50} max={150} step={5} className="w-full"
                     />
                   </div>
-
-                  {/* Test button */}
                   <button
                     onClick={() => speak("This is how I will read questions and explain answers during your quiz.", voiceSettings)}
                     className="w-full py-2 rounded-xl bg-accent/10 text-accent text-xs font-display font-semibold border border-accent/20"
@@ -381,7 +481,7 @@ const MemoryScreen = ({ selectedCourse, selectedSubject, studiedSubjects }: Prop
         )}
       </AnimatePresence>
 
-      {/* Speaking indicator during quiz */}
+      {/* Speaking indicator */}
       {quizStarted && !done && voiceActive && (
         <motion.div
           initial={{ opacity: 0, y: -5 }}
@@ -402,29 +502,25 @@ const MemoryScreen = ({ selectedCourse, selectedSubject, studiedSubjects }: Prop
             {waitingForExplanation ? "Explaining answer..." : "Reading question..."}
           </span>
           {waitingForExplanation && (
-            <button
-              onClick={skipExplanation}
-              className="text-[10px] text-muted-foreground font-display underline ml-1"
-            >
+            <button onClick={skipExplanation} className="text-[10px] text-muted-foreground font-display underline ml-1">
               Skip
             </button>
           )}
         </motion.div>
       )}
 
-      {/* Main Tabs */}
-      <div className="flex gap-1.5 mb-4">
-        {([
-          { id: "quiz" as TabView, label: "📝 Quiz" },
-          { id: "conversation" as TabView, label: "💬 Chat" },
-          { id: "performance" as TabView, label: "📊 Stats" },
-          { id: "upload" as TabView, label: "📤 Upload" },
-        ]).map((t) => (
+      {/* Main 4 Tab Navigation */}
+      <div className="flex gap-1 mb-4">
+        {tabIcons.map((t) => (
           <button
             key={t.id}
-            onClick={() => { setTabView(t.id); stopVoice(); }}
-            className={`flex-1 py-2 rounded-xl text-xs font-display font-semibold transition-all ${
-              tabView === t.id ? "bg-primary text-primary-foreground" : "glass-card text-muted-foreground"
+            onClick={() => {
+              setMainTab(t.id);
+              stopVoice();
+              if (t.id !== "quiz") { setQuizStarted(false); setDone(false); }
+            }}
+            className={`flex-1 py-2.5 rounded-xl text-xs font-display font-semibold transition-all ${
+              mainTab === t.id ? "bg-primary text-primary-foreground shadow-lg" : "glass-card text-muted-foreground"
             }`}
           >
             {t.label}
@@ -432,163 +528,189 @@ const MemoryScreen = ({ selectedCourse, selectedSubject, studiedSubjects }: Prop
         ))}
       </div>
 
-      {/* ─── CONVERSATION TAB ─── */}
-      {tabView === "conversation" && (
+      {/* ═══════════════════ REVISION TAB ═══════════════════ */}
+      {mainTab === "revision" && (
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+          {revisionSubject ? (
+            <RevisionView
+              subject={revisionSubject}
+              onClose={() => setRevisionSubject(null)}
+              onCompleted={() => toast.success(`🎉 ${revisionSubject} revision complete! Great memory work.`)}
+            />
+          ) : (
+            <div className="space-y-4">
+              {/* Weak areas banner */}
+              {weakSubjects.length > 0 && (
+                <div className="glass-card p-3 border-destructive/20">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Target size={14} className="text-destructive" />
+                    <span className="text-xs font-display font-bold text-foreground">Needs More Revision</span>
+                  </div>
+                  <div className="flex flex-wrap gap-1.5">
+                    {weakSubjects.map((subj) => (
+                      <button
+                        key={subj}
+                        onClick={() => revisionBySubject[subj] ? setRevisionSubject(subj) : toast.info("No revision cards available yet")}
+                        className="px-3 py-1.5 rounded-lg bg-destructive/10 text-destructive text-[11px] font-display font-semibold transition-all hover:bg-destructive/20"
+                      >
+                        🎯 {subj} ({getSubjectAccuracy(subj)}%)
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Recently studied */}
+              {studiedSubjects.length > 0 && (
+                <div className="glass-card p-3">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Clock size={14} className="text-secondary" />
+                    <span className="text-xs font-display font-bold text-foreground">Recently Studied</span>
+                  </div>
+                  <div className="flex flex-wrap gap-1.5">
+                    {studiedSubjects.slice(-6).reverse().map((subj) => (
+                      <button
+                        key={subj}
+                        onClick={() => revisionBySubject[subj] ? setRevisionSubject(subj) : toast.info("No revision cards for this topic")}
+                        className="px-3 py-1.5 rounded-lg bg-secondary/10 text-secondary text-[11px] font-display font-semibold transition-all hover:bg-secondary/20"
+                      >
+                        ✅ {subj}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* All subjects for revision */}
+              <div>
+                <h3 className="text-sm font-display font-bold text-foreground mb-3 flex items-center gap-2">
+                  <BookOpen size={14} className="text-primary" />
+                  All Revision Topics
+                </h3>
+                <div className="grid grid-cols-2 gap-2 max-h-[50vh] overflow-y-auto">
+                  {availableRevisionSubjects.map((subj) => {
+                    const cards = revisionBySubject[subj];
+                    if (!cards || cards.length === 0) return null;
+                    const acc = getSubjectAccuracy(subj);
+                    const isWeak = weakSubjects.includes(subj);
+                    const isStudied = studiedSubjects.includes(subj);
+                    return (
+                      <motion.button
+                        key={subj}
+                        onClick={() => setRevisionSubject(subj)}
+                        className={`glass-card p-3 text-left transition-all ${
+                          isWeak ? "border-destructive/20" : isStudied ? "border-primary/20" : ""
+                        }`}
+                        whileTap={{ scale: 0.97 }}
+                      >
+                        <p className="text-xs font-display font-semibold text-foreground truncate">{subj}</p>
+                        <div className="flex items-center justify-between mt-1.5">
+                          <span className="text-[10px] text-muted-foreground font-display">{cards.length} cards</span>
+                          {acc > 0 && (
+                            <span className={`text-[10px] font-display font-bold ${acc >= 70 ? "text-green-400" : acc >= 40 ? "text-yellow-400" : "text-destructive"}`}>
+                              {acc}%
+                            </span>
+                          )}
+                        </div>
+                        {isWeak && <span className="text-[9px] text-destructive font-display">⚠ Weak</span>}
+                      </motion.button>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+          )}
+        </motion.div>
+      )}
+
+      {/* ═══════════════════ CHAT TAB ═══════════════════ */}
+      {mainTab === "chat" && (
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
           <ConversationMode
             subject={activeQuizSubject || (selectedCourse ? selectedCourse.charAt(0).toUpperCase() + selectedCourse.slice(1) : null)}
-            onBack={() => setTabView("quiz")}
+            onBack={() => setMainTab("revision")}
           />
         </motion.div>
       )}
 
-      {/* ─── UPLOAD TAB ─── */}
-      {tabView === "upload" && (
+      {/* ═══════════════════ UPLOAD TAB ═══════════════════ */}
+      {mainTab === "upload" && (
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
-          <div className="glass-card p-6 text-center">
-            <Upload size={40} className="mx-auto text-primary mb-3" />
-            <h3 className="font-display font-bold text-foreground mb-2">Upload Study Material</h3>
-            <p className="text-xs text-muted-foreground mb-4">
-              Upload PDFs or photos of your notes. AI will extract key concepts and generate quizzes.
-            </p>
-            <div className="grid grid-cols-2 gap-3">
-              <motion.button
-                onClick={() => handleUploadFile("pdf")}
-                className="glass-card p-4 flex flex-col items-center gap-2"
-                whileTap={{ scale: 0.95 }}
-              >
-                <FileText size={24} className="text-secondary" />
-                <span className="text-xs font-display text-foreground">Upload PDF</span>
-              </motion.button>
-              <motion.button
-                onClick={() => handleUploadFile("image")}
-                className="glass-card p-4 flex flex-col items-center gap-2"
-                whileTap={{ scale: 0.95 }}
-              >
-                <Camera size={24} className="text-accent" />
-                <span className="text-xs font-display text-foreground">Take Photo</span>
-              </motion.button>
-            </div>
-          </div>
-
-          {uploadedFiles.length > 0 && (
-            <div className="glass-card p-4">
-              <h4 className="font-display font-semibold text-foreground text-sm mb-3">📁 Uploaded Files</h4>
-              <div className="space-y-2">
-                {uploadedFiles.map((f, i) => (
-                  <div key={i} className="flex items-center gap-3 bg-muted/50 rounded-xl p-3">
-                    {f.type === "pdf" ? <FileText size={16} className="text-secondary" /> : <Camera size={16} className="text-accent" />}
-                    <span className="text-xs text-foreground font-display flex-1 truncate">{f.name}</span>
-                    <span className="text-[10px] text-muted-foreground">Analyzing...</span>
-                  </div>
-                ))}
-              </div>
-              <p className="text-[10px] text-muted-foreground mt-3 text-center">
-                ⚡ Enable Lovable Cloud for real AI analysis
-              </p>
-            </div>
-          )}
-        </motion.div>
-      )}
-
-      {/* ─── PERFORMANCE TAB ─── */}
-      {tabView === "performance" && (
-        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
-          {/* Overview */}
-          <div className="grid grid-cols-3 gap-3">
-            <div className="glass-card p-3 text-center">
-              <p className="text-2xl font-display font-bold text-primary">{overallAccuracy}%</p>
-              <p className="text-[10px] text-muted-foreground font-display">Accuracy</p>
-            </div>
-            <div className="glass-card p-3 text-center">
-              <p className="text-2xl font-display font-bold text-secondary">{perfData.totalQuizzesTaken}</p>
-              <p className="text-[10px] text-muted-foreground font-display">Quizzes</p>
-            </div>
-            <div className="glass-card p-3 text-center">
-              <p className="text-2xl font-display font-bold text-accent">{perfData.streak}🔥</p>
-              <p className="text-[10px] text-muted-foreground font-display">Streak</p>
-            </div>
-          </div>
-
-          {/* Weak Topics */}
-          {weakSubjects.length > 0 && (
-            <div className="glass-card p-4">
-              <h4 className="font-display font-semibold text-foreground text-sm mb-3 flex items-center gap-2">
-                <Target size={14} className="text-destructive" /> Weak Areas — Focus Here
-              </h4>
-              <div className="space-y-2">
-                {weakSubjects.map((subj) => {
-                  const acc = getSubjectAccuracy(subj);
-                  return (
-                    <div key={subj} className="flex items-center gap-3">
-                      <span className="text-xs text-foreground font-display flex-1">{subj}</span>
-                      <div className="w-20 h-2 rounded-full bg-muted overflow-hidden">
-                        <div
-                          className={`h-full rounded-full ${acc < 50 ? "bg-destructive" : "bg-yellow-500"}`}
-                          style={{ width: `${acc}%` }}
-                        />
-                      </div>
-                      <span className="text-xs text-muted-foreground w-8 text-right">{acc}%</span>
-                    </div>
-                  );
-                })}
-              </div>
-              <button
-                onClick={() => {
-                  setQuizSource("weak");
-                  setTabView("quiz");
-                  startQuiz("weak");
-                }}
-                className="w-full mt-3 py-2 rounded-xl bg-destructive/20 text-destructive text-xs font-display font-semibold"
-              >
-                🎯 Practice Weak Topics
-              </button>
-            </div>
-          )}
-
-          {/* Subject-wise breakdown */}
+          {/* Upload component */}
           <div className="glass-card p-4">
-            <h4 className="font-display font-semibold text-foreground text-sm mb-3 flex items-center gap-2">
-              <BarChart3 size={14} className="text-primary" /> Subject Performance
-            </h4>
-            {Object.values(perfData.subjects).length === 0 ? (
-              <p className="text-xs text-muted-foreground text-center py-4">Take a quiz to see your stats!</p>
-            ) : (
-              <div className="space-y-2 max-h-64 overflow-y-auto">
-                {Object.values(perfData.subjects)
-                  .sort((a, b) => b.attempts - a.attempts)
-                  .map((s) => {
-                    const acc = s.totalQuestions > 0 ? Math.round((s.correctAnswers / s.totalQuestions) * 100) : 0;
-                    return (
-                      <div key={s.subject} className="bg-muted/30 rounded-xl p-3">
-                        <div className="flex justify-between items-center mb-1">
-                          <span className="text-xs font-display text-foreground font-semibold">{s.subject}</span>
-                          <span className="text-[10px] text-muted-foreground">{s.attempts} attempts</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <div className="flex-1 h-2 rounded-full bg-muted overflow-hidden">
-                            <div
-                              className={`h-full rounded-full ${acc >= 80 ? "bg-green-500" : acc >= 50 ? "bg-yellow-500" : "bg-destructive"}`}
-                              style={{ width: `${acc}%` }}
-                            />
-                          </div>
-                          <span className="text-xs text-foreground font-bold w-10 text-right">{acc}%</span>
-                        </div>
-                      </div>
-                    );
-                  })}
+            <div className="flex items-center gap-2 mb-3">
+              <Upload size={18} className="text-primary" />
+              <h3 className="font-display font-bold text-foreground text-sm">Upload Study Material</h3>
+            </div>
+            <p className="text-xs text-muted-foreground mb-4 font-display">
+              Upload PDFs or images. AI will extract text and generate summaries & quizzes from your notes.
+            </p>
+            <StudyMaterialUpload onTextExtracted={setExtractedText} />
+          </div>
+
+          {/* Extracted content preview */}
+          {extractedText && (
+            <div className="glass-card p-4">
+              <div className="flex items-center gap-2 mb-2">
+                <FileText size={14} className="text-accent" />
+                <span className="text-xs font-display font-bold text-foreground">Extracted Content</span>
               </div>
-            )}
+              <div className="bg-muted/30 rounded-xl p-3 max-h-40 overflow-y-auto">
+                <p className="text-[11px] text-foreground/80 font-display leading-relaxed whitespace-pre-wrap">
+                  {extractedText.slice(0, 1000)}{extractedText.length > 1000 ? "..." : ""}
+                </p>
+              </div>
+              <div className="flex gap-2 mt-3">
+                <button
+                  onClick={() => {
+                    setMainTab("quiz");
+                    toast.info("💡 Enable Lovable Cloud for AI-powered quiz generation from uploads", { duration: 5000 });
+                  }}
+                  className="flex-1 py-2 rounded-xl bg-primary/10 text-primary text-xs font-display font-semibold"
+                >
+                  📝 Generate Quiz
+                </button>
+                <button
+                  onClick={() => toast.info("💡 Enable Lovable Cloud for AI-powered summaries", { duration: 5000 })}
+                  className="flex-1 py-2 rounded-xl bg-accent/10 text-accent text-xs font-display font-semibold"
+                >
+                  📋 Summarize
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Tips */}
+          <div className="glass-card p-3">
+            <p className="text-[10px] text-muted-foreground font-display text-center">
+              💡 Tip: Upload your textbook pages or handwritten notes. AI will analyze them to create personalized revision material and quizzes.
+            </p>
           </div>
         </motion.div>
       )}
 
-      {/* ─── QUIZ TAB ─── */}
-      {tabView === "quiz" && (
+      {/* ═══════════════════ QUIZ TAB ═══════════════════ */}
+      {mainTab === "quiz" && (
         <>
           {/* Quiz source selector */}
           {!quizStarted && (
             <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
+              {/* Performance summary */}
+              <div className="grid grid-cols-3 gap-2">
+                <div className="glass-card p-2.5 text-center">
+                  <p className="text-lg font-display font-bold text-primary">{overallAccuracy}%</p>
+                  <p className="text-[9px] text-muted-foreground font-display">Accuracy</p>
+                </div>
+                <div className="glass-card p-2.5 text-center">
+                  <p className="text-lg font-display font-bold text-secondary">{perfData.totalQuizzesTaken}</p>
+                  <p className="text-[9px] text-muted-foreground font-display">Quizzes</p>
+                </div>
+                <div className="glass-card p-2.5 text-center">
+                  <p className="text-lg font-display font-bold text-accent">{perfData.streak}🔥</p>
+                  <p className="text-[9px] text-muted-foreground font-display">Streak</p>
+                </div>
+              </div>
+
               {/* Voice info banner */}
               {voiceSettings.enabled && (
                 <div className="glass-card p-3 flex items-center gap-3 border-accent/20">
@@ -596,11 +718,9 @@ const MemoryScreen = ({ selectedCourse, selectedSubject, studiedSubjects }: Prop
                     <Mic size={14} className="text-accent" />
                   </div>
                   <div>
-                    <p className="text-xs font-display font-semibold text-foreground">
-                      🎙️ Voice Mode Active
-                    </p>
+                    <p className="text-xs font-display font-semibold text-foreground">🎙️ Voice Mode Active</p>
                     <p className="text-[10px] text-muted-foreground">
-                      {voiceSettings.gender === "female" ? "👩‍🏫" : "👨‍🏫"} {voiceSettings.gender.charAt(0).toUpperCase() + voiceSettings.gender.slice(1)} voice will read questions & explain answers
+                      {voiceSettings.gender === "female" ? "👩‍🏫" : "👨‍🏫"} voice will read questions & explain answers
                     </p>
                   </div>
                 </div>
@@ -617,7 +737,7 @@ const MemoryScreen = ({ selectedCourse, selectedSubject, studiedSubjects }: Prop
                   <motion.button
                     key={s.id}
                     onClick={() => {
-                      if (s.id === "upload") { setTabView("upload"); return; }
+                      if (s.id === "upload") { setMainTab("upload"); return; }
                       setQuizSource(s.id);
                     }}
                     className={`glass-card p-3 text-left transition-all ${
@@ -637,7 +757,7 @@ const MemoryScreen = ({ selectedCourse, selectedSubject, studiedSubjects }: Prop
                   {studiedSubjects.length === 0 ? (
                     <div className="glass-card p-4 text-center">
                       <BookOpen size={24} className="mx-auto text-muted-foreground mb-2" />
-                      <p className="text-xs text-muted-foreground font-display">Complete revision cards in Study tab first</p>
+                      <p className="text-xs text-muted-foreground font-display">Complete revision cards first</p>
                     </div>
                   ) : (
                     <div className="flex flex-wrap gap-2">
@@ -654,6 +774,20 @@ const MemoryScreen = ({ selectedCourse, selectedSubject, studiedSubjects }: Prop
                       ))}
                     </div>
                   )}
+                </div>
+              )}
+
+              {/* Weak areas detail */}
+              {quizSource === "weak" && weakSubjects.length > 0 && (
+                <div className="glass-card p-3">
+                  <p className="text-[10px] text-muted-foreground font-display mb-2">Weak topics detected:</p>
+                  {weakSubjects.map((subj) => (
+                    <div key={subj} className="flex items-center gap-2 py-1">
+                      <Target size={12} className="text-destructive" />
+                      <span className="text-xs text-foreground font-display flex-1">{subj}</span>
+                      <span className="text-[10px] text-destructive font-display font-bold">{getSubjectAccuracy(subj)}%</span>
+                    </div>
+                  ))}
                 </div>
               )}
 
@@ -690,7 +824,6 @@ const MemoryScreen = ({ selectedCourse, selectedSubject, studiedSubjects }: Prop
           {/* Active Quiz */}
           {quizStarted && !done && quizzes.length > 0 && (
             <>
-              {/* Progress bar */}
               <div className="flex items-center gap-1.5 mb-4">
                 {quizzes.map((_, i) => (
                   <div
@@ -702,7 +835,6 @@ const MemoryScreen = ({ selectedCourse, selectedSubject, studiedSubjects }: Prop
                 ))}
               </div>
 
-              {/* Score badge */}
               <div className="flex items-center justify-between mb-3">
                 <span className="text-xs text-muted-foreground font-display">
                   📚 {label} {quizSource === "weak" ? "(Weak Areas)" : ""}
@@ -720,11 +852,8 @@ const MemoryScreen = ({ selectedCourse, selectedSubject, studiedSubjects }: Prop
                   animate={{ x: 0, opacity: 1 }}
                   exit={{ x: -30, opacity: 0 }}
                 >
-                  {/* Question meta */}
                   <div className="flex items-center gap-2 mb-1">
-                    <span className="text-[10px] text-muted-foreground font-display">
-                      Q{current + 1}/{quizzes.length}
-                    </span>
+                    <span className="text-[10px] text-muted-foreground font-display">Q{current + 1}/{quizzes.length}</span>
                     <span className={`text-[10px] font-display font-semibold px-1.5 py-0.5 rounded-md bg-muted/50 ${getDifficultyColor(quizzes[current].difficulty)}`}>
                       {quizzes[current].difficulty || "easy"}
                     </span>
@@ -738,7 +867,6 @@ const MemoryScreen = ({ selectedCourse, selectedSubject, studiedSubjects }: Prop
                           readQuestion(quizzes[current].q, voiceSettings, () => setVoiceActive(false));
                         }}
                         className="ml-auto text-accent"
-                        title="Re-read question"
                       >
                         <Volume2 size={14} />
                       </button>
@@ -782,7 +910,6 @@ const MemoryScreen = ({ selectedCourse, selectedSubject, studiedSubjects }: Prop
                     })}
                   </div>
 
-                  {/* Explanation text shown while voice explains */}
                   {selected !== null && voiceSettings.enabled && (
                     <motion.div
                       initial={{ opacity: 0, y: 5 }}
@@ -822,7 +949,6 @@ const MemoryScreen = ({ selectedCourse, selectedSubject, studiedSubjects }: Prop
                 </p>
               </div>
 
-              {/* Round review */}
               <div className="glass-card p-4 max-h-48 overflow-y-auto">
                 <h4 className="text-xs font-display font-semibold text-foreground mb-2">Review:</h4>
                 {roundHistory.map((r, i) => (
@@ -833,7 +959,6 @@ const MemoryScreen = ({ selectedCourse, selectedSubject, studiedSubjects }: Prop
                 ))}
               </div>
 
-              {/* Actions */}
               <div className="grid grid-cols-2 gap-3">
                 <motion.button
                   onClick={handleNextRound}
@@ -850,6 +975,42 @@ const MemoryScreen = ({ selectedCourse, selectedSubject, studiedSubjects }: Prop
                   ← Back to Menu
                 </motion.button>
               </div>
+
+              {/* Recommendation after quiz */}
+              {score < quizzes.length * 0.7 && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.5 }}
+                  className="glass-card p-3 border-accent/20"
+                >
+                  <div className="flex items-center gap-2">
+                    <Lightbulb size={14} className="text-accent" />
+                    <span className="text-xs font-display font-bold text-foreground">💡 Suggestion</span>
+                  </div>
+                  <p className="text-[10px] text-muted-foreground font-display mt-1">
+                    Try revising the flashcards for this topic before attempting another quiz. Revision + Sleep = Better Memory! 🌙
+                  </p>
+                  <button
+                    onClick={() => {
+                      const subj = activeQuizSubject || "Mathematics";
+                      if (revisionBySubject[subj]) {
+                        setMainTab("revision");
+                        setRevisionSubject(subj);
+                        setQuizStarted(false);
+                        setDone(false);
+                      } else {
+                        setMainTab("revision");
+                        setQuizStarted(false);
+                        setDone(false);
+                      }
+                    }}
+                    className="mt-2 w-full py-2 rounded-xl bg-accent/10 text-accent text-xs font-display font-semibold"
+                  >
+                    📚 Go to Revision
+                  </button>
+                </motion.div>
+              )}
             </motion.div>
           )}
         </>
