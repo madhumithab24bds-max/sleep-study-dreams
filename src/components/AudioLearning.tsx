@@ -1,11 +1,11 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { BookOpen, Play, Pause, Volume2, Timer, Plus, X, ChevronDown, Music } from "lucide-react";
+import { BookOpen, Play, Pause, RotateCcw, Volume2, VolumeX, Timer, Plus, X, ChevronDown, Music } from "lucide-react";
 import { useState, useEffect, useRef, useCallback } from "react";
 import { toast } from "sonner";
 import { revisionBySubject } from "@/lib/revisionData";
-import { loadVoiceSettings } from "@/lib/voiceEngine";
 import { playAudio, stopAudio } from "@/lib/audioEngine";
 import StudyMaterialUpload from "./StudyMaterialUpload";
+import { Switch } from "./ui/switch";
 
 const ALL_SUBJECTS = Object.keys(revisionBySubject);
 
@@ -54,14 +54,20 @@ const AudioLearning = () => {
   const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
   const [showTopicPicker, setShowTopicPicker] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [isPlaying, setIsPlaying] = useState(false);
+
+  // Narration state
+  const [narrationState, setNarrationState] = useState<"idle" | "playing" | "paused">("idle");
   const [volume, setVolume] = useState(50);
+  const [currentLineIdx, setCurrentLineIdx] = useState(0);
+  const [progress, setProgress] = useState(0);
+
+  // Background audio state
+  const [bgEnabled, setBgEnabled] = useState(true);
   const [bgVolume, setBgVolume] = useState(20);
   const [bgSound, setBgSound] = useState("alpha-waves");
   const [showBgPicker, setShowBgPicker] = useState(false);
+
   const [durationIdx, setDurationIdx] = useState(1);
-  const [currentLineIdx, setCurrentLineIdx] = useState(0);
-  const [progress, setProgress] = useState(0);
   const [customNote, setCustomNote] = useState("");
   const [uploadedText, setUploadedText] = useState("");
 
@@ -72,7 +78,7 @@ const AudioLearning = () => {
   const playingRef = useRef(false);
   const resumeIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  // Preload voices on mount
+  // Preload voices
   useEffect(() => {
     const loadVoices = () => speechSynthesis.getVoices();
     loadVoices();
@@ -96,33 +102,43 @@ const AudioLearning = () => {
     setSelectedTopics((prev) => prev.filter((t) => t !== topic));
   };
 
-  const stopPlayback = useCallback(() => {
+  // --- Background audio control ---
+  useEffect(() => {
+    if (bgEnabled && narrationState !== "idle") {
+      playAudio(bgSound, bgVolume);
+    } else {
+      stopAudio();
+    }
+  }, [bgEnabled, bgSound, bgVolume, narrationState]);
+
+  // --- Narration helpers ---
+  const stopNarration = useCallback(() => {
     playingRef.current = false;
     speechSynthesis.cancel();
-    stopAudio();
     if (timerRef.current) clearTimeout(timerRef.current);
     if (resumeIntervalRef.current) clearInterval(resumeIntervalRef.current);
-    setIsPlaying(false);
+    setNarrationState("idle");
     setProgress(0);
     setCurrentLineIdx(0);
+    // Also stop background
+    stopAudio();
   }, []);
 
   const speakLine = useCallback((lines: string[], index: number) => {
     if (!playingRef.current || index >= lines.length) {
       const elapsed = Date.now() - startTimeRef.current;
       if (playingRef.current && elapsed < duration.seconds * 1000) {
-        // Loop back to start
         speakLine(lines, 0);
         return;
       }
-      stopPlayback();
+      stopNarration();
       toast.success("Audio learning session completed! 🎉");
       return;
     }
 
     const elapsed = Date.now() - startTimeRef.current;
     if (elapsed >= duration.seconds * 1000) {
-      stopPlayback();
+      stopNarration();
       toast.success("Audio learning session completed! 🎉");
       return;
     }
@@ -130,22 +146,17 @@ const AudioLearning = () => {
     setCurrentLineIdx(index);
     setProgress(Math.min(100, (elapsed / (duration.seconds * 1000)) * 100));
 
-    const voiceSettings = loadVoiceSettings();
-
-    // Cancel any pending speech first
     speechSynthesis.cancel();
 
     const utterance = new SpeechSynthesisUtterance(lines[index]);
     utterance.volume = Math.max(0.1, Math.min(1, volume / 100));
-    utterance.rate = 0.8;
-    utterance.pitch = 1.1;
+    utterance.rate = 0.85;
+    utterance.pitch = 1.05;
 
     const voices = speechSynthesis.getVoices();
     const englishVoices = voices.filter((v) => v.lang.startsWith("en"));
-    
-    // Prefer a female voice by name hints
     const femaleNames = ["samantha", "victoria", "karen", "fiona", "moira", "tessa", "zira", "susan", "female", "google us english", "google uk english female"];
-    const femaleVoice = englishVoices.find((v) => 
+    const femaleVoice = englishVoices.find((v) =>
       femaleNames.some((name) => v.name.toLowerCase().includes(name))
     );
     const chosenVoice = femaleVoice || englishVoices[0];
@@ -159,40 +170,26 @@ const AudioLearning = () => {
     utterance.onerror = (e) => {
       console.warn("TTS error on line", index, e.error);
       if (!playingRef.current) return;
-      // Retry the same line once, then skip
       timerRef.current = setTimeout(() => speakLine(lines, index + 1), 500);
     };
 
     utteranceRef.current = utterance;
-    
-    // Small delay to ensure cancel() completed
+
     setTimeout(() => {
       if (playingRef.current) {
         speechSynthesis.speak(utterance);
       }
     }, 50);
-  }, [volume, duration, stopPlayback]);
+  }, [volume, duration, stopNarration]);
 
-  const startPlayback = useCallback(() => {
-    if (selectedTopics.length === 0 && !customNote.trim() && !uploadedText.trim()) {
-      toast.error("Please select topics, add notes, or upload study materials");
-      return;
-    }
-
-    // Cancel any existing speech
-    speechSynthesis.cancel();
-
+  const buildLines = useCallback(() => {
     const lines: string[] = [];
 
-    // Add uploaded material content FIRST (priority)
     if (uploadedText.trim()) {
       lines.push("Let's begin with your uploaded study material.");
-      // Split by sentences more carefully, keeping chunks readable
       const cleaned = uploadedText.replace(/\s+/g, " ").trim();
       const sentences = cleaned.split(/(?<=[.!?])\s+/).filter((s) => s.trim().length > 2);
-      
       if (sentences.length > 0) {
-        // Group into chunks of ~100 chars for natural TTS pacing
         let chunk = "";
         for (const sentence of sentences) {
           if (chunk.length + sentence.length > 150 && chunk.length > 0) {
@@ -207,11 +204,9 @@ const AudioLearning = () => {
       lines.push("That completes your uploaded material. Well done!");
     }
 
-    // Add revision from selected topics
     const topicLines = buildRevisionScript(selectedTopics);
     lines.push(...topicLines);
 
-    // Add custom notes as spoken content
     if (customNote.trim()) {
       lines.push("Now let's go through your personal study notes.");
       const sentences = customNote.split(/[.!?\n]+/).filter((s) => s.trim().length > 2);
@@ -219,50 +214,99 @@ const AudioLearning = () => {
       lines.push("Those were your personal notes. Great job revising!");
     }
 
+    return lines;
+  }, [selectedTopics, customNote, uploadedText]);
+
+  const startPlayback = useCallback(() => {
+    const lines = buildLines();
     if (lines.length === 0) {
-      toast.error("No content available to revise");
+      toast.error("Please select topics, add notes, or upload study materials");
       return;
     }
 
-    console.log(`[AudioLearning] Starting with ${lines.length} lines`);
-    
+    speechSynthesis.cancel();
     linesRef.current = lines;
     playingRef.current = true;
     startTimeRef.current = Date.now();
-    setIsPlaying(true);
+    setNarrationState("playing");
     setCurrentLineIdx(0);
 
-    // Start background audio
-    playAudio(bgSound, bgVolume);
+    // Start background audio if enabled
+    if (bgEnabled) {
+      playAudio(bgSound, bgVolume);
+    }
 
-    // Chrome workaround: periodically resume speech synthesis
+    // Chrome workaround
     resumeIntervalRef.current = setInterval(() => {
       if (speechSynthesis.speaking && speechSynthesis.paused) {
         speechSynthesis.resume();
       }
     }, 3000);
 
-    // Start speaking immediately
     speakLine(lines, 0);
     toast.success(`Audio learning started — ${lines.length} sections for ${duration.label}`);
-  }, [selectedTopics, customNote, uploadedText, bgSound, bgVolume, duration, speakLine]);
+  }, [buildLines, bgEnabled, bgSound, bgVolume, duration, speakLine]);
 
-  // Update background sound while playing
-  useEffect(() => {
-    if (isPlaying) {
+  const pauseNarration = useCallback(() => {
+    if (speechSynthesis.speaking) {
+      speechSynthesis.pause();
+    }
+    playingRef.current = false;
+    if (timerRef.current) clearTimeout(timerRef.current);
+    setNarrationState("paused");
+  }, []);
+
+  const resumeNarration = useCallback(() => {
+    playingRef.current = true;
+    setNarrationState("playing");
+
+    if (speechSynthesis.paused) {
+      speechSynthesis.resume();
+    } else {
+      // Re-speak from current line
+      speakLine(linesRef.current, currentLineIdx);
+    }
+
+    // Restart background if enabled
+    if (bgEnabled) {
       playAudio(bgSound, bgVolume);
     }
-  }, [bgVolume, bgSound, isPlaying]);
+  }, [currentLineIdx, speakLine, bgEnabled, bgSound, bgVolume]);
+
+  const replayNarration = useCallback(() => {
+    speechSynthesis.cancel();
+    if (timerRef.current) clearTimeout(timerRef.current);
+
+    const lines = linesRef.current.length > 0 ? linesRef.current : buildLines();
+    if (lines.length === 0) {
+      toast.error("No content to replay");
+      return;
+    }
+
+    linesRef.current = lines;
+    playingRef.current = true;
+    startTimeRef.current = Date.now();
+    setNarrationState("playing");
+    setCurrentLineIdx(0);
+    setProgress(0);
+
+    if (bgEnabled) {
+      playAudio(bgSound, bgVolume);
+    }
+
+    speakLine(lines, 0);
+    toast.success("Replaying from the beginning 🔄");
+  }, [buildLines, bgEnabled, bgSound, bgVolume, speakLine]);
 
   // Progress updater
   useEffect(() => {
-    if (!isPlaying) return;
+    if (narrationState !== "playing") return;
     const interval = setInterval(() => {
       const elapsed = Date.now() - startTimeRef.current;
       setProgress(Math.min(100, (elapsed / (duration.seconds * 1000)) * 100));
     }, 1000);
     return () => clearInterval(interval);
-  }, [isPlaying, duration]);
+  }, [narrationState, duration]);
 
   // Cleanup on unmount
   useEffect(() => {
@@ -274,6 +318,8 @@ const AudioLearning = () => {
       if (resumeIntervalRef.current) clearInterval(resumeIntervalRef.current);
     };
   }, []);
+
+  const isActive = narrationState !== "idle";
 
   return (
     <div className="space-y-4 mb-6">
@@ -358,10 +404,10 @@ const AudioLearning = () => {
         </div>
       </div>
 
-      {/* Controls - always visible */}
+      {/* Narration Controls */}
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="glass-card p-4 space-y-4">
         {/* Progress bar */}
-        {isPlaying && (
+        {isActive && (
           <div className="space-y-2">
             <div className="w-full h-1.5 rounded-full bg-muted/30 overflow-hidden">
               <motion.div className="h-full bg-primary rounded-full" style={{ width: `${progress}%` }} transition={{ duration: 0.5 }} />
@@ -372,87 +418,128 @@ const AudioLearning = () => {
           </div>
         )}
 
-        {/* Tap button */}
-        <div className="flex justify-center">
+        {/* Play / Pause / Replay controls */}
+        <div className="flex items-center justify-center gap-4">
+          {/* Replay */}
           <motion.button
-            onClick={isPlaying ? stopPlayback : startPlayback}
+            onClick={replayNarration}
             whileTap={{ scale: 0.9 }}
-            animate={isPlaying ? { scale: [1, 1.05, 1] } : {}}
-            transition={isPlaying ? { repeat: Infinity, duration: 2 } : { type: "spring", stiffness: 400 }}
-            className={`w-28 h-28 rounded-full flex flex-col items-center justify-center font-display font-bold text-sm transition-all shadow-lg ${
-              isPlaying
+            disabled={!isActive && linesRef.current.length === 0}
+            className="w-11 h-11 rounded-full flex items-center justify-center bg-muted/20 text-muted-foreground hover:bg-muted/40 disabled:opacity-30 transition-all"
+            title="Replay from start"
+          >
+            <RotateCcw size={18} />
+          </motion.button>
+
+          {/* Main Play/Pause */}
+          <motion.button
+            onClick={() => {
+              if (narrationState === "idle") startPlayback();
+              else if (narrationState === "playing") pauseNarration();
+              else resumeNarration();
+            }}
+            whileTap={{ scale: 0.9 }}
+            animate={narrationState === "playing" ? { scale: [1, 1.05, 1] } : {}}
+            transition={narrationState === "playing" ? { repeat: Infinity, duration: 2 } : { type: "spring", stiffness: 400 }}
+            className={`w-16 h-16 rounded-full flex items-center justify-center font-display font-bold text-sm shadow-lg transition-all ${
+              narrationState === "playing"
                 ? "bg-destructive/20 text-destructive border-2 border-destructive/30"
                 : "bg-primary/20 text-primary border-2 border-primary/30 hover:bg-primary/30"
             }`}
           >
-            {isPlaying ? <Pause size={28} /> : <Play size={28} className="ml-1" />}
-            <span className="text-[10px] mt-1">{isPlaying ? "Stop" : "Play"}</span>
+            {narrationState === "playing" ? <Pause size={24} /> : <Play size={24} className="ml-0.5" />}
           </motion.button>
+
+          {/* Stop */}
+          {isActive && (
+            <motion.button
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              onClick={stopNarration}
+              whileTap={{ scale: 0.9 }}
+              className="w-11 h-11 rounded-full flex items-center justify-center bg-destructive/10 text-destructive hover:bg-destructive/20 transition-all"
+              title="Stop"
+            >
+              <X size={18} />
+            </motion.button>
+          )}
         </div>
 
-        {/* Background Sound Selector */}
+        {/* Background Sound Toggle + Selector */}
         <div className="space-y-2">
-          <button
-            onClick={() => setShowBgPicker(!showBgPicker)}
-            className="w-full flex items-center justify-between p-3 rounded-xl bg-muted/20 hover:bg-muted/30 transition-all"
-          >
+          <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Music size={14} className="text-secondary" />
-              <span className="text-xs font-display text-foreground">Background Sound</span>
+              {bgEnabled ? <Volume2 size={14} className="text-secondary" /> : <VolumeX size={14} className="text-muted-foreground" />}
+              <span className="text-xs font-display text-foreground">Background Audio</span>
             </div>
-            <span className="text-xs font-display text-muted-foreground">
-              {currentBg.emoji} {currentBg.label}
-            </span>
-          </button>
+            <Switch checked={bgEnabled} onCheckedChange={setBgEnabled} />
+          </div>
 
-          <AnimatePresence>
-            {showBgPicker && (
-              <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }} className="overflow-hidden">
-                <div className="grid grid-cols-2 gap-1.5 p-1">
-                  {BG_SOUND_OPTIONS.map((sound) => (
-                    <button
-                      key={sound.id}
-                      onClick={() => { setBgSound(sound.id); setShowBgPicker(false); }}
-                      className={`flex items-center gap-2 p-2.5 rounded-xl text-left transition-all ${
-                        bgSound === sound.id ? "bg-primary/20 border border-primary/30" : "bg-muted/10 hover:bg-muted/20 border border-transparent"
-                      }`}
-                    >
-                      <span className="text-base">{sound.emoji}</span>
-                      <div className="min-w-0">
-                        <p className={`text-[11px] font-display font-medium truncate ${bgSound === sound.id ? "text-primary" : "text-foreground"}`}>
-                          {sound.label}
-                        </p>
-                        <p className="text-[9px] text-muted-foreground truncate">{sound.desc}</p>
-                      </div>
-                    </button>
-                  ))}
+          {bgEnabled && (
+            <>
+              <button
+                onClick={() => setShowBgPicker(!showBgPicker)}
+                className="w-full flex items-center justify-between p-3 rounded-xl bg-muted/20 hover:bg-muted/30 transition-all"
+              >
+                <div className="flex items-center gap-2">
+                  <Music size={14} className="text-secondary" />
+                  <span className="text-xs font-display text-foreground">Sound Type</span>
                 </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
+                <span className="text-xs font-display text-muted-foreground">
+                  {currentBg.emoji} {currentBg.label}
+                </span>
+              </button>
+
+              <AnimatePresence>
+                {showBgPicker && (
+                  <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }} className="overflow-hidden">
+                    <div className="grid grid-cols-2 gap-1.5 p-1">
+                      {BG_SOUND_OPTIONS.map((sound) => (
+                        <button
+                          key={sound.id}
+                          onClick={() => { setBgSound(sound.id); setShowBgPicker(false); }}
+                          className={`flex items-center gap-2 p-2.5 rounded-xl text-left transition-all ${
+                            bgSound === sound.id ? "bg-primary/20 border border-primary/30" : "bg-muted/10 hover:bg-muted/20 border border-transparent"
+                          }`}
+                        >
+                          <span className="text-base">{sound.emoji}</span>
+                          <div className="min-w-0">
+                            <p className={`text-[11px] font-display font-medium truncate ${bgSound === sound.id ? "text-primary" : "text-foreground"}`}>
+                              {sound.label}
+                            </p>
+                            <p className="text-[9px] text-muted-foreground truncate">{sound.desc}</p>
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              {/* Background Volume */}
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm">{currentBg.emoji}</span>
+                  <span className="text-xs font-display text-foreground">BG Volume</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <input type="range" min={0} max={60} value={bgVolume} onChange={(e) => setBgVolume(Number(e.target.value))} className="w-20 accent-secondary" />
+                  <span className="text-xs text-muted-foreground font-display w-8 text-right">{bgVolume}%</span>
+                </div>
+              </div>
+            </>
+          )}
         </div>
 
         {/* Voice Volume */}
         <div className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-2">
             <Volume2 size={14} className="text-primary" />
-            <span className="text-xs font-display text-foreground">Voice</span>
+            <span className="text-xs font-display text-foreground">Voice Volume</span>
           </div>
           <div className="flex items-center gap-2">
             <input type="range" min={0} max={100} value={volume} onChange={(e) => setVolume(Number(e.target.value))} className="w-20 accent-primary" />
             <span className="text-xs text-muted-foreground font-display w-8 text-right">{volume}%</span>
-          </div>
-        </div>
-
-        {/* Background Sound Volume */}
-        <div className="flex items-center justify-between gap-3">
-          <div className="flex items-center gap-2">
-            <span className="text-sm">{currentBg.emoji}</span>
-            <span className="text-xs font-display text-foreground">Background</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <input type="range" min={0} max={60} value={bgVolume} onChange={(e) => setBgVolume(Number(e.target.value))} className="w-20 accent-secondary" />
-            <span className="text-xs text-muted-foreground font-display w-8 text-right">{bgVolume}%</span>
           </div>
         </div>
 
@@ -467,7 +554,7 @@ const AudioLearning = () => {
               <button
                 key={opt.label}
                 onClick={() => setDurationIdx(i)}
-                disabled={isPlaying}
+                disabled={isActive}
                 className={`px-2 py-1 rounded-md text-[10px] font-display transition-all ${
                   i === durationIdx ? "bg-primary/20 text-primary font-bold" : "text-muted-foreground hover:bg-muted/30"
                 }`}
