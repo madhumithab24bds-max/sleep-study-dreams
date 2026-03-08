@@ -366,6 +366,87 @@ const ProfileScreen = ({ onLanguageChange }: ProfileScreenProps) => {
         <LogOut size={18} />
         <span className="text-sm font-display font-semibold">Log Out</span>
       </motion.button>
+
+      {/* Payment Modal */}
+      <AnimatePresence>
+        {showPayment && (
+          <motion.div
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setShowPayment(false)}
+          >
+            <motion.div
+              className="glass-card w-full max-w-sm p-6 space-y-5 relative overflow-y-auto max-h-[90vh]"
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <button
+                onClick={() => setShowPayment(false)}
+                className="absolute top-3 right-3 text-muted-foreground hover:text-foreground transition-colors"
+              >
+                <X size={18} />
+              </button>
+
+              <div className="text-center">
+                <div className="w-12 h-12 rounded-2xl bg-primary/20 flex items-center justify-center mx-auto mb-3">
+                  <IndianRupee size={24} className="text-primary" />
+                </div>
+                <h2 className="font-display font-bold text-lg text-foreground">Subscribe to ThukkamTutor</h2>
+                <p className="text-xs text-muted-foreground mt-1">Unlock all premium features</p>
+              </div>
+
+              <div className="glass-card p-4 space-y-2 bg-primary/5 border border-primary/20">
+                <div className="flex justify-between items-center">
+                  <span className="text-sm font-display text-foreground font-semibold">Basic Plan</span>
+                  <span className="text-lg font-display font-bold text-primary">₹50<span className="text-xs text-muted-foreground font-normal">/month</span></span>
+                </div>
+                <ul className="text-xs text-muted-foreground space-y-1">
+                  <li>✅ All study materials (LKG–12 + College)</li>
+                  <li>✅ AI Tutor conversations</li>
+                  <li>✅ Sleep learning sessions</li>
+                  <li>✅ Quizzes & flashcards</li>
+                  <li>✅ Trilingual support (EN/TA/HI)</li>
+                </ul>
+              </div>
+
+              <div className="text-center space-y-3">
+                <p className="text-xs font-display text-muted-foreground">Scan QR code to pay via UPI</p>
+                <div className="inline-block p-3 bg-white rounded-2xl">
+                  <img src={UPI_QR_URL} alt="UPI QR Code" className="w-48 h-48" loading="lazy" />
+                </div>
+              </div>
+
+              <div className="glass-card p-3 flex items-center justify-between">
+                <div>
+                  <p className="text-[10px] text-muted-foreground font-display">UPI ID</p>
+                  <p className="text-sm font-display font-semibold text-foreground">{UPI_ID}</p>
+                </div>
+                <button
+                  onClick={copyUpiId}
+                  className="glass-card px-3 py-1.5 flex items-center gap-1.5 text-xs font-display text-primary hover:text-foreground transition-colors"
+                >
+                  <Copy size={12} /> Copy
+                </button>
+              </div>
+
+              <a
+                href={`upi://pay?pa=${UPI_ID}&pn=ThukkamTutor&am=${UPI_AMOUNT}&cu=INR&tn=ThukkamTutor%20Subscription`}
+                className="w-full rounded-xl bg-primary text-primary-foreground font-display font-semibold text-sm py-3 flex items-center justify-center gap-2 active:scale-95 transition-transform"
+              >
+                <ExternalLink size={14} /> Open UPI App to Pay ₹50
+              </a>
+
+              <p className="text-[10px] text-muted-foreground text-center">
+                After payment, share screenshot to confirm subscription activation
+              </p>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
