@@ -4,7 +4,8 @@ import {
   Settings, Globe, Bell, LogOut,
   User, Vibrate, Clock, Palette, Pencil, Check, Smartphone, Camera, X
 } from "lucide-react";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { Switch } from "@/components/ui/switch";
 import { Input } from "@/components/ui/input";
@@ -60,6 +61,7 @@ interface ProfileScreenProps {
 }
 
 const ProfileScreen = ({ onLanguageChange }: ProfileScreenProps) => {
+  const navigate = useNavigate();
   const [name, setName] = useState("Student");
   const [username, setUsername] = useState("student_123");
   const [editingName, setEditingName] = useState(false);
@@ -74,6 +76,31 @@ const ProfileScreen = ({ onLanguageChange }: ProfileScreenProps) => {
   const [showAvatarPicker, setShowAvatarPicker] = useState(false);
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [tapCount, setTapCount] = useState(0);
+  const tapTimer = useRef<ReturnType<typeof setTimeout>>();
+
+  const handleVersionTap = useCallback(async () => {
+    const newCount = tapCount + 1;
+    setTapCount(newCount);
+    clearTimeout(tapTimer.current);
+    tapTimer.current = setTimeout(() => setTapCount(0), 2000);
+    if (newCount >= 5) {
+      setTapCount(0);
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.user) return;
+      const { data } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", session.user.id)
+        .eq("role", "admin")
+        .maybeSingle();
+      if (data) {
+        navigate("/admin");
+      } else {
+        toast("🐣 Nothing here!");
+      }
+    }
+  }, [tapCount, navigate]);
 
   useEffect(() => {
     applyTheme(selectedTheme);
@@ -352,6 +379,14 @@ const ProfileScreen = ({ onLanguageChange }: ProfileScreenProps) => {
           ))}
         </div>
       </motion.div>
+
+      {/* Version - secret admin access (tap 5 times) */}
+      <p
+        onClick={handleVersionTap}
+        className="text-center text-[10px] text-muted-foreground/40 font-display select-none cursor-default"
+      >
+        v1.0.0
+      </p>
 
       {/* Logout */}
       <motion.button
