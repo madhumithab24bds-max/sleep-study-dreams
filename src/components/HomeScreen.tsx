@@ -208,16 +208,17 @@ const HomeScreen = ({ onNavigate }: HomeScreenProps) => {
             ₹50<span className="text-sm text-muted-foreground">/month</span>
           </p>
           <div className="mt-4 space-y-2 text-left text-sm text-muted-foreground">
-            <p>✅ Sleep Learning Mode</p>
-            <p>✅ Memory Quizzes</p>
-            <p>✅ Study Tracker</p>
-            <p>✅ Dream Journal</p>
+            <p>✅ All study materials (LKG–12 + College)</p>
+            <p>✅ AI Tutor conversations</p>
+            <p>✅ Sleep learning sessions</p>
+            <p>✅ Quizzes & flashcards</p>
+            <p>✅ Trilingual support (EN/TA/HI)</p>
           </div>
           <button
-            onClick={() => toast.success("Demo subscription started")}
+            onClick={() => setShowPayment(true)}
             className="mt-4 w-full rounded-xl bg-primary py-3 text-sm font-display font-bold text-primary-foreground transition hover:opacity-90"
           >
-            Start Free Trial
+            Subscribe Now – ₹50/month
           </button>
         </motion.div>
       </div>
