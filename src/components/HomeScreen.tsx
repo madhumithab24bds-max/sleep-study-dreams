@@ -25,7 +25,6 @@ const quickActions: { emoji: string; label: string; tab: TabId; note?: string }[
 ];
 
 const HomeScreen = ({ onNavigate }: HomeScreenProps) => {
-  const [menuOpen, setMenuOpen] = useState(false);
   const [menuPage, setMenuPage] = useState<MenuPage>(null);
   const [showPayment, setShowPayment] = useState(false);
 
