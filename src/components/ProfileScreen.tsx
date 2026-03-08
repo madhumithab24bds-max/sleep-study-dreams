@@ -61,6 +61,7 @@ interface ProfileScreenProps {
 }
 
 const ProfileScreen = ({ onLanguageChange }: ProfileScreenProps) => {
+  const navigate = useNavigate();
   const [name, setName] = useState("Student");
   const [username, setUsername] = useState("student_123");
   const [editingName, setEditingName] = useState(false);
@@ -75,6 +76,31 @@ const ProfileScreen = ({ onLanguageChange }: ProfileScreenProps) => {
   const [showAvatarPicker, setShowAvatarPicker] = useState(false);
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [tapCount, setTapCount] = useState(0);
+  const tapTimer = useRef<ReturnType<typeof setTimeout>>();
+
+  const handleVersionTap = useCallback(async () => {
+    const newCount = tapCount + 1;
+    setTapCount(newCount);
+    clearTimeout(tapTimer.current);
+    tapTimer.current = setTimeout(() => setTapCount(0), 2000);
+    if (newCount >= 5) {
+      setTapCount(0);
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.user) return;
+      const { data } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", session.user.id)
+        .eq("role", "admin")
+        .maybeSingle();
+      if (data) {
+        navigate("/admin");
+      } else {
+        toast("🐣 Nothing here!");
+      }
+    }
+  }, [tapCount, navigate]);
 
   useEffect(() => {
     applyTheme(selectedTheme);
