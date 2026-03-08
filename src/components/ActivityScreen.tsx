@@ -12,7 +12,7 @@ interface ActivityItem {
   time: string;
 }
 
-const STORAGE_KEY = "thukkam_activity_log";
+const STORAGE_KEY = "thookam_activity_log";
 
 // Collect activity from all localStorage sources
 function collectActivity(): ActivityItem[] {
