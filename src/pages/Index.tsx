@@ -14,6 +14,7 @@ const Index = () => {
   const [selectedCourse, setSelectedCourse] = useState<string | null>(null);
   const [selectedSubject, setSelectedSubject] = useState<string | null>(null);
   const [studiedSubjects, setStudiedSubjects] = useState<string[]>([]);
+  const [profileLanguage, setProfileLanguage] = useState("english");
 
   const handleSubjectStudied = (subject: string) => {
     setStudiedSubjects((prev) =>
@@ -31,6 +32,7 @@ const Index = () => {
             onCourseChange={setSelectedCourse}
             onSubjectChange={setSelectedSubject}
             onSubjectStudied={handleSubjectStudied}
+            language={profileLanguage}
           />
         );
       case "sleep":
@@ -44,7 +46,7 @@ const Index = () => {
           />
         );
       case "profile":
-        return <ProfileScreen />;
+        return <ProfileScreen onLanguageChange={setProfileLanguage} />;
       default:
         return <HomeScreen onNavigate={setActiveTab} />;
     }
