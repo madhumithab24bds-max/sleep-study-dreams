@@ -2,7 +2,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   Settings, Moon, Globe, Bell, CreditCard, LogOut, ChevronRight,
   User, Vibrate, BarChart3, Clock, Palette, GraduationCap, BookOpen,
-  Pencil, Check
+  Pencil, Check, X, IndianRupee, Copy, ExternalLink
 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
