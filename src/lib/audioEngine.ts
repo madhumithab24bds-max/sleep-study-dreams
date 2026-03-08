@@ -447,8 +447,16 @@ const players: Record<string, (ctx: AudioContext, vol: number) => void> = {
     "ground-noise": playGroundNoise,
     "sleep-music": playSleepMusic,
     "deep-focus": playDeepFocus,
-  };
+};
 
+export const playAudio = (type: string, volume: number) => {
+  stopAll();
+  const ctx = getContext();
+  if (ctx.state === "suspended") ctx.resume();
+  isPlaying = true;
+  lastPlayedType = type;
+
+  const vol = Math.max(0, Math.min(1, volume / 100));
   const player = players[type] || playWhiteNoise;
   player(ctx, vol);
 };
