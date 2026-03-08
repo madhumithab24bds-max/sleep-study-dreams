@@ -432,15 +432,9 @@ const playLullaby = (ctx: AudioContext, volume: number) => {
   activeNodes.push(gain);
 };
 
-export const playAudio = (type: string, volume: number) => {
-  stopAll();
-  const ctx = getContext();
-  if (ctx.state === "suspended") ctx.resume();
-  isPlaying = true;
+let lastPlayedType: string | null = null;
 
-  const vol = Math.max(0, Math.min(1, volume / 100));
-
-  const players: Record<string, (ctx: AudioContext, vol: number) => void> = {
+const players: Record<string, (ctx: AudioContext, vol: number) => void> = {
     whisper: playWhisper,
     rain: playRain,
     ocean: playOcean,
@@ -453,8 +447,16 @@ export const playAudio = (type: string, volume: number) => {
     "ground-noise": playGroundNoise,
     "sleep-music": playSleepMusic,
     "deep-focus": playDeepFocus,
-  };
+};
 
+export const playAudio = (type: string, volume: number) => {
+  stopAll();
+  const ctx = getContext();
+  if (ctx.state === "suspended") ctx.resume();
+  isPlaying = true;
+  lastPlayedType = type;
+
+  const vol = Math.max(0, Math.min(1, volume / 100));
   const player = players[type] || playWhiteNoise;
   player(ctx, vol);
 };
@@ -465,6 +467,15 @@ export const stopAudio = () => {
 
 export const updateVolume = (volume: number) => {
   if (!audioContext || !isPlaying) return;
+  // Re-start with new volume (simplest reliable approach)
+  const currentType = lastPlayedType;
+  if (currentType) {
+    stopAll();
+    isPlaying = true;
+    const vol = Math.max(0, Math.min(1, volume / 100));
+    const player = players[currentType] || playWhiteNoise;
+    player(audioContext, vol);
+  }
 };
 
 // Quick sound effects for UI interactions

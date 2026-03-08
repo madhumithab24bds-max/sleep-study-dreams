@@ -3,7 +3,7 @@ import { BookOpen, Play, Pause, RotateCcw, Volume2, VolumeX, Timer, Plus, X, Che
 import { useState, useEffect, useRef, useCallback } from "react";
 import { toast } from "sonner";
 import { revisionBySubject } from "@/lib/revisionData";
-import { playAudio, stopAudio } from "@/lib/audioEngine";
+import { playAudio, stopAudio, updateVolume } from "@/lib/audioEngine";
 import StudyMaterialUpload from "./StudyMaterialUpload";
 import { Switch } from "./ui/switch";
 
@@ -106,10 +106,17 @@ const AudioLearning = () => {
   useEffect(() => {
     if (bgEnabled && narrationState !== "idle") {
       playAudio(bgSound, bgVolume);
-    } else {
+    } else if (!bgEnabled) {
       stopAudio();
     }
-  }, [bgEnabled, bgSound, bgVolume, narrationState]);
+  }, [bgEnabled, bgSound, narrationState]);
+
+  // Live background volume update
+  useEffect(() => {
+    if (bgEnabled && narrationState !== "idle") {
+      updateVolume(bgVolume);
+    }
+  }, [bgVolume, bgEnabled, narrationState]);
 
   // --- Narration helpers ---
   const stopNarration = useCallback(() => {
