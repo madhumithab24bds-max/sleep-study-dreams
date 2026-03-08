@@ -266,7 +266,7 @@ const StudyScreen = ({ onCourseChange, onSubjectChange, onSubjectStudied, langua
                                     <span className="text-xs font-display text-primary font-bold w-6">{ci + 1}</span>
                                     <span className={`font-display text-sm flex-1 ${progress.isCompleted(ch.id) ? "line-through text-muted-foreground" : "text-foreground"}`}>{lk(ch)}</span>
                                     <button
-                                      onClick={(e) => { e.stopPropagation(); handleStartRevision(lk(ch)); }}
+                                      onClick={(e) => { e.stopPropagation(); handleStartRevision(ch.en, lk(ch)); }}
                                       className="text-xs font-display font-semibold text-primary bg-primary/10 px-2 py-1 rounded-lg"
                                     >
                                       {lk(ui.study_btn)}
