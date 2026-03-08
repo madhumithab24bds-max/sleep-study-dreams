@@ -172,22 +172,44 @@ const AudioLearning = () => {
       return;
     }
 
-    const lines = buildRevisionScript(selectedTopics);
-    
-    // Add uploaded material content
+    // Cancel any existing speech
+    speechSynthesis.cancel();
+
+    const lines: string[] = [];
+
+    // Add uploaded material content FIRST (priority)
     if (uploadedText.trim()) {
-      lines.unshift("Let's begin with your uploaded study material.");
-      const sentences = uploadedText.split(/[.!?\n]+/).filter((s) => s.trim().length > 3);
-      sentences.forEach((s) => lines.push(s.trim() + "."));
-      lines.push("That completes your uploaded material.");
+      lines.push("Let's begin with your uploaded study material.");
+      // Split by sentences more carefully, keeping chunks readable
+      const cleaned = uploadedText.replace(/\s+/g, " ").trim();
+      const sentences = cleaned.split(/(?<=[.!?])\s+/).filter((s) => s.trim().length > 2);
+      
+      if (sentences.length > 0) {
+        // Group into chunks of ~100 chars for natural TTS pacing
+        let chunk = "";
+        for (const sentence of sentences) {
+          if (chunk.length + sentence.length > 150 && chunk.length > 0) {
+            lines.push(chunk.trim());
+            chunk = sentence;
+          } else {
+            chunk += (chunk ? " " : "") + sentence;
+          }
+        }
+        if (chunk.trim()) lines.push(chunk.trim());
+      }
+      lines.push("That completes your uploaded material. Well done!");
     }
+
+    // Add revision from selected topics
+    const topicLines = buildRevisionScript(selectedTopics);
+    lines.push(...topicLines);
 
     // Add custom notes as spoken content
     if (customNote.trim()) {
       lines.push("Now let's go through your personal study notes.");
-      const sentences = customNote.split(/[.!?\n]+/).filter((s) => s.trim());
+      const sentences = customNote.split(/[.!?\n]+/).filter((s) => s.trim().length > 2);
       sentences.forEach((s) => lines.push(s.trim() + "."));
-      lines.push("Those were your personal notes.");
+      lines.push("Those were your personal notes. Great job revising!");
     }
 
     if (lines.length === 0) {
@@ -195,24 +217,27 @@ const AudioLearning = () => {
       return;
     }
 
+    console.log(`[AudioLearning] Starting with ${lines.length} lines`);
+    
     linesRef.current = lines;
     playingRef.current = true;
     startTimeRef.current = Date.now();
     setIsPlaying(true);
     setCurrentLineIdx(0);
 
+    // Start background audio
     playAudio(bgSound, bgVolume);
 
-    // Chrome workaround: periodically resume speech synthesis to prevent it from stopping
+    // Chrome workaround: periodically resume speech synthesis
     resumeIntervalRef.current = setInterval(() => {
       if (speechSynthesis.speaking && speechSynthesis.paused) {
         speechSynthesis.resume();
       }
-    }, 5000);
+    }, 3000);
 
-    // Start speaking immediately (no delay to preserve user gesture context)
+    // Start speaking immediately
     speakLine(lines, 0);
-    toast.success(`Audio learning started for ${duration.label}`);
+    toast.success(`Audio learning started — ${lines.length} sections for ${duration.label}`);
   }, [selectedTopics, customNote, uploadedText, bgSound, bgVolume, duration, speakLine]);
 
   // Update background sound while playing
