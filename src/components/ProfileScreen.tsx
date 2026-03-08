@@ -77,22 +77,31 @@ const ProfileScreen = ({ onLanguageChange }: ProfileScreenProps) => {
 
   useEffect(() => {
     applyTheme(selectedTheme);
-    // Load avatar from profile
-    const loadAvatar = async () => {
+    const loadProfile = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (session?.user) {
         const { data } = await supabase
           .from("profiles")
-          .select("avatar_url")
+          .select("display_name, username, academic_level, language, avatar_url")
           .eq("user_id", session.user.id)
           .maybeSingle();
-        if (data?.avatar_url) setAvatarUrl(data.avatar_url);
+        if (data) {
+          if (data.display_name) setName(data.display_name);
+          if (data.username) setUsername(data.username);
+          if (data.academic_level) setAcademicLevel(data.academic_level);
+          if (data.language) { setLanguage(data.language); onLanguageChange?.(data.language); }
+          if (data.avatar_url) setAvatarUrl(data.avatar_url);
+        }
       }
     };
-    loadAvatar();
+    loadProfile();
   }, []);
 
-  const handleSave = (field: string) => {
+  const handleSave = async (field: string, value: string, column: string) => {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session?.user) return;
+    const { error } = await supabase.from("profiles").update({ [column]: value }).eq("user_id", session.user.id);
+    if (error) { toast.error(`Failed to update ${field}`); return; }
     toast.success(`${field} updated`);
   };
 
@@ -206,7 +215,7 @@ const ProfileScreen = ({ onLanguageChange }: ProfileScreenProps) => {
           <div className="flex gap-2">
             <Input value={name} onChange={(e) => setName(e.target.value)} disabled={!editingName}
               className="bg-muted/50 border-border/50 text-foreground font-display h-9 text-sm rounded-xl" />
-            <button onClick={() => { if (editingName) handleSave("Name"); setEditingName(!editingName); }}
+            <button onClick={() => { if (editingName) handleSave("Name", name, "display_name"); setEditingName(!editingName); }}
               className="glass-card px-3 flex items-center text-primary hover:text-foreground transition-colors">
               {editingName ? <Check size={16} /> : <Pencil size={14} />}
             </button>
@@ -219,7 +228,7 @@ const ProfileScreen = ({ onLanguageChange }: ProfileScreenProps) => {
           <div className="flex gap-2">
             <Input value={username} onChange={(e) => setUsername(e.target.value)} disabled={!editingUsername}
               className="bg-muted/50 border-border/50 text-foreground font-display h-9 text-sm rounded-xl" />
-            <button onClick={() => { if (editingUsername) handleSave("Username"); setEditingUsername(!editingUsername); }}
+            <button onClick={() => { if (editingUsername) handleSave("Username", username, "username"); setEditingUsername(!editingUsername); }}
               className="glass-card px-3 flex items-center text-primary hover:text-foreground transition-colors">
               {editingUsername ? <Check size={16} /> : <Pencil size={14} />}
             </button>
@@ -229,7 +238,7 @@ const ProfileScreen = ({ onLanguageChange }: ProfileScreenProps) => {
         {/* Combined Academic Level (Grade + Course) */}
         <div className="space-y-1.5">
           <label className="text-xs text-muted-foreground font-display">🎓 Grade / Course</label>
-          <Select value={academicLevel} onValueChange={(v) => { setAcademicLevel(v); toast.success(`Set to ${v}`); }}>
+          <Select value={academicLevel} onValueChange={(v) => { setAcademicLevel(v); handleSave("Grade", v, "academic_level"); }}>
             <SelectTrigger className="bg-muted/50 border-border/50 text-foreground font-display h-9 text-sm rounded-xl">
               <SelectValue />
             </SelectTrigger>
@@ -259,7 +268,7 @@ const ProfileScreen = ({ onLanguageChange }: ProfileScreenProps) => {
             <Globe size={18} className="text-primary" />
             <span className="text-sm font-display text-foreground">Language</span>
           </div>
-          <Select value={language} onValueChange={(v) => { setLanguage(v); onLanguageChange?.(v); toast.success(`Language: ${languages.find(l => l.value === v)?.label}`); }}>
+          <Select value={language} onValueChange={(v) => { setLanguage(v); onLanguageChange?.(v); handleSave("Language", v, "language"); }}>
             <SelectTrigger className="w-32 bg-muted/50 border-border/50 text-foreground font-display h-8 text-xs rounded-xl">
               <SelectValue />
             </SelectTrigger>
