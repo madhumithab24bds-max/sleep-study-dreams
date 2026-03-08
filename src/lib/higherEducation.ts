@@ -59,12 +59,12 @@ const bdsCourse: HECourse = {
       {
         ...yr(1),
         subjects: [
-          { id: "bds-anat", en: "Anatomy (Gen & Dental)", ta: "உடற்கூறியல்", hi: "शरीर रचना विज्ञान", emoji: "🦴", color: "from-primary/20 to-accent/20", topics: [
-            { id: "ba1", en: "General Anatomy", ta: "பொது உடற்கூறியல்", hi: "सामान्य शरीर रचना" },
-            { id: "ba2", en: "Head & Neck", ta: "தலை & கழுத்து", hi: "सिर और गर्दन" },
-            { id: "ba3", en: "Osteology", ta: "எலும்பியல்", hi: "अस्थि विज्ञान" },
-            { id: "ba4", en: "Histology", ta: "திசுவியல்", hi: "ऊतक विज्ञान" },
-            { id: "ba5", en: "Embryology", ta: "கருவியல்", hi: "भ्रूणविज्ञान" },
+          { id: "bds-biochem", en: "Biochemistry", ta: "உயிர் வேதியியல்", hi: "जैव रसायन", emoji: "🧪", color: "from-dream/20 to-secondary/20", topics: [
+            { id: "bb1", en: "Carbohydrate Metabolism", ta: "கார்போஹைட்ரேட் வளர்சிதை மாற்றம்", hi: "कार्बोहाइड्रेट चयापचय" },
+            { id: "bb2", en: "Protein Chemistry", ta: "புரத வேதியியல்", hi: "प्रोटीन रसायन" },
+            { id: "bb3", en: "Enzymology", ta: "நொதியியல்", hi: "एंजाइमोलॉजी" },
+            { id: "bb4", en: "Lipid Metabolism", ta: "கொழுப்பு வளர்சிதை மாற்றம்", hi: "लिपिड चयापचय" },
+            { id: "bb5", en: "Nucleic Acid Chemistry", ta: "நியூக்ளிக் அமில வேதியியல்", hi: "न्यूक्लिक अम्ल रसायन" },
           ]},
           { id: "bds-physio", en: "Physiology", ta: "உடலியல்", hi: "शरीर क्रिया विज्ञान", emoji: "❤️", color: "from-secondary/20 to-primary/20", topics: [
             { id: "bp1", en: "General Physiology", ta: "பொது உடலியல்", hi: "सामान्य शरीर क्रिया" },
@@ -72,91 +72,133 @@ const bdsCourse: HECourse = {
             { id: "bp3", en: "Nerve & Muscle Physiology", ta: "நரம்பு & தசை", hi: "तंत्रिका और मांसपेशी" },
             { id: "bp4", en: "CVS Physiology", ta: "இருதய உடலியல்", hi: "हृदय शरीर क्रिया" },
             { id: "bp5", en: "GIT Physiology", ta: "இரைப்பை குடல் உடலியல்", hi: "पाचन शरीर क्रिया" },
+            { id: "bp6", en: "Renal Physiology", ta: "சிறுநீரக உடலியல்", hi: "वृक्क शरीर क्रिया" },
           ]},
-          { id: "bds-biochem", en: "Biochemistry", ta: "உயிர் வேதியியல்", hi: "जैव रसायन", emoji: "🧪", color: "from-dream/20 to-secondary/20", topics: [
-            { id: "bb1", en: "Carbohydrate Metabolism", ta: "கார்போஹைட்ரேட் வளர்சிதை மாற்றம்", hi: "कार्बोहाइड्रेट चयापचय" },
-            { id: "bb2", en: "Protein Chemistry", ta: "புரத வேதியியல்", hi: "प्रोटीन रसायन" },
-            { id: "bb3", en: "Enzymology", ta: "நொதியியல்", hi: "एंजाइमोलॉजी" },
-            { id: "bb4", en: "Lipid Metabolism", ta: "கொழுப்பு வளர்சிதை மாற்றம்", hi: "लिपिड चयापचय" },
+          { id: "bds-hanat", en: "Human Anatomy", ta: "மனித உடற்கூறியல்", hi: "मानव शरीर रचना विज्ञान", emoji: "🦴", color: "from-primary/20 to-accent/20", topics: [
+            { id: "ha1", en: "General Anatomy", ta: "பொது உடற்கூறியல்", hi: "सामान्य शरीर रचना" },
+            { id: "ha2", en: "Upper & Lower Limbs", ta: "மேல் & கீழ் கைகால்கள்", hi: "ऊपरी और निचले अंग" },
+            { id: "ha3", en: "Head & Neck", ta: "தலை & கழுத்து", hi: "सिर और गर्दन" },
+            { id: "ha4", en: "Thorax & Abdomen", ta: "மார்பு & வயிறு", hi: "वक्ष और उदर" },
+            { id: "ha5", en: "Histology", ta: "திசுவியல்", hi: "ऊतक विज्ञान" },
+            { id: "ha6", en: "Embryology", ta: "கருவியல்", hi: "भ्रूणविज्ञान" },
           ]},
-          { id: "bds-dmat", en: "Dental Materials", ta: "பல் பொருட்கள்", hi: "दंत सामग्री", emoji: "🔩", color: "from-accent/20 to-dream/20", topics: [
-            { id: "dm1", en: "Impression Materials", ta: "அச்சு பொருட்கள்", hi: "इम्प्रेशन सामग्री" },
-            { id: "dm2", en: "Restorative Materials", ta: "மறுசீரமைப்பு பொருட்கள்", hi: "पुनर्स्थापन सामग्री" },
-            { id: "dm3", en: "Dental Cements", ta: "பல் சிமெண்ட்கள்", hi: "दंत सीमेंट" },
+          { id: "bds-danat", en: "Dental Anatomy", ta: "பல் உடற்கூறியல்", hi: "दंत शरीर रचना विज्ञान", emoji: "🦷", color: "from-accent/20 to-dream/20", topics: [
+            { id: "da1", en: "Tooth Morphology", ta: "பல் வடிவ அமைப்பு", hi: "दांत आकृति विज्ञान" },
+            { id: "da2", en: "Deciduous & Permanent Teeth", ta: "பால் & நிரந்தர பற்கள்", hi: "दूध और स्थायी दांत" },
+            { id: "da3", en: "Occlusion", ta: "கடிப்பு", hi: "अवरोध" },
+            { id: "da4", en: "Tooth Identification & Numbering", ta: "பல் அடையாளம் & எண்ணிடுதல்", hi: "दांत पहचान और क्रमांकन" },
+            { id: "da5", en: "Root Morphology", ta: "வேர் வடிவ அமைப்பு", hi: "जड़ आकृति विज्ञान" },
           ]},
         ],
       },
       {
         ...yr(2),
         subjects: [
-          { id: "bds-patho", en: "General Pathology", ta: "பொது நோயியல்", hi: "सामान्य रोग विज्ञान", emoji: "🔬", color: "from-primary/20 to-accent/20", topics: [
-            { id: "bpa1", en: "Cell Injury & Inflammation", ta: "உயிரணு காயம் & வீக்கம்", hi: "कोशिका क्षति और शोथ" },
-            { id: "bpa2", en: "Neoplasia", ta: "புதிய வளர்ச்சி", hi: "अर्बुदविज्ञान" },
-            { id: "bpa3", en: "Hemodynamic Disorders", ta: "இரத்த இயக்க கோளாறுகள்", hi: "रक्तगतिकी विकार" },
-          ]},
-          { id: "bds-micro", en: "Microbiology", ta: "நுண்ணுயிரியல்", hi: "सूक्ष्म जीव विज्ञान", emoji: "🦠", color: "from-secondary/20 to-primary/20", topics: [
-            { id: "bm1", en: "General Microbiology", ta: "பொது நுண்ணுயிரியல்", hi: "सामान्य सूक्ष्म जीव विज्ञान" },
-            { id: "bm2", en: "Oral Microbiology", ta: "வாய்வழி நுண்ணுயிரியல்", hi: "मौखिक सूक्ष्म जीव विज्ञान" },
-            { id: "bm3", en: "Immunology", ta: "நோய்த்தடுப்பு இயல்", hi: "प्रतिरक्षा विज्ञान" },
+          { id: "bds-dmat", en: "Dental Materials", ta: "பல் பொருட்கள்", hi: "दंत सामग्री", emoji: "🔩", color: "from-accent/20 to-dream/20", topics: [
+            { id: "dm1", en: "Impression Materials", ta: "அச்சு பொருட்கள்", hi: "इम्प्रेशन सामग्री" },
+            { id: "dm2", en: "Restorative Materials", ta: "மறுசீரமைப்பு பொருட்கள்", hi: "पुनर्स्थापन सामग्री" },
+            { id: "dm3", en: "Dental Cements", ta: "பல் சிமெண்ட்கள்", hi: "दंत सीमेंट" },
+            { id: "dm4", en: "Casting Alloys", ta: "வார்ப்பு உலோகக்கலவைகள்", hi: "कास्टिंग मिश्र धातु" },
+            { id: "dm5", en: "Dental Ceramics", ta: "பல் பீங்கான்கள்", hi: "दंत सिरेमिक" },
           ]},
           { id: "bds-pharma", en: "Pharmacology", ta: "மருந்தியல்", hi: "औषध विज्ञान", emoji: "💊", color: "from-dream/20 to-secondary/20", topics: [
             { id: "bph1", en: "General Pharmacology", ta: "பொது மருந்தியல்", hi: "सामान्य औषध विज्ञान" },
             { id: "bph2", en: "Dental Pharmacology", ta: "பல் மருந்தியல்", hi: "दंत औषध विज्ञान" },
             { id: "bph3", en: "Analgesics & Anaesthetics", ta: "வலி நிவாரணிகள்", hi: "दर्दनाशक और संवेदनाहारी" },
+            { id: "bph4", en: "Antibiotics", ta: "நுண்ணுயிர் எதிர்ப்பிகள்", hi: "एंटीबायोटिक्स" },
+            { id: "bph5", en: "Drug Interactions", ta: "மருந்து இடைவினைகள்", hi: "दवा इंटरैक्शन" },
           ]},
-          { id: "bds-opath", en: "Oral Pathology", ta: "வாய்வழி நோயியல்", hi: "मौखिक रोग विज्ञान", emoji: "🔍", color: "from-accent/20 to-dream/20", topics: [
-            { id: "op1", en: "Developmental Anomalies", ta: "வளர்ச்சி குறைபாடுகள்", hi: "विकासात्मक विसंगतियां" },
-            { id: "op2", en: "Cysts of Oral Region", ta: "வாய் பகுதி நீர்க்கட்டிகள்", hi: "मुख क्षेत्र के पुटी" },
-            { id: "op3", en: "Tumors of Oral Region", ta: "வாய் கட்டிகள்", hi: "मुख क्षेत्र के ट्यूमर" },
+          { id: "bds-micro", en: "Microbiology", ta: "நுண்ணுயிரியல்", hi: "सूक्ष्म जीव विज्ञान", emoji: "🦠", color: "from-secondary/20 to-primary/20", topics: [
+            { id: "bm1", en: "General Microbiology", ta: "பொது நுண்ணுயிரியல்", hi: "सामान्य सूक्ष्म जीव विज्ञान" },
+            { id: "bm2", en: "Oral Microbiology", ta: "வாய்வழி நுண்ணுயிரியல்", hi: "मौखिक सूक्ष्म जीव विज्ञान" },
+            { id: "bm3", en: "Immunology", ta: "நோய்த்தடுப்பு இயல்", hi: "प्रतिरक्षा विज्ञान" },
+            { id: "bm4", en: "Virology", ta: "வைரஸ் இயல்", hi: "विषाणु विज्ञान" },
           ]},
-          { id: "bds-pcd", en: "Pre-clinical Conservative Dentistry", ta: "முன் மருத்துவ பல் பாதுகாப்பு", hi: "पूर्व-नैदानिक रूढ़िवादी दंत चिकित्सा", emoji: "🦷", color: "from-primary/20 to-dream/20", topics: [
-            { id: "pcd1", en: "Cavity Preparation", ta: "குழி தயாரிப்பு", hi: "गुहा तैयारी" },
-            { id: "pcd2", en: "Restoration Techniques", ta: "மறுசீரமைப்பு நுட்பங்கள்", hi: "पुनर्स्थापना तकनीक" },
+          { id: "bds-patho", en: "General Pathology", ta: "பொது நோயியல்", hi: "सामान्य रोग विज्ञान", emoji: "🔬", color: "from-primary/20 to-accent/20", topics: [
+            { id: "bpa1", en: "Cell Injury & Inflammation", ta: "உயிரணு காயம் & வீக்கம்", hi: "कोशिका क्षति और शोथ" },
+            { id: "bpa2", en: "Neoplasia", ta: "புதிய வளர்ச்சி", hi: "अर्बुदविज्ञान" },
+            { id: "bpa3", en: "Hemodynamic Disorders", ta: "இரத்த இயக்க கோளாறுகள்", hi: "रक्तगतिकी विकार" },
+            { id: "bpa4", en: "Immunopathology", ta: "நோய்த்தடுப்பு நோயியல்", hi: "प्रतिरक्षा रोगविज्ञान" },
           ]},
         ],
       },
       {
         ...yr(3),
         subjects: [
-          { id: "bds-prosth", en: "Prosthodontics", ta: "செயற்கை பல் சிகிச்சை", hi: "कृत्रिम दंत विज्ञान", emoji: "🦷", color: "from-dream/20 to-primary/20", topics: [
-            { id: "bpr1", en: "Complete Dentures", ta: "முழு பல் செட்", hi: "पूर्ण दंत सेट" },
-            { id: "bpr2", en: "Removable Partial Dentures", ta: "நீக்கக்கூடிய பகுதி பல்", hi: "हटाने योग्य आंशिक दंत" },
-            { id: "bpr3", en: "Fixed Partial Dentures", ta: "நிலையான பகுதி பல்", hi: "स्थिर आंशिक दंत" },
-            { id: "bpr4", en: "Maxillofacial Prosthetics", ta: "முக செயற்கை உறுப்புகள்", hi: "मुख कृत्रिम अंग" },
+          { id: "bds-opath", en: "Oral Pathology", ta: "வாய்வழி நோயியல்", hi: "मौखिक रोग विज्ञान", emoji: "🔍", color: "from-accent/20 to-dream/20", topics: [
+            { id: "op1", en: "Developmental Anomalies", ta: "வளர்ச்சி குறைபாடுகள்", hi: "विकासात्मक विसंगतियां" },
+            { id: "op2", en: "Cysts of Oral Region", ta: "வாய் பகுதி நீர்க்கட்டிகள்", hi: "मुख क्षेत्र के पुटी" },
+            { id: "op3", en: "Tumors of Oral Region", ta: "வாய் கட்டிகள்", hi: "मुख क्षेत्र के ट्यूमर" },
+            { id: "op4", en: "Salivary Gland Diseases", ta: "உமிழ்நீர் சுரப்பி நோய்கள்", hi: "लार ग्रंथि रोग" },
+            { id: "op5", en: "Oral Premalignant Lesions", ta: "வாய் முன்புற்று புண்கள்", hi: "मौखिक पूर्व-कैंसर घाव" },
           ]},
-          { id: "bds-ortho", en: "Orthodontics", ta: "பல் சீரமைப்பு", hi: "दंत कतार विज्ञान", emoji: "😁", color: "from-accent/20 to-primary/20", topics: [
-            { id: "bo1", en: "Growth & Development", ta: "வளர்ச்சி & மேம்பாடு", hi: "वृद्धि और विकास" },
-            { id: "bo2", en: "Fixed Appliances", ta: "நிலையான கருவிகள்", hi: "स्थिर उपकरण" },
-            { id: "bo3", en: "Malocclusion Classification", ta: "தவறான கடி வகைப்பாடு", hi: "कुअवरोध वर्गीकरण" },
+          { id: "bds-omed", en: "Dental Medicine (Oral Medicine)", ta: "பல் மருத்துவம் (வாய் மருத்துவம்)", hi: "दंत चिकित्सा (मौखिक चिकित्सा)", emoji: "🩺", color: "from-primary/20 to-secondary/20", topics: [
+            { id: "om1", en: "Oral Mucosal Diseases", ta: "வாய் சளி சவ்வு நோய்கள்", hi: "मौखिक श्लेष्मा रोग" },
+            { id: "om2", en: "TMJ Disorders", ta: "TMJ கோளாறுகள்", hi: "TMJ विकार" },
+            { id: "om3", en: "Oral Manifestations of Systemic Diseases", ta: "முழு உடல் நோய்களின் வாய் அறிகுறிகள்", hi: "प्रणालीगत रोगों की मौखिक अभिव्यक्तियां" },
+            { id: "om4", en: "Orofacial Pain", ta: "வாய்முக வலி", hi: "मुख-चेहरे का दर्द" },
           ]},
-          { id: "bds-cons", en: "Conservative Dentistry & Endodontics", ta: "பல் பாதுகாப்பு & வேர் சிகிச்சை", hi: "रूढ़िवादी दंत चिकित्सा", emoji: "🔧", color: "from-secondary/20 to-dream/20", topics: [
-            { id: "ce1", en: "Dental Caries", ta: "பல் சொத்தை", hi: "दंत क्षय" },
-            { id: "ce2", en: "Root Canal Treatment", ta: "வேர் கால்வாய் சிகிச்சை", hi: "रूट कैनाल उपचार" },
-            { id: "ce3", en: "Bleaching & Aesthetics", ta: "வெண்மையாக்கல்", hi: "ब्लीचिंग और सौंदर्य" },
-          ]},
-          { id: "bds-perio", en: "Periodontics", ta: "ஈறு சிகிச்சை", hi: "मसूड़ा विज्ञान", emoji: "🩺", color: "from-primary/20 to-secondary/20", topics: [
-            { id: "bpe1", en: "Periodontal Diseases", ta: "ஈறு நோய்கள்", hi: "मसूड़ा रोग" },
-            { id: "bpe2", en: "Scaling & Root Planing", ta: "சுத்தம் & வேர் சமப்படுத்தல்", hi: "स्केलिंग और रूट प्लानिंग" },
-            { id: "bpe3", en: "Periodontal Surgery", ta: "ஈறு அறுவை சிகிச்சை", hi: "मसूड़ा शल्य चिकित्सा" },
-          ]},
-          { id: "bds-pedo", en: "Pedodontics", ta: "குழந்தை பல் சிகிச்சை", hi: "बाल दंत चिकित्सा", emoji: "👶", color: "from-dream/20 to-accent/20", topics: [
-            { id: "pd1", en: "Child Psychology", ta: "குழந்தை உளவியல்", hi: "बाल मनोविज्ञान" },
-            { id: "pd2", en: "Preventive Dentistry", ta: "தடுப்பு பல் மருத்துவம்", hi: "निवारक दंत चिकित्सा" },
+          { id: "bds-dsurg", en: "Dental Surgery (Oral Surgery)", ta: "பல் அறுவை சிகிச்சை", hi: "दंत शल्य चिकित्सा", emoji: "🏥", color: "from-secondary/20 to-dream/20", topics: [
+            { id: "ds1", en: "Exodontia (Tooth Extraction)", ta: "பல் பிடுங்குதல்", hi: "दांत निकालना" },
+            { id: "ds2", en: "Impacted Teeth Management", ta: "புதைந்த பற்கள் மேலாண்மை", hi: "प्रभावित दांत प्रबंधन" },
+            { id: "ds3", en: "Minor Oral Surgery", ta: "சிறு வாய் அறுவை சிகிச்சை", hi: "लघु मौखिक शल्य चिकित्सा" },
+            { id: "ds4", en: "Local Anaesthesia", ta: "உள்ளூர் மயக்கமருந்து", hi: "स्थानीय संवेदनाहारी" },
+            { id: "ds5", en: "Maxillofacial Trauma", ta: "முக காயம்", hi: "मुख आघात" },
           ]},
         ],
       },
       {
         ...yr(4),
         subjects: [
-          { id: "bds-surg", en: "Oral & Maxillofacial Surgery", ta: "வாய் & முக அறுவை சிகிச்சை", hi: "मौखिक और मुख शल्य चिकित्सा", emoji: "🏥", color: "from-primary/20 to-secondary/20", topics: [
-            { id: "bs1", en: "Exodontia", ta: "பல் பிடுங்குதல்", hi: "दांत निकालना" },
-            { id: "bs2", en: "Maxillofacial Trauma", ta: "முக காயம்", hi: "मुख आघात" },
-            { id: "bs3", en: "TMJ Disorders", ta: "TMJ கோளாறுகள்", hi: "TMJ विकार" },
-            { id: "bs4", en: "Implantology", ta: "உள்வைப்பு இயல்", hi: "इम्प्लांटोलॉजी" },
+          { id: "bds-ortho", en: "Orthodontics", ta: "பல் சீரமைப்பு", hi: "दंत कतार विज्ञान", emoji: "😁", color: "from-accent/20 to-primary/20", topics: [
+            { id: "bo1", en: "Growth & Development", ta: "வளர்ச்சி & மேம்பாடு", hi: "वृद्धि और विकास" },
+            { id: "bo2", en: "Fixed Appliances", ta: "நிலையான கருவிகள்", hi: "स्थिर उपकरण" },
+            { id: "bo3", en: "Malocclusion Classification", ta: "தவறான கடி வகைப்பாடு", hi: "कुअवरोध वर्गीकरण" },
+            { id: "bo4", en: "Removable Appliances", ta: "நீக்கக்கூடிய கருவிகள்", hi: "हटाने योग्य उपकरण" },
+            { id: "bo5", en: "Cephalometrics", ta: "செபலோமெட்ரிக்ஸ்", hi: "सेफेलोमेट्रिक्स" },
           ]},
-          { id: "bds-omr", en: "Oral Medicine & Radiology", ta: "வாய் மருத்துவம் & கதிர்வீச்சியல்", hi: "मौखिक चिकित्सा और रेडियोलॉजी", emoji: "📷", color: "from-secondary/20 to-dream/20", topics: [
+          { id: "bds-pedo", en: "Pedodontics", ta: "குழந்தை பல் சிகிச்சை", hi: "बाल दंत चिकित्सा", emoji: "👶", color: "from-dream/20 to-accent/20", topics: [
+            { id: "pd1", en: "Child Psychology", ta: "குழந்தை உளவியல்", hi: "बाल मनोविज्ञान" },
+            { id: "pd2", en: "Preventive Dentistry", ta: "தடுப்பு பல் மருத்துவம்", hi: "निवारक दंत चिकित्सा" },
+            { id: "pd3", en: "Pulp Therapy in Children", ta: "குழந்தைகளில் கூழ் சிகிச்சை", hi: "बच्चों में पल्प थेरेपी" },
+            { id: "pd4", en: "Behaviour Management", ta: "நடத்தை மேலாண்மை", hi: "व्यवहार प्रबंधन" },
+          ]},
+          { id: "bds-prosth", en: "Prosthodontics", ta: "செயற்கை பல் சிகிச்சை", hi: "कृत्रिम दंत विज्ञान", emoji: "🦷", color: "from-dream/20 to-primary/20", topics: [
+            { id: "bpr1", en: "Complete Dentures", ta: "முழு பல் செட்", hi: "पूर्ण दंत सेट" },
+            { id: "bpr2", en: "Removable Partial Dentures", ta: "நீக்கக்கூடிய பகுதி பல்", hi: "हटाने योग्य आंशिक दंत" },
+            { id: "bpr3", en: "Fixed Partial Dentures", ta: "நிலையான பகுதி பல்", hi: "स्थिर आंशिक दंत" },
+            { id: "bpr4", en: "Maxillofacial Prosthetics", ta: "முக செயற்கை உறுப்புகள்", hi: "मुख कृत्रिम अंग" },
+            { id: "bpr5", en: "Implant Prosthodontics", ta: "உள்வைப்பு செயற்கை பல்", hi: "इम्प्लांट कृत्रिम दंत" },
+          ]},
+          { id: "bds-phd", en: "Public Health Dentistry", ta: "பொது சுகாதார பல் மருத்துவம்", hi: "सार्वजनिक स्वास्थ्य दंत चिकित्सा", emoji: "🌍", color: "from-primary/20 to-dream/20", topics: [
+            { id: "phd1", en: "Epidemiology of Oral Diseases", ta: "வாய் நோய் தொற்றுநோயியல்", hi: "मौखिक रोगों की महामारी विज्ञान" },
+            { id: "phd2", en: "Community Dentistry", ta: "சமூக பல் மருத்துவம்", hi: "सामुदायिक दंत चिकित्सा" },
+            { id: "phd3", en: "Preventive Programs", ta: "தடுப்பு திட்டங்கள்", hi: "निवारक कार्यक्रम" },
+            { id: "phd4", en: "Biostatistics", ta: "உயிர் புள்ளியியல்", hi: "जैव सांख्यिकी" },
+          ]},
+          { id: "bds-perio", en: "Periodontics", ta: "ஈறு சிகிச்சை", hi: "मसूड़ा विज्ञान", emoji: "🩹", color: "from-primary/20 to-secondary/20", topics: [
+            { id: "bpe1", en: "Periodontal Diseases", ta: "ஈறு நோய்கள்", hi: "मसूड़ा रोग" },
+            { id: "bpe2", en: "Scaling & Root Planing", ta: "சுத்தம் & வேர் சமப்படுத்தல்", hi: "स्केलिंग और रूट प्लानिंग" },
+            { id: "bpe3", en: "Periodontal Surgery", ta: "ஈறு அறுவை சிகிச்சை", hi: "मसूड़ा शल्य चिकित्सा" },
+            { id: "bpe4", en: "Regenerative Periodontics", ta: "மீளுருவாக்க ஈறு சிகிச்சை", hi: "पुनर्जनन मसूड़ा विज्ञान" },
+          ]},
+          { id: "bds-endo", en: "Endodontics", ta: "வேர் சிகிச்சை", hi: "एंडोडोंटिक्स", emoji: "🔧", color: "from-secondary/20 to-dream/20", topics: [
+            { id: "en1", en: "Root Canal Treatment", ta: "வேர் கால்வாய் சிகிச்சை", hi: "रूट कैनाल उपचार" },
+            { id: "en2", en: "Pulp Biology", ta: "கூழ் உயிரியல்", hi: "पल्प जीवविज्ञान" },
+            { id: "en3", en: "Endodontic Surgery", ta: "வேர் அறுவை சிகிச்சை", hi: "एंडोडोंटिक शल्य चिकित्सा" },
+            { id: "en4", en: "Retreatment", ta: "மீண்டும் சிகிச்சை", hi: "पुनर्चिकित्सा" },
+          ]},
+          { id: "bds-omfs", en: "OMFS (Oral & Maxillofacial Surgery)", ta: "வாய் & முக அறுவை சிகிச்சை", hi: "मौखिक और मुख शल्य चिकित्सा", emoji: "🏥", color: "from-accent/20 to-secondary/20", topics: [
+            { id: "omfs1", en: "Maxillofacial Trauma", ta: "முக காயம்", hi: "मुख आघात" },
+            { id: "omfs2", en: "Orthognathic Surgery", ta: "தாடை சீரமைப்பு அறுவை", hi: "ऑर्थोग्नेथिक शल्य चिकित्सा" },
+            { id: "omfs3", en: "Implantology", ta: "உள்வைப்பு இயல்", hi: "इम्प्लांटोलॉजी" },
+            { id: "omfs4", en: "Cleft Lip & Palate", ta: "பிளவு உதடு & அண்ணம்", hi: "कटे होंठ और तालु" },
+          ]},
+          { id: "bds-omr", en: "OMR (Oral Medicine & Radiology)", ta: "வாய் மருத்துவம் & கதிர்வீச்சியல்", hi: "मौखिक चिकित्सा और रेडियोलॉजी", emoji: "📷", color: "from-secondary/20 to-dream/20", topics: [
             { id: "omr1", en: "Oral Mucosal Lesions", ta: "வாய் சளி சவ்வு புண்கள்", hi: "मौखिक श्लेष्मा घाव" },
             { id: "omr2", en: "Dental Radiography", ta: "பல் கதிர்வீச்சு படமெடுப்பு", hi: "दंत रेडियोग्राफी" },
+            { id: "omr3", en: "Advanced Imaging (CBCT, MRI)", ta: "மேம்பட்ட படமெடுப்பு", hi: "उन्नत इमेजिंग" },
+            { id: "omr4", en: "Radiation Biology", ta: "கதிர்வீச்சு உயிரியல்", hi: "विकिरण जीवविज्ञान" },
           ]},
           { id: "bds-phd", en: "Public Health Dentistry", ta: "பொது சுகாதார பல் மருத்துவம்", hi: "सार्वजनिक स्वास्थ्य दंत चिकित्सा", emoji: "🌍", color: "from-accent/20 to-primary/20", topics: [
             { id: "phd1", en: "Epidemiology of Oral Diseases", ta: "வாய் நோய் தொற்றுநோயியல்", hi: "मौखिक रोग महामारी विज्ञान" },
