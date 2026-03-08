@@ -63,6 +63,7 @@ const AudioLearning = () => {
   const [currentLineIdx, setCurrentLineIdx] = useState(0);
   const [progress, setProgress] = useState(0);
   const [customNote, setCustomNote] = useState("");
+  const [uploadedText, setUploadedText] = useState("");
 
   const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
