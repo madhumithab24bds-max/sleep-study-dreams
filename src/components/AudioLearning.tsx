@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { revisionBySubject } from "@/lib/revisionData";
 import { loadVoiceSettings } from "@/lib/voiceEngine";
 import { playAudio, stopAudio } from "@/lib/audioEngine";
+import StudyMaterialUpload from "./StudyMaterialUpload";
 
 const ALL_SUBJECTS = Object.keys(revisionBySubject);
 
