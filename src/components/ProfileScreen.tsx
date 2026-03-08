@@ -35,6 +35,21 @@ const academicLevels = [
   ]},
 ];
 
+const presetAvatars = [
+  "https://api.dicebear.com/9.x/adventurer/svg?seed=Felix",
+  "https://api.dicebear.com/9.x/adventurer/svg?seed=Luna",
+  "https://api.dicebear.com/9.x/adventurer/svg?seed=Mia",
+  "https://api.dicebear.com/9.x/adventurer/svg?seed=Leo",
+  "https://api.dicebear.com/9.x/adventurer/svg?seed=Zoe",
+  "https://api.dicebear.com/9.x/adventurer/svg?seed=Max",
+  "https://api.dicebear.com/9.x/adventurer/svg?seed=Bella",
+  "https://api.dicebear.com/9.x/adventurer/svg?seed=Sam",
+  "https://api.dicebear.com/9.x/adventurer/svg?seed=Aria",
+  "https://api.dicebear.com/9.x/adventurer/svg?seed=Kai",
+  "https://api.dicebear.com/9.x/adventurer/svg?seed=Nova",
+  "https://api.dicebear.com/9.x/adventurer/svg?seed=Finn",
+];
+
 const sectionVariants = {
   hidden: { opacity: 0, y: 16 },
   visible: (i: number) => ({ opacity: 1, y: 0, transition: { delay: i * 0.06, duration: 0.35 } }),
@@ -55,6 +70,10 @@ const ProfileScreen = ({ onLanguageChange }: ProfileScreenProps) => {
   const [sleepReminderOn, setSleepReminderOn] = useState(true);
   const [selectedTheme, setSelectedTheme] = useState(loadSavedTheme());
   const [academicLevel, setAcademicLevel] = useState("Class 10");
+  const [avatarUrl, setAvatarUrl] = useState("");
+  const [showAvatarPicker, setShowAvatarPicker] = useState(false);
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     applyTheme(selectedTheme);
