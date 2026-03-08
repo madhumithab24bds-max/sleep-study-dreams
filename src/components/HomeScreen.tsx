@@ -1,7 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Moon, BookOpen, Activity, HelpCircle, IndianRupee, Copy, ExternalLink, Users } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
+import { X, Moon, BookOpen, Activity, HelpCircle, IndianRupee, Copy, ExternalLink } from "lucide-react";
 import logo from "@/assets/logo.png";
 import nightSkyBg from "@/assets/night-sky-bg.jpg";
 import { toast } from "sonner";
@@ -28,17 +27,6 @@ const quickActions: { emoji: string; label: string; tab: TabId; note?: string }[
 const HomeScreen = ({ onNavigate }: HomeScreenProps) => {
   const [menuPage, setMenuPage] = useState<MenuPage>(null);
   const [showPayment, setShowPayment] = useState(false);
-  const [userCount, setUserCount] = useState<number | null>(null);
-
-  useEffect(() => {
-    const fetchUserCount = async () => {
-      const { count } = await supabase
-        .from("profiles")
-        .select("*", { count: "exact", head: true });
-      if (count !== null) setUserCount(count);
-    };
-    fetchUserCount();
-  }, []);
 
   const UPI_ID = "madhukrr2006@oksbi";
   const UPI_AMOUNT = "50";
@@ -94,19 +82,6 @@ const HomeScreen = ({ onNavigate }: HomeScreenProps) => {
           >
             "Learn Smart… Even While You Sleep"
           </motion.p>
-          {userCount !== null && (
-            <motion.div
-              className="mt-3 flex items-center gap-1.5 rounded-full bg-primary/20 px-3 py-1"
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.7 }}
-            >
-              <Users size={14} className="text-primary" />
-              <span className="text-xs font-display font-semibold text-primary">
-                {userCount.toLocaleString()} {userCount === 1 ? "User" : "Users"}
-              </span>
-            </motion.div>
-          )}
         </div>
       </div>
 
