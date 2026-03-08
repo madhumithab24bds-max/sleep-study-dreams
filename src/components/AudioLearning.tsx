@@ -111,6 +111,7 @@ const AudioLearning = () => {
     if (!playingRef.current || index >= lines.length) {
       const elapsed = Date.now() - startTimeRef.current;
       if (playingRef.current && elapsed < duration.seconds * 1000) {
+        // Loop back to start
         speakLine(lines, 0);
         return;
       }
@@ -130,9 +131,13 @@ const AudioLearning = () => {
     setProgress(Math.min(100, (elapsed / (duration.seconds * 1000)) * 100));
 
     const voiceSettings = loadVoiceSettings();
+
+    // Cancel any pending speech first
+    speechSynthesis.cancel();
+
     const utterance = new SpeechSynthesisUtterance(lines[index]);
-    utterance.volume = Math.max(0, Math.min(1, volume / 100));
-    utterance.rate = 0.85;
+    utterance.volume = Math.max(0.1, Math.min(1, volume / 100));
+    utterance.rate = 0.8;
     utterance.pitch = voiceSettings.gender === "female" ? 1.05 : 0.85;
 
     const voices = speechSynthesis.getVoices();
@@ -141,16 +146,24 @@ const AudioLearning = () => {
 
     utterance.onend = () => {
       if (!playingRef.current) return;
-      timerRef.current = setTimeout(() => speakLine(lines, index + 1), 1500);
+      timerRef.current = setTimeout(() => speakLine(lines, index + 1), 800);
     };
 
-    utterance.onerror = () => {
+    utterance.onerror = (e) => {
+      console.warn("TTS error on line", index, e.error);
       if (!playingRef.current) return;
-      timerRef.current = setTimeout(() => speakLine(lines, index + 1), 1000);
+      // Retry the same line once, then skip
+      timerRef.current = setTimeout(() => speakLine(lines, index + 1), 500);
     };
 
     utteranceRef.current = utterance;
-    speechSynthesis.speak(utterance);
+    
+    // Small delay to ensure cancel() completed
+    setTimeout(() => {
+      if (playingRef.current) {
+        speechSynthesis.speak(utterance);
+      }
+    }, 50);
   }, [volume, duration, stopPlayback]);
 
   const startPlayback = useCallback(() => {
