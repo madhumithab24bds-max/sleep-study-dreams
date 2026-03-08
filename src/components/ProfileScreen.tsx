@@ -380,6 +380,14 @@ const ProfileScreen = ({ onLanguageChange }: ProfileScreenProps) => {
         </div>
       </motion.div>
 
+      {/* Version - secret admin access (tap 5 times) */}
+      <p
+        onClick={handleVersionTap}
+        className="text-center text-[10px] text-muted-foreground/40 font-display select-none cursor-default"
+      >
+        v1.0.0
+      </p>
+
       {/* Logout */}
       <motion.button
         onClick={async () => {
