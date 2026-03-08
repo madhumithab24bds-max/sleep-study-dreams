@@ -1,4 +1,4 @@
-import { Home, BookOpen, Moon, Brain, User, Library } from "lucide-react";
+import { Home, BookOpen, Moon, Brain, User } from "lucide-react";
 
 interface BottomNavProps {
   activeTab: string;
