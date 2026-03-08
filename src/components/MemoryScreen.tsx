@@ -26,7 +26,7 @@ interface Props {
 }
 
 type QuizMode = "current" | "studied" | "weak" | "upload";
-type TabView = "quiz" | "performance" | "upload";
+type TabView = "quiz" | "performance" | "upload" | "conversation";
 
 const MemoryScreen = ({ selectedCourse, selectedSubject, studiedSubjects }: Props) => {
   const [tabView, setTabView] = useState<TabView>("quiz");
