@@ -28,7 +28,7 @@ const Index = () => {
       case "sleep":
         return <SleepScreen selectedSubject={selectedSubject} />;
       case "memory":
-        return <MemoryScreen selectedCourse={selectedCourse} />;
+        return <MemoryScreen selectedCourse={selectedCourse} selectedSubject={selectedSubject} />;
       case "profile":
         return <ProfileScreen />;
       default:
