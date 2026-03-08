@@ -36,7 +36,7 @@ const AuthScreen = () => {
       >
         <motion.img
           src={logo}
-          alt="ThukkamTutor Logo"
+          alt="ThookamTutor Logo"
           className="mb-6 h-28 w-28 drop-shadow-2xl"
           initial={{ scale: 0.8, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
