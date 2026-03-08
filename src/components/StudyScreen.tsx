@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { Languages, ChevronRight, ChevronDown, GraduationCap } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
+import RevisionView from "./RevisionView";
 
 interface Course {
   id: string;
