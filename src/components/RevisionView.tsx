@@ -9,7 +9,7 @@ interface Props {
   onCompleted?: () => void;
 }
 
-const RevisionView = ({ subject, onClose }: Props) => {
+const RevisionView = ({ subject, onClose, onCompleted }: Props) => {
   const items = revisionBySubject[subject] || [];
   const [index, setIndex] = useState(0);
   const [flipped, setFlipped] = useState(false);

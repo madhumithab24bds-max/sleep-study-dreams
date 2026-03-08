@@ -329,7 +329,11 @@ const StudyScreen = ({ onCourseChange, onSubjectChange, onSubjectStudied }: Stud
 
       {revisionSubject && (
         <div className="mt-4">
-          <RevisionView subject={revisionSubject} onClose={() => setRevisionSubject(null)} />
+          <RevisionView
+            subject={revisionSubject}
+            onClose={() => setRevisionSubject(null)}
+            onCompleted={() => onSubjectStudied?.(revisionSubject)}
+          />
         </div>
       )}
 
