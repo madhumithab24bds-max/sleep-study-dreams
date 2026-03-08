@@ -66,7 +66,7 @@ const HelpCenter = ({ onBack }: { onBack: () => void }) => {
       <motion.div className="glass-card p-5 mb-6 text-center" initial={{ y: 10, opacity: 0 }} animate={{ y: 0, opacity: 1 }}>
         <HelpCircle size={32} className="mx-auto text-primary mb-2" />
         <h3 className="font-display font-bold text-foreground mb-1">How can we help?</h3>
-        <p className="text-xs text-muted-foreground">Browse FAQs below to learn how to use ThukkamTutor effectively</p>
+        <p className="text-xs text-muted-foreground">Browse FAQs below to learn how to use ThookamTutor effectively</p>
       </motion.div>
 
       <div className="space-y-2">
