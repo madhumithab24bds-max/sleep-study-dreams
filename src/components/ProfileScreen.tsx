@@ -77,19 +77,24 @@ const ProfileScreen = ({ onLanguageChange }: ProfileScreenProps) => {
 
   useEffect(() => {
     applyTheme(selectedTheme);
-    // Load avatar from profile
-    const loadAvatar = async () => {
+    const loadProfile = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (session?.user) {
         const { data } = await supabase
           .from("profiles")
-          .select("avatar_url")
+          .select("display_name, username, academic_level, language, avatar_url")
           .eq("user_id", session.user.id)
           .maybeSingle();
-        if (data?.avatar_url) setAvatarUrl(data.avatar_url);
+        if (data) {
+          if (data.display_name) setName(data.display_name);
+          if (data.username) setUsername(data.username);
+          if (data.academic_level) setAcademicLevel(data.academic_level);
+          if (data.language) { setLanguage(data.language); onLanguageChange?.(data.language); }
+          if (data.avatar_url) setAvatarUrl(data.avatar_url);
+        }
       }
     };
-    loadAvatar();
+    loadProfile();
   }, []);
 
   const handleSave = (field: string) => {
