@@ -9,12 +9,14 @@ import SleepScreen from "@/components/SleepScreen";
 import MemoryScreen from "@/components/MemoryScreen";
 import ProfileScreen from "@/components/ProfileScreen";
 import AuthScreen from "@/components/AuthScreen";
+import ProfileSetup from "@/components/ProfileSetup";
 
 type TabId = "home" | "study" | "sleep" | "memory" | "profile";
 
 const Index = () => {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
+  const [profileComplete, setProfileComplete] = useState<boolean | null>(null);
   const [activeTab, setActiveTab] = useState<TabId>("home");
   const [selectedCourse, setSelectedCourse] = useState<string | null>(null);
   const [selectedSubject, setSelectedSubject] = useState<string | null>(null);
@@ -37,6 +39,31 @@ const Index = () => {
     return () => subscription.unsubscribe();
   }, []);
 
+  // Check profile completion when session changes
+  useEffect(() => {
+    if (!session?.user) {
+      setProfileComplete(null);
+      return;
+    }
+
+    const checkProfile = async () => {
+      const { data } = await supabase
+        .from("profiles")
+        .select("profile_completed, language")
+        .eq("user_id", session.user.id)
+        .maybeSingle();
+
+      if (data?.profile_completed) {
+        setProfileComplete(true);
+        if (data.language) setProfileLanguage(data.language);
+      } else {
+        setProfileComplete(false);
+      }
+    };
+
+    checkProfile();
+  }, [session]);
+
   const handleSubjectStudied = (subject: string) => {
     setStudiedSubjects((prev) =>
       prev.includes(subject) ? prev : [...prev, subject]
@@ -53,6 +80,26 @@ const Index = () => {
 
   if (!session) {
     return <AuthScreen />;
+  }
+
+  // Show profile setup if not completed
+  if (profileComplete === false) {
+    return (
+      <ProfileSetup
+        userId={session.user.id}
+        defaultName={session.user.user_metadata?.full_name || ""}
+        onComplete={() => setProfileComplete(true)}
+      />
+    );
+  }
+
+  // Still checking profile status
+  if (profileComplete === null) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="animate-pulse text-muted-foreground font-display">Loading...</div>
+      </div>
+    );
   }
 
   const renderScreen = () => {
