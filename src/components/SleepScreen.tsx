@@ -1,7 +1,8 @@
 import { motion } from "framer-motion";
 import { Moon, Volume2, Timer, Settings, Music, CloudRain, Waves, Wind, Bird, Radio } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { toast } from "sonner";
+import { playAudio, stopAudio } from "@/lib/audioEngine";
 
 const audioTypes = [
   { id: "whisper", label: "Whisper", icon: Volume2, emoji: "🤫" },
@@ -24,11 +25,33 @@ const SleepScreen = () => {
 
   const currentAudio = audioTypes.find((a) => a.id === selectedAudio)!;
 
+  const startAudio = useCallback(() => {
+    playAudio(selectedAudio, volume);
+  }, [selectedAudio, volume]);
+
   const handleSleepToggle = () => {
     const nextState = !isActive;
     setIsActive(nextState);
-    toast.success(nextState ? `Sleep mode started with ${currentAudio.label}` : "Sleep mode stopped");
+    if (nextState) {
+      startAudio();
+      toast.success(`Sleep mode started with ${currentAudio.label}`);
+    } else {
+      stopAudio();
+      toast.success("Sleep mode stopped");
+    }
   };
+
+  // Update audio when volume or type changes while active
+  useEffect(() => {
+    if (isActive) {
+      playAudio(selectedAudio, volume);
+    }
+  }, [selectedAudio, volume, isActive]);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => stopAudio();
+  }, []);
 
   const handleDurationCycle = () => {
     setDurationIndex((prev) => {
@@ -81,7 +104,7 @@ const SleepScreen = () => {
             <p className="text-sm text-muted-foreground font-display">
               {currentAudio.emoji} Playing {currentAudio.label}...
             </p>
-            <p className="text-xs text-muted-foreground mt-1">Monitoring sleep patterns via sensors</p>
+            <p className="text-xs text-muted-foreground mt-1">🔊 Audio is playing through your speakers</p>
           </motion.div>
         )}
       </div>
