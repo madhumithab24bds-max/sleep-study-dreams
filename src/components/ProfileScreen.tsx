@@ -4,7 +4,8 @@ import {
   Settings, Globe, Bell, LogOut,
   User, Vibrate, Clock, Palette, Pencil, Check, Smartphone, Camera, X
 } from "lucide-react";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { Switch } from "@/components/ui/switch";
 import { Input } from "@/components/ui/input";
