@@ -44,7 +44,6 @@ const HomeScreen = ({ onNavigate }: HomeScreenProps) => {
 
   const openMenuPage = (page: MenuPage) => {
     setMenuPage(page);
-    setMenuOpen(false);
   };
 
   // If a menu page is active, render it full-screen
