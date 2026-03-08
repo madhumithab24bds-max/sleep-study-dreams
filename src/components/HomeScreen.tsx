@@ -56,61 +56,9 @@ const HomeScreen = ({ onNavigate }: HomeScreenProps) => {
 
   return (
     <div className="min-h-screen pb-24">
-      {/* Menu overlay */}
-      <AnimatePresence>
-        {menuOpen && (
-          <motion.div
-            className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={() => setMenuOpen(false)}
-          >
-            <motion.div
-              className="absolute top-0 right-0 w-64 h-full bg-card border-l border-border/20 p-6"
-              initial={{ x: 264 }}
-              animate={{ x: 0 }}
-              exit={{ x: 264 }}
-              transition={{ type: "spring", damping: 25 }}
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="flex items-center justify-between mb-8">
-                <h3 className="font-display font-bold text-foreground">Menu</h3>
-                <button onClick={() => setMenuOpen(false)} className="text-muted-foreground">
-                  <X size={20} />
-                </button>
-              </div>
-              <div className="space-y-2">
-                {[
-                  { id: "dream" as MenuPage, label: "Dream Journal", icon: <Moon size={18} className="text-dream" />, emoji: "🌙" },
-                  { id: "journal" as MenuPage, label: "Daily Journal", icon: <BookOpen size={18} className="text-secondary" />, emoji: "📓" },
-                  { id: "activity" as MenuPage, label: "Activity", icon: <Activity size={18} className="text-primary" />, emoji: "📊" },
-                  { id: "help" as MenuPage, label: "Help Center", icon: <HelpCircle size={18} className="text-accent" />, emoji: "❓" },
-                ].map((item) => (
-                  <button
-                    key={item.id}
-                    onClick={() => openMenuPage(item.id)}
-                    className="w-full glass-card p-3.5 flex items-center gap-3 text-left group"
-                  >
-                    {item.icon}
-                    <span className="font-display font-semibold text-sm text-foreground">{item.label}</span>
-                  </button>
-                ))}
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
       <div className="relative overflow-hidden rounded-b-3xl">
         <img src={nightSkyBg} alt="Night sky" className="absolute inset-0 h-full w-full object-cover opacity-60" />
         <div className="absolute inset-0 bg-gradient-to-b from-background/30 via-background/50 to-background" />
-        {/* Menu button */}
-        <button
-          onClick={() => setMenuOpen(true)}
-          className="absolute top-4 right-4 z-20 glass-card p-2.5 rounded-xl"
-        >
-          <Menu size={20} className="text-foreground" />
-        </button>
         <div className="relative z-10 flex flex-col items-center px-6 pb-10 pt-12 text-center">
           <motion.img
             src={logo}
