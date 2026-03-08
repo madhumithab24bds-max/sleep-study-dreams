@@ -36,6 +36,8 @@ const MemoryScreen = ({ selectedCourse, selectedSubject, studiedSubjects }: Prop
   const [mainTab, setMainTab] = useState<MainTab>("revision");
   const [quizSource, setQuizSource] = useState<QuizMode>("current");
   const [studiedPick, setStudiedPick] = useState<string | null>(null);
+  const [subjectPick, setSubjectPick] = useState<string | null>(null);
+  const [subjectSearch, setSubjectSearch] = useState("");
   const [quizCount, setQuizCount] = useState(10);
   const [quizStarted, setQuizStarted] = useState(false);
 
