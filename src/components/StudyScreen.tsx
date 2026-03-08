@@ -126,6 +126,13 @@ const courses: Course[] = [
       { title: "Oral Pathology", emoji: "🔬", count: 150, color: "from-dream/20 to-secondary/20" },
       { title: "Prosthodontics", emoji: "🦷", count: 140, color: "from-accent/20 to-dream/20" },
       { title: "Orthodontics", emoji: "😁", count: 130, color: "from-primary/20 to-dream/20" },
+      { title: "Periodontics", emoji: "🩺", count: 110, color: "from-secondary/20 to-dream/20" },
+      { title: "Endodontics", emoji: "💉", count: 100, color: "from-primary/20 to-secondary/20" },
+      { title: "Oral Surgery", emoji: "🏥", count: 140, color: "from-dream/20 to-accent/20" },
+      { title: "Pedodontics", emoji: "👶", count: 95, color: "from-accent/20 to-primary/20" },
+      { title: "Community Dentistry", emoji: "🏘️", count: 85, color: "from-secondary/20 to-accent/20" },
+      { title: "Oral Medicine & Radiology", emoji: "📡", count: 120, color: "from-dream/20 to-primary/20" },
+      { title: "Conservative Dentistry", emoji: "🪥", count: 115, color: "from-primary/20 to-accent/20" },
     ],
   },
   {
