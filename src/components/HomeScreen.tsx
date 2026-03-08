@@ -94,12 +94,19 @@ const HomeScreen = ({ onNavigate }: HomeScreenProps) => {
           >
             "Learn Smart… Even While You Sleep"
           </motion.p>
-        </div>
-      </div>
-
-      <div className="relative z-10 -mt-4 px-4">
-        <div className="glass-card glow-primary flex items-center justify-around p-4">
-          {quickActions.map((action) => (
+          {userCount !== null && (
+            <motion.div
+              className="mt-3 flex items-center gap-1.5 rounded-full bg-primary/20 px-3 py-1"
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.7 }}
+            >
+              <Users size={14} className="text-primary" />
+              <span className="text-xs font-display font-semibold text-primary">
+                {userCount.toLocaleString()} {userCount === 1 ? "User" : "Users"}
+              </span>
+            </motion.div>
+          )}
             <QuickAction
               key={action.label}
               emoji={action.emoji}
