@@ -99,9 +99,9 @@ const StudyScreen = ({ onCourseChange, onSubjectChange, onSubjectStudied, langua
     onSubjectChange?.(subject.en);
   };
 
-  const handleStartRevision = (subjectName: string) => {
-    setRevisionSubject(subjectName);
-    toast.success(`${lk(ui.startRevision)} ${subjectName}`);
+  const handleStartRevision = (englishName: string, displayName?: string) => {
+    setRevisionSubject(englishName);
+    toast.success(`${lk(ui.startRevision)} ${displayName || englishName}`);
   };
 
   const cycleMedium = () => {
