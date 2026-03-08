@@ -46,6 +46,11 @@ const StudyScreen = ({ onCourseChange, onSubjectChange, onSubjectStudied, langua
   const [selectedYear, setSelectedYear] = useState<string | null>(null);
   const [expandedHESubject, setExpandedHESubject] = useState<string | null>(null);
 
+  // Search & Sort
+  const [searchQuery, setSearchQuery] = useState("");
+  const [sortBy, setSortBy] = useState<"default" | "progress" | "cards" | "name">("default");
+  const [showSortMenu, setShowSortMenu] = useState(false);
+
   // Progress tracking
   const progress = useStudyProgress();
 
@@ -53,7 +58,35 @@ const StudyScreen = ({ onCourseChange, onSubjectChange, onSubjectStudied, langua
   const lk = (item: { en: string; ta: string; hi: string }) => t(lang, item.en, item.ta, item.hi);
 
   const currentGrade = indianGrades.find((g) => g.id === selectedGrade);
-  const subjects = currentGrade ? currentGrade.subjects[board] : [];
+  const allSubjects = currentGrade ? currentGrade.subjects[board] : [];
+
+  // Filter subjects by search query
+  const subjects = useMemo(() => {
+    let filtered = allSubjects;
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase();
+      filtered = allSubjects.filter(s =>
+        lk(s).toLowerCase().includes(q) ||
+        s.en.toLowerCase().includes(q) ||
+        s.chapters.some(ch => lk(ch).toLowerCase().includes(q) || ch.en.toLowerCase().includes(q))
+      );
+    }
+    // Sort
+    if (sortBy === "name") {
+      filtered = [...filtered].sort((a, b) => lk(a).localeCompare(lk(b)));
+    } else if (sortBy === "progress") {
+      filtered = [...filtered].sort((a, b) =>
+        progress.getSubjectProgress(b.chapters.map(ch => ch.id)) - progress.getSubjectProgress(a.chapters.map(ch => ch.id))
+      );
+    } else if (sortBy === "cards") {
+      filtered = [...filtered].sort((a, b) => {
+        const aCards = a.chapters.reduce((sum, ch) => sum + getRevisionItems(ch.en).length, 0);
+        const bCards = b.chapters.reduce((sum, ch) => sum + getRevisionItems(ch.en).length, 0);
+        return bCards - aCards;
+      });
+    }
+    return filtered;
+  }, [allSubjects, searchQuery, sortBy, lang, progress.completedTopics]);
 
   // Higher ed lookups
   const heCourse = higherEdCourses.find((c) => c.id === selectedCourse);
