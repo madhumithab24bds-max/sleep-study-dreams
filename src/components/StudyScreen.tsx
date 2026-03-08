@@ -1,8 +1,12 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown, GraduationCap, BookOpen, Languages, School, Building2 } from "lucide-react";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { toast } from "sonner";
 import RevisionView from "./RevisionView";
+import StudyProgressDashboard from "./study/StudyProgressDashboard";
+import CustomTopics from "./study/CustomTopics";
+import TopicCheckbox from "./study/TopicCheckbox";
+import { useStudyProgress } from "@/hooks/useStudyProgress";
 import { indianGrades, type Board, type Medium, type Grade, type Subject } from "@/lib/indianSyllabus";
 import { higherEdCourses, type HECourse, type HEDepartment, type HEYear, type HESubject } from "@/lib/higherEducation";
 import { type AppLang, t, ui } from "@/lib/i18n";
@@ -41,6 +45,9 @@ const StudyScreen = ({ onCourseChange, onSubjectChange, onSubjectStudied, langua
   const [selectedYear, setSelectedYear] = useState<string | null>(null);
   const [expandedHESubject, setExpandedHESubject] = useState<string | null>(null);
 
+  // Progress tracking
+  const progress = useStudyProgress();
+
   const lang: AppLang = medium === "tamil" ? "tamil" : medium === "hindi" ? "hindi" : "english";
   const lk = (item: { en: string; ta: string; hi: string }) => t(lang, item.en, item.ta, item.hi);
 
@@ -51,6 +58,33 @@ const StudyScreen = ({ onCourseChange, onSubjectChange, onSubjectStudied, langua
   const heCourse = higherEdCourses.find((c) => c.id === selectedCourse);
   const heDept = heCourse?.departments.find((d) => d.id === selectedDept);
   const heYear = heDept?.years.find((y) => y.id === selectedYear);
+
+  // Calculate subject progress for dashboard
+  const subjectProgressData = useMemo(() => {
+    if (mode === "school" && subjects.length > 0) {
+      return subjects.map(s => ({
+        name: lk(s),
+        emoji: s.emoji,
+        percent: progress.getSubjectProgress(s.chapters.map(ch => ch.id)),
+        color: s.color,
+      }));
+    }
+    if (mode === "college" && heYear) {
+      return heYear.subjects.map(s => ({
+        name: lk(s),
+        emoji: s.emoji,
+        percent: progress.getSubjectProgress(s.topics.map(tp => tp.id)),
+        color: s.color,
+      }));
+    }
+    return [];
+  }, [mode, subjects, heYear, progress.completedTopics, lang]);
+
+  const overallPercent = useMemo(() => {
+    if (subjectProgressData.length === 0) return 0;
+    const sum = subjectProgressData.reduce((a, b) => a + b.percent, 0);
+    return Math.round(sum / subjectProgressData.length);
+  }, [subjectProgressData]);
 
   const handleGradeSelect = (grade: Grade) => {
     setSelectedGrade(grade.id);
@@ -131,19 +165,12 @@ const StudyScreen = ({ onCourseChange, onSubjectChange, onSubjectStudied, langua
         </motion.button>
       </div>
 
-      {/* Progress */}
-      <motion.div className="glass-card p-5 mb-5" initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }}>
-        <h3 className="font-display font-semibold text-sm text-foreground mb-3">{lk(ui.todayProgress)}</h3>
-        <div className="flex items-center gap-4">
-          <div className="flex-1">
-            <div className="h-2 rounded-full bg-muted overflow-hidden">
-              <motion.div className="h-full rounded-full bg-gradient-to-r from-primary to-accent" initial={{ width: 0 }} animate={{ width: "65%" }} transition={{ delay: 0.5, duration: 1 }} />
-            </div>
-          </div>
-          <span className="text-sm font-display font-bold text-primary">65%</span>
-        </div>
-        <p className="text-xs text-muted-foreground mt-2">32 / 50 {lk(ui.itemsReviewed)}</p>
-      </motion.div>
+      {/* Progress Dashboard */}
+      <StudyProgressDashboard
+        lang={lang}
+        subjects={subjectProgressData}
+        overallPercent={overallPercent}
+      />
 
       {/* ═══ SCHOOL MODE ═══ */}
       {mode === "school" && (
@@ -211,7 +238,12 @@ const StudyScreen = ({ onCourseChange, onSubjectChange, onSubjectStudied, langua
                           <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${subject.color} flex items-center justify-center text-xl shrink-0`}>{subject.emoji}</div>
                           <div className="flex-1 min-w-0">
                             <h4 className="font-display font-semibold text-sm text-foreground truncate">{lk(subject)}</h4>
-                            <p className="text-xs text-muted-foreground">{subject.chapters.length} {lk(ui.chapters)}</p>
+                            <div className="flex items-center gap-2">
+                              <p className="text-xs text-muted-foreground">{subject.chapters.length} {lk(ui.chapters)}</p>
+                              <span className="text-xs font-display font-bold text-primary">
+                                {progress.getSubjectProgress(subject.chapters.map(ch => ch.id))}%
+                              </span>
+                            </div>
                           </div>
                           <ChevronDown size={16} className={`text-muted-foreground transition-transform ${isExpanded ? "rotate-180" : ""}`} />
                         </button>
@@ -221,8 +253,12 @@ const StudyScreen = ({ onCourseChange, onSubjectChange, onSubjectStudied, langua
                               <div className="pl-4 pr-2 py-2 space-y-1.5">
                                 {subject.chapters.map((ch, ci) => (
                                   <motion.div key={ch.id} initial={{ x: -10, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ delay: 0.03 * ci }} className="glass-card p-3 flex items-center gap-3">
+                                    <TopicCheckbox
+                                      completed={progress.isCompleted(ch.id)}
+                                      onToggle={() => progress.toggleTopic(ch.id)}
+                                    />
                                     <span className="text-xs font-display text-primary font-bold w-6">{ci + 1}</span>
-                                    <span className="font-display text-sm text-foreground flex-1">{lk(ch)}</span>
+                                    <span className={`font-display text-sm flex-1 ${progress.isCompleted(ch.id) ? "line-through text-muted-foreground" : "text-foreground"}`}>{lk(ch)}</span>
                                     <button
                                       onClick={(e) => { e.stopPropagation(); handleStartRevision(lk(ch)); }}
                                       className="text-xs font-display font-semibold text-primary bg-primary/10 px-2 py-1 rounded-lg"
@@ -359,7 +395,12 @@ const StudyScreen = ({ onCourseChange, onSubjectChange, onSubjectStudied, langua
                         <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${subject.color} flex items-center justify-center text-xl shrink-0`}>{subject.emoji}</div>
                         <div className="flex-1 min-w-0">
                           <h4 className="font-display font-semibold text-sm text-foreground truncate">{lk(subject)}</h4>
-                          <p className="text-xs text-muted-foreground">{subject.topics.length} {lk(ui.topics)}</p>
+                          <div className="flex items-center gap-2">
+                            <p className="text-xs text-muted-foreground">{subject.topics.length} {lk(ui.topics)}</p>
+                            <span className="text-xs font-display font-bold text-primary">
+                              {progress.getSubjectProgress(subject.topics.map(tp => tp.id))}%
+                            </span>
+                          </div>
                         </div>
                         <ChevronDown size={16} className={`text-muted-foreground transition-transform ${isExpanded ? "rotate-180" : ""}`} />
                       </button>
@@ -369,8 +410,12 @@ const StudyScreen = ({ onCourseChange, onSubjectChange, onSubjectStudied, langua
                             <div className="pl-4 pr-2 py-2 space-y-1.5">
                               {subject.topics.map((topic, ti) => (
                                 <motion.div key={topic.id} initial={{ x: -10, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ delay: 0.03 * ti }} className="glass-card p-3 flex items-center gap-3">
+                                  <TopicCheckbox
+                                    completed={progress.isCompleted(topic.id)}
+                                    onToggle={() => progress.toggleTopic(topic.id)}
+                                  />
                                   <span className="text-xs font-display text-primary font-bold w-6">{ti + 1}</span>
-                                  <span className="font-display text-sm text-foreground flex-1">{lk(topic)}</span>
+                                  <span className={`font-display text-sm flex-1 ${progress.isCompleted(topic.id) ? "line-through text-muted-foreground" : "text-foreground"}`}>{lk(topic)}</span>
                                   <button
                                     onClick={(e) => { e.stopPropagation(); handleStartRevision(lk(topic)); }}
                                     className="text-xs font-display font-semibold text-primary bg-primary/10 px-2 py-1 rounded-lg"
@@ -397,6 +442,15 @@ const StudyScreen = ({ onCourseChange, onSubjectChange, onSubjectStudied, langua
           )}
         </div>
       )}
+
+      {/* Custom Topics */}
+      <CustomTopics
+        lang={lang}
+        topics={progress.customTopics}
+        onAdd={progress.addCustomTopic}
+        onToggle={progress.toggleCustomTopic}
+        onRemove={progress.removeCustomTopic}
+      />
 
       {/* Tip */}
       {mode === "school" && !selectedGrade && (
