@@ -431,7 +431,7 @@ const StudyScreen = ({ onCourseChange, onSubjectChange, onSubjectStudied, langua
                                 </motion.div>
                               ))}
                               <button
-                                onClick={() => handleStartRevision(lk(subject))}
+                                onClick={() => handleStartRevision(subject.en, lk(subject))}
                                 className="w-full rounded-lg bg-primary/10 border border-primary/20 px-3 py-2 text-xs font-display font-semibold text-primary active:scale-95 transition-transform mt-2"
                               >
                                 {lk(ui.fullRevision)} — {lk(subject)}
