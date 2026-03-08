@@ -4,7 +4,99 @@ export interface RevisionItem {
   back: string;
 }
 
-export const revisionBySubject: Record<string, RevisionItem[]> = {
+// Fallback mapping: chapter name keywords → revisionBySubject key
+const chapterFallbacks: Record<string, string> = {
+  // Math chapters
+  "Numbers": "Basic Math", "Addition": "Basic Math", "Subtraction": "Basic Math",
+  "Shapes": "Colors & Shapes", "Patterns": "Basic Math",
+  "Numbers & Operations": "Basic Math", "Fractions": "Mathematics", "Measurement": "Mathematics",
+  "Geometry": "Mathematics", "Data Handling": "Mathematics", "Money": "Basic Math",
+  "Time & Calendar": "Basic Math", "Number System": "Mathematics", "Algebra": "Mathematics",
+  "Mensuration": "Mathematics", "Statistics": "Mathematics", "Ratio & Proportion": "Mathematics",
+  "Profit & Loss": "Mathematics", "Simple Interest": "Mathematics",
+  "Real Numbers": "Mathematics", "Polynomials": "Mathematics", "Linear Equations": "Mathematics",
+  "Quadratic Equations": "Mathematics", "Coordinate Geometry": "Mathematics",
+  "Trigonometry": "Maths", "Statistics & Probability": "Mathematics",
+  "Circles": "Mathematics", "Surface Area & Volume": "Mathematics",
+  "Sets & Functions": "Maths", "Calculus": "Maths", "Matrices & Determinants": "Maths",
+  "Probability": "Maths", "Vectors": "Maths", "Differential Equations": "Maths",
+  // Science chapters
+  "Living & Non-living": "EVS Basics", "Plants": "EVS Basics", "Animals": "EVS Basics",
+  "Our Body": "Science", "Water & Air": "EVS Basics", "Food & Nutrition": "Science",
+  "Force & Motion": "Physics", "Heat & Temperature": "Physics", "Light": "Physics",
+  "Electricity": "Physics", "Plant Kingdom": "Science", "Human Body Systems": "Science",
+  "Acids & Bases": "Chemistry", "Laws of Motion": "Physics", "Atomic Structure": "Chemistry",
+  "Chemical Reactions": "Chemistry", "Heredity & Evolution": "Science",
+  "Optics": "Physics", "Electricity & Magnetism": "Physics", "Carbon Compounds": "Chemistry",
+  "Reproduction": "Science",
+  // Tamil chapters
+  "Tamil Alphabets": "Tamil Letters", "Simple Words": "Tamil",
+  "Sentences": "Tamil", "Poems": "Tamil", "Stories": "Tamil",
+  "Prose": "Literature", "Poetry": "Literature", "Grammar": "English",
+  "Comprehension": "English", "Letter Writing": "English", "Essay": "English",
+  "Grammar - Phonetics": "Tamil", "Grammar - Syntax": "Tamil", "Literature": "Literature",
+  "Essay & Letter": "English",
+  // English chapters
+  "Alphabets & Phonics": "English Words", "Reading Comprehension": "English",
+  "Simple Grammar": "English", "Vocabulary": "English Words",
+  "Stories & Poems": "Literature", "Writing Skills": "English",
+  "Grammar & Usage": "English", "Writing": "English",
+  // Social Science chapters
+  "My Family": "Social Science", "My Neighbourhood": "Social Science",
+  "Our Country India": "Social Science", "Festivals": "Social Science",
+  "Maps & Directions": "Social Science",
+  "History - Ancient India": "History", "History - Medieval India": "History",
+  "Geography": "Social Science", "Civics": "Political Science",
+  "Indian National Movement": "History", "World History": "History",
+  "Indian Geography": "Social Science", "Indian Constitution": "Political Science",
+  "Disaster Management": "Science",
+  // EVS chapters
+  "Plants Around Us": "EVS Basics", "Animals Around Us": "EVS Basics",
+  "Weather & Seasons": "EVS Basics", "Clean Environment": "EVS Basics",
+  "Our Helpers": "EVS Basics",
+  // Physics 11-12
+  "Kinematics": "Physics", "Work, Energy & Power": "Physics",
+  "Gravitation": "Physics", "Waves": "Physics", "Electrostatics": "Physics",
+  "Current Electricity": "Physics",
+  // Chemistry 11-12
+  "Chemical Bonding": "Chemistry", "Thermodynamics": "Thermodynamics",
+  "Solutions": "Chemistry", "Organic Chemistry": "Chemistry", "Electrochemistry": "Chemistry",
+  // Biology
+  "Cell Biology": "Science", "Plant Biology": "Science",
+  "Human Physiology": "Physiology", "Genetics": "Science", "Ecology": "Science",
+  // Pre-school
+  "Letters A-F": "Alphabets (A-Z)", "Letters G-L": "Alphabets (A-Z)",
+  "Letters M-R": "Alphabets (A-Z)", "Letters S-Z": "Alphabets (A-Z)",
+  "Numbers 1-5": "Numbers (1-10)", "Numbers 6-10": "Numbers (1-10)",
+  "Numbers 11-20": "Numbers (1-10)",
+  "Vowels (உயிர் எழுத்துக்கள்)": "Tamil Letters",
+  "Consonants (மெய் எழுத்துக்கள்)": "Tamil Letters",
+  "Primary Colors": "Colors & Shapes",
+  "English Rhymes": "Rhymes & Songs", "Tamil Rhymes": "Rhymes & Songs",
+  // Higher ed
+  "Engineering Maths": "Engineering Maths", "Data Structures": "Data Structures",
+  "Circuit Theory": "Circuit Theory", "Programming": "Programming",
+};
+
+export function getRevisionItems(subject: string): RevisionItem[] {
+  // Exact match first
+  if (revisionBySubject[subject] && revisionBySubject[subject].length > 0) {
+    return revisionBySubject[subject];
+  }
+  // Fallback mapping
+  const fallbackKey = chapterFallbacks[subject];
+  if (fallbackKey && revisionBySubject[fallbackKey]) {
+    return revisionBySubject[fallbackKey];
+  }
+  // Partial match: find any key that contains the subject name or vice versa
+  const lowerSubject = subject.toLowerCase();
+  for (const key of Object.keys(revisionBySubject)) {
+    if (key.toLowerCase().includes(lowerSubject) || lowerSubject.includes(key.toLowerCase())) {
+      return revisionBySubject[key];
+    }
+  }
+  return [];
+}
   "Alphabets (A-Z)": [
     { front: "A", back: "🍎 Apple" }, { front: "B", back: "🏀 Ball" }, { front: "C", back: "🐱 Cat" },
     { front: "D", back: "🐶 Dog" }, { front: "E", back: "🐘 Elephant" }, { front: "F", back: "🐸 Frog" },
