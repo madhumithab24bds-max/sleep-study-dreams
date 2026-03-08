@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { CheckCircle, XCircle, Trophy, Volume2, VolumeX, BookOpen, Upload, BarChart3, Target, RefreshCw, Zap, FileText, Camera, Mic, MicOff, User, Settings2 } from "lucide-react";
+import { CheckCircle, XCircle, Trophy, Volume2, VolumeX, BookOpen, Upload, BarChart3, Target, RefreshCw, Zap, FileText, Camera, Mic, MicOff, User, Settings2, MessageCircle } from "lucide-react";
 import { useState, useMemo, useEffect, useCallback, useRef } from "react";
 import { quizBySubject, quizByCourse, subjectAudioMap, getRandomQuiz, getWeakTopicQuiz, type QuizQuestion } from "@/lib/quizData";
 import { playAudio, stopAudio, playSfx } from "@/lib/audioEngine";
