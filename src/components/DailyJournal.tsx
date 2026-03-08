@@ -9,7 +9,7 @@ interface JournalEntry {
   content: string;
 }
 
-const STORAGE_KEY = "thukkam_daily_journal";
+const STORAGE_KEY = "thookam_daily_journal";
 
 const DailyJournal = ({ onBack }: { onBack: () => void }) => {
   const [entries, setEntries] = useState<JournalEntry[]>([]);

@@ -10,7 +10,7 @@ interface DreamEntry {
   tags: string[];
 }
 
-const STORAGE_KEY = "thukkam_dream_journal";
+const STORAGE_KEY = "thookam_dream_journal";
 
 const DreamJournal = ({ onBack }: { onBack: () => void }) => {
   const [entries, setEntries] = useState<DreamEntry[]>([]);

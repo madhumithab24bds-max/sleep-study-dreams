@@ -11,7 +11,7 @@ interface FAQ {
 const faqs: FAQ[] = [
   {
     q: "How does Sleep Learning work?",
-    a: "ThukkamTutor plays gentle audio cues of study material during your light sleep phases. Research shows this can reinforce memory consolidation. Simply select a subject, go to Sleep mode, and place your phone nearby while sleeping.",
+    a: "ThookamTutor plays gentle audio cues of study material during your light sleep phases. Research shows this can reinforce memory consolidation. Simply select a subject, go to Sleep mode, and place your phone nearby while sleeping.",
     icon: <Moon size={16} className="text-dream" />,
   },
   {
@@ -46,7 +46,7 @@ const faqs: FAQ[] = [
   },
   {
     q: "What languages are supported?",
-    a: "ThukkamTutor supports Tamil and English. You can switch between languages in the Study section using the language toggle at the top.",
+    a: "ThookamTutor supports Tamil and English. You can switch between languages in the Study section using the language toggle at the top.",
     icon: <HelpCircle size={16} className="text-primary" />,
   },
 ];
@@ -66,7 +66,7 @@ const HelpCenter = ({ onBack }: { onBack: () => void }) => {
       <motion.div className="glass-card p-5 mb-6 text-center" initial={{ y: 10, opacity: 0 }} animate={{ y: 0, opacity: 1 }}>
         <HelpCircle size={32} className="mx-auto text-primary mb-2" />
         <h3 className="font-display font-bold text-foreground mb-1">How can we help?</h3>
-        <p className="text-xs text-muted-foreground">Browse FAQs below to learn how to use ThukkamTutor effectively</p>
+        <p className="text-xs text-muted-foreground">Browse FAQs below to learn how to use ThookamTutor effectively</p>
       </motion.div>
 
       <div className="space-y-2">
@@ -104,7 +104,7 @@ const HelpCenter = ({ onBack }: { onBack: () => void }) => {
 
       <motion.div className="glass-card p-5 mt-6 text-center" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }}>
         <p className="text-xs text-muted-foreground font-display">
-          Still need help? Contact us at <span className="text-primary font-semibold">support@thukkamtutor.app</span>
+          Still need help? Contact us at <span className="text-primary font-semibold">support@thookamtutor.app</span>
         </p>
       </motion.div>
     </div>

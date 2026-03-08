@@ -6,8 +6,8 @@ export interface CustomTopic {
   completed: boolean;
 }
 
-const STORAGE_KEY = "thukkam_completed_topics";
-const CUSTOM_TOPICS_KEY = "thukkam_custom_topics";
+const STORAGE_KEY = "thookam_completed_topics";
+const CUSTOM_TOPICS_KEY = "thookam_custom_topics";
 
 export function useStudyProgress() {
   const [completedTopics, setCompletedTopics] = useState<Set<string>>(() => {

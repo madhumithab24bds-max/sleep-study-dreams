@@ -12,7 +12,7 @@ interface ActivityItem {
   time: string;
 }
 
-const STORAGE_KEY = "thukkam_activity_log";
+const STORAGE_KEY = "thookam_activity_log";
 
 // Collect activity from all localStorage sources
 function collectActivity(): ActivityItem[] {
@@ -26,7 +26,7 @@ function collectActivity(): ActivityItem[] {
 
   // Quiz performance data
   try {
-    const perf = localStorage.getItem("thukkam_performance");
+    const perf = localStorage.getItem("thookam_performance");
     if (perf) {
       const data = JSON.parse(perf);
       Object.entries(data).forEach(([subject, info]: [string, any]) => {
@@ -47,7 +47,7 @@ function collectActivity(): ActivityItem[] {
 
   // Dream journal entries
   try {
-    const dreams = localStorage.getItem("thukkam_dream_journal");
+    const dreams = localStorage.getItem("thookam_dream_journal");
     if (dreams) {
       JSON.parse(dreams).forEach((d: any) => {
         items.push({
@@ -65,7 +65,7 @@ function collectActivity(): ActivityItem[] {
 
   // Daily journal entries
   try {
-    const journal = localStorage.getItem("thukkam_daily_journal");
+    const journal = localStorage.getItem("thookam_daily_journal");
     if (journal) {
       JSON.parse(journal).forEach((j: any) => {
         items.push({

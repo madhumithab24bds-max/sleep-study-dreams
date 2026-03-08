@@ -30,7 +30,7 @@ const HomeScreen = ({ onNavigate }: HomeScreenProps) => {
 
   const UPI_ID = "madhukrr2006@oksbi";
   const UPI_AMOUNT = "50";
-  const UPI_QR_URL = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(`upi://pay?pa=${UPI_ID}&pn=ThukkamTutor&am=${UPI_AMOUNT}&cu=INR&tn=ThukkamTutor%20Subscription`)}`;
+  const UPI_QR_URL = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(`upi://pay?pa=${UPI_ID}&pn=ThookamTutor&am=${UPI_AMOUNT}&cu=INR&tn=ThookamTutor%20Subscription`)}`;
 
   const copyUpiId = () => {
     navigator.clipboard.writeText(UPI_ID);
@@ -60,7 +60,7 @@ const HomeScreen = ({ onNavigate }: HomeScreenProps) => {
         <div className="relative z-10 flex flex-col items-center px-6 pb-10 pt-12 text-center">
           <motion.img
             src={logo}
-            alt="ThukkamTutor Logo"
+            alt="ThookamTutor Logo"
             className="mb-4 h-28 w-28 drop-shadow-2xl"
             initial={{ y: -30, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
@@ -72,7 +72,7 @@ const HomeScreen = ({ onNavigate }: HomeScreenProps) => {
             animate={{ opacity: 1 }}
             transition={{ delay: 0.3 }}
           >
-            ThukkamTutor
+            ThookamTutor
           </motion.h1>
           <motion.p
             className="text-sm font-display italic text-muted-foreground"
@@ -168,13 +168,13 @@ const HomeScreen = ({ onNavigate }: HomeScreenProps) => {
 
       <div className="mb-8 mt-8 px-4">
         <div className="glass-card p-6">
-          <h2 className="mb-3 text-lg font-display font-bold text-gradient-dream">🚀 Why ThukkamTutor?</h2>
+          <h2 className="mb-3 text-lg font-display font-bold text-gradient-dream">🚀 Why ThookamTutor?</h2>
           <div className="space-y-3 text-sm leading-relaxed text-muted-foreground">
             <p>
               <span className="font-semibold text-foreground">The Problem:</span> Students forget 70% of what they study overnight. Traditional revision is time-consuming and exhausting.
             </p>
             <p>
-              <span className="font-semibold text-foreground">Our Solution:</span> ThukkamTutor uses scientifically-backed sleep learning techniques — playing gentle audio cues during light sleep phases to reinforce memory consolidation.
+              <span className="font-semibold text-foreground">Our Solution:</span> ThookamTutor uses scientifically-backed sleep learning techniques — playing gentle audio cues during light sleep phases to reinforce memory consolidation.
             </p>
             <p>
               <span className="font-semibold text-foreground">Market:</span> 300M+ students in India alone. Sleep learning is a ₹500Cr untapped market.
@@ -213,7 +213,7 @@ const HomeScreen = ({ onNavigate }: HomeScreenProps) => {
                 <div className="w-12 h-12 rounded-2xl bg-primary/20 flex items-center justify-center mx-auto mb-3">
                   <IndianRupee size={24} className="text-primary" />
                 </div>
-                <h2 className="font-display font-bold text-lg text-foreground">Subscribe to ThukkamTutor</h2>
+                <h2 className="font-display font-bold text-lg text-foreground">Subscribe to ThookamTutor</h2>
                 <p className="text-xs text-muted-foreground mt-1">Unlock all premium features</p>
               </div>
 
@@ -252,7 +252,7 @@ const HomeScreen = ({ onNavigate }: HomeScreenProps) => {
               </div>
 
               <a
-                href={`upi://pay?pa=${UPI_ID}&pn=ThukkamTutor&am=${UPI_AMOUNT}&cu=INR&tn=ThukkamTutor%20Subscription`}
+                href={`upi://pay?pa=${UPI_ID}&pn=ThookamTutor&am=${UPI_AMOUNT}&cu=INR&tn=ThookamTutor%20Subscription`}
                 className="w-full rounded-xl bg-primary text-primary-foreground font-display font-semibold text-sm py-3 flex items-center justify-center gap-2 active:scale-95 transition-transform"
               >
                 <ExternalLink size={14} /> Open UPI App to Pay ₹50

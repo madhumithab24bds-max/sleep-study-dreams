@@ -144,9 +144,9 @@ export function applyTheme(themeId: string) {
   Object.entries(theme.vars).forEach(([key, value]) => {
     root.style.setProperty(key, value);
   });
-  localStorage.setItem("thukkam-theme", themeId);
+  localStorage.setItem("thookam-theme", themeId);
 }
 
 export function loadSavedTheme(): string {
-  return localStorage.getItem("thukkam-theme") || "night-blue";
+  return localStorage.getItem("thookam-theme") || "night-blue";
 }
