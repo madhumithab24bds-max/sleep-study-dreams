@@ -2,9 +2,9 @@ import { motion } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 import {
   Settings, Globe, Bell, LogOut,
-  User, Vibrate, Clock, Palette, Pencil, Check, Smartphone
+  User, Vibrate, Clock, Palette, Pencil, Check, Smartphone, Camera, X
 } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { toast } from "sonner";
 import { Switch } from "@/components/ui/switch";
 import { Input } from "@/components/ui/input";
