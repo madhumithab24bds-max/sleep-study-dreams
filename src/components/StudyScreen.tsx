@@ -1,9 +1,8 @@
 import { motion } from "framer-motion";
-import { Languages, ChevronRight, ChevronDown, GraduationCap, BookOpen } from "lucide-react";
+import { Languages, ChevronRight, ChevronDown, GraduationCap } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import RevisionView from "./RevisionView";
-import SyllabusBrowser from "./SyllabusBrowser";
 
 interface Course {
   id: string;
@@ -212,7 +211,6 @@ const StudyScreen = ({ onCourseChange, onSubjectChange, onSubjectStudied }: Stud
   const [language, setLanguage] = useState<"Tamil" | "English">("English");
   const [activeSubject, setActiveSubject] = useState<string | null>(null);
   const [revisionSubject, setRevisionSubject] = useState<string | null>(null);
-  const [studyMode, setStudyMode] = useState<"quick" | "syllabus">("quick");
 
   const currentCourse = courses.find((c) => c.id === selectedCourse);
 
@@ -243,7 +241,7 @@ const StudyScreen = ({ onCourseChange, onSubjectChange, onSubjectStudied }: Stud
 
   return (
     <div className="min-h-screen pb-24 pt-6 px-4">
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-display font-bold text-foreground">📖 Study</h1>
         <button onClick={toggleLanguage} className="glass-card px-3 py-1.5 flex items-center gap-1.5 text-xs font-display text-muted-foreground">
           <Languages size={14} />
@@ -251,43 +249,7 @@ const StudyScreen = ({ onCourseChange, onSubjectChange, onSubjectStudied }: Stud
         </button>
       </div>
 
-      {/* Study Mode Toggle */}
-      <div className="flex gap-1.5 mb-4">
-        <button
-          onClick={() => setStudyMode("quick")}
-          className={`flex-1 py-2.5 rounded-xl text-xs font-display font-semibold transition-all flex items-center justify-center gap-1.5 ${
-            studyMode === "quick" ? "bg-primary text-primary-foreground" : "glass-card text-muted-foreground"
-          }`}
-        >
-          <BookOpen size={14} /> Quick Study
-        </button>
-        <button
-          onClick={() => setStudyMode("syllabus")}
-          className={`flex-1 py-2.5 rounded-xl text-xs font-display font-semibold transition-all flex items-center justify-center gap-1.5 ${
-            studyMode === "syllabus" ? "bg-primary text-primary-foreground" : "glass-card text-muted-foreground"
-          }`}
-        >
-          <GraduationCap size={14} /> Full Syllabus
-        </button>
-      </div>
-
-      {/* ─── FULL SYLLABUS MODE ─── */}
-      {studyMode === "syllabus" && (
-        <SyllabusBrowser
-          onNavigateToSleep={(subject) => {
-            onSubjectChange?.(subject);
-          }}
-          onNavigateToQuiz={(subject) => {
-            onSubjectChange?.(subject);
-          }}
-          onSubjectStudied={onSubjectStudied}
-        />
-      )}
-
-      {/* ─── QUICK STUDY MODE ─── */}
-      {studyMode === "quick" && (
-        <>
-      <motion.div className="glass-card p-5 mb-4" initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }}>
+      <motion.div className="glass-card p-5 mb-6" initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }}>
         <h3 className="font-display font-semibold text-sm text-foreground mb-3">Today's Progress</h3>
         <div className="flex items-center gap-4">
           <div className="flex-1">
@@ -405,8 +367,6 @@ const StudyScreen = ({ onCourseChange, onSubjectChange, onSubjectStudied }: Stud
             💡 <span className="text-foreground font-semibold">Tip:</span> Study 30 minutes before sleep for best memory consolidation results!
           </p>
         </motion.div>
-      )}
-        </>
       )}
     </div>
   );
