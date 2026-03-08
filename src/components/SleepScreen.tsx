@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Moon, Volume2, Timer, Settings, Music, CloudRain, Waves, Wind, Bird, Radio } from "lucide-react";
+import { Moon } from "lucide-react";
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { toast } from "sonner";
 import { playAudio, stopAudio } from "@/lib/audioEngine";
