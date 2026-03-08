@@ -226,6 +226,7 @@ const AudioLearning = () => {
       speechSynthesis.cancel();
       stopAudio();
       if (timerRef.current) clearTimeout(timerRef.current);
+      if (resumeIntervalRef.current) clearInterval(resumeIntervalRef.current);
     };
   }, []);
 
