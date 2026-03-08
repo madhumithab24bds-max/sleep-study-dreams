@@ -255,22 +255,6 @@ const ProfileScreen = ({ onLanguageChange }: ProfileScreenProps) => {
           />
         </div>
 
-        <div className="border-t border-border/30" />
-
-        {/* Subscription */}
-        <button
-          onClick={() => setShowPayment(true)}
-          className="flex items-center justify-between py-3 w-full group"
-        >
-          <div className="flex items-center gap-3">
-            <CreditCard size={18} className="text-primary" />
-            <div className="text-left">
-              <span className="text-sm font-display text-foreground block">Subscription</span>
-              <span className="text-xs text-muted-foreground">Current: {plan}</span>
-            </div>
-          </div>
-          <ChevronRight size={14} className="text-muted-foreground group-hover:text-foreground transition-colors" />
-        </button>
       </motion.div>
 
       {/* Screen Time */}
