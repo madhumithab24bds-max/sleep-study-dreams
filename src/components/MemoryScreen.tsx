@@ -30,16 +30,25 @@ interface Props {
 }
 
 type MainTab = "revision" | "chat" | "quiz" | "upload";
-type QuizMode = "current" | "studied" | "weak" | "upload";
+type QuizMode = "current" | "studied" | "weak" | "upload" | "subject";
 
 const MemoryScreen = ({ selectedCourse, selectedSubject, studiedSubjects }: Props) => {
   const [mainTab, setMainTab] = useState<MainTab>("revision");
   const [quizSource, setQuizSource] = useState<QuizMode>("current");
   const [studiedPick, setStudiedPick] = useState<string | null>(null);
+  const [subjectPick, setSubjectPick] = useState<string | null>(null);
+  const [subjectSearch, setSubjectSearch] = useState("");
   const [quizCount, setQuizCount] = useState(10);
   const [quizStarted, setQuizStarted] = useState(false);
 
-  const activeQuizSubject = quizSource === "studied" ? studiedPick : selectedSubject;
+  const activeQuizSubject = quizSource === "studied" ? studiedPick : quizSource === "subject" ? subjectPick : selectedSubject;
+
+  const allQuizSubjects = useMemo(() => Object.keys(quizBySubject).sort(), []);
+  const filteredQuizSubjects = useMemo(() => {
+    if (!subjectSearch.trim()) return allQuizSubjects;
+    const q = subjectSearch.toLowerCase();
+    return allQuizSubjects.filter(s => s.toLowerCase().includes(q));
+  }, [allQuizSubjects, subjectSearch]);
 
   const [quizzes, setQuizzes] = useState<QuizQuestion[]>([]);
   const [current, setCurrent] = useState(0);
@@ -733,6 +742,7 @@ const MemoryScreen = ({ selectedCourse, selectedSubject, studiedSubjects }: Prop
                   { id: "studied" as QuizMode, label: "✅ What I Studied", desc: `${studiedSubjects.length} topics` },
                   { id: "weak" as QuizMode, label: "🎯 Weak Areas", desc: `${weakSubjects.length} topics` },
                   { id: "upload" as QuizMode, label: "📤 From Upload", desc: "AI generated" },
+                  { id: "subject" as QuizMode, label: "📋 Select Subject", desc: `${allQuizSubjects.length} subjects` },
                 ]).map((s) => (
                   <motion.button
                     key={s.id}
@@ -750,6 +760,36 @@ const MemoryScreen = ({ selectedCourse, selectedSubject, studiedSubjects }: Prop
                   </motion.button>
                 ))}
               </div>
+
+              {/* Subject picker */}
+              {quizSource === "subject" && (
+                <div className="space-y-2">
+                  <p className="text-xs font-display font-semibold text-foreground">Choose a subject:</p>
+                  <input
+                    type="text"
+                    placeholder="🔍 Search subjects..."
+                    value={subjectSearch}
+                    onChange={(e) => setSubjectSearch(e.target.value)}
+                    className="w-full px-3 py-2 rounded-xl bg-muted/30 border border-border text-xs text-foreground font-display placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary"
+                  />
+                  <div className="flex flex-wrap gap-1.5 max-h-48 overflow-y-auto">
+                    {filteredQuizSubjects.map((subj) => (
+                      <button
+                        key={subj}
+                        onClick={() => setSubjectPick(subj)}
+                        className={`px-3 py-1.5 rounded-xl text-[11px] font-display font-semibold transition-all ${
+                          subjectPick === subj ? "bg-primary text-primary-foreground" : "glass-card text-foreground"
+                        }`}
+                      >
+                        {subj}
+                      </button>
+                    ))}
+                    {filteredQuizSubjects.length === 0 && (
+                      <p className="text-[10px] text-muted-foreground font-display p-2">No subjects match your search</p>
+                    )}
+                  </div>
+                </div>
+              )}
 
               {/* Studied picker */}
               {quizSource === "studied" && (
