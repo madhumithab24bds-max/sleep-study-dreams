@@ -465,6 +465,15 @@ export const stopAudio = () => {
 
 export const updateVolume = (volume: number) => {
   if (!audioContext || !isPlaying) return;
+  // Re-start with new volume (simplest reliable approach)
+  const currentType = lastPlayedType;
+  if (currentType) {
+    stopAll();
+    isPlaying = true;
+    const vol = Math.max(0, Math.min(1, volume / 100));
+    const player = players[currentType] || playWhiteNoise;
+    player(audioContext, vol);
+  }
 };
 
 // Quick sound effects for UI interactions
