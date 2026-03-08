@@ -372,16 +372,23 @@ const AudioLearning = () => {
           </div>
         )}
 
-        {/* Play button */}
-        <button
-          onClick={isPlaying ? stopPlayback : startPlayback}
-          className={`w-full flex items-center justify-center gap-3 py-3 rounded-xl font-display font-bold text-sm transition-all ${
-            isPlaying ? "bg-destructive/20 text-destructive hover:bg-destructive/30" : "bg-primary/20 text-primary hover:bg-primary/30"
-          }`}
-        >
-          {isPlaying ? <Pause size={18} /> : <Play size={18} />}
-          {isPlaying ? "Stop Audio Learning" : "Start Audio Learning"}
-        </button>
+        {/* Tap button */}
+        <div className="flex justify-center">
+          <motion.button
+            onClick={isPlaying ? stopPlayback : startPlayback}
+            whileTap={{ scale: 0.9 }}
+            animate={isPlaying ? { scale: [1, 1.05, 1] } : {}}
+            transition={isPlaying ? { repeat: Infinity, duration: 2 } : { type: "spring", stiffness: 400 }}
+            className={`w-28 h-28 rounded-full flex flex-col items-center justify-center font-display font-bold text-sm transition-all shadow-lg ${
+              isPlaying
+                ? "bg-destructive/20 text-destructive border-2 border-destructive/30"
+                : "bg-primary/20 text-primary border-2 border-primary/30 hover:bg-primary/30"
+            }`}
+          >
+            {isPlaying ? <Pause size={28} /> : <Play size={28} className="ml-1" />}
+            <span className="text-[10px] mt-1">{isPlaying ? "Stop" : "Play"}</span>
+          </motion.button>
+        </div>
 
         {/* Background Sound Selector */}
         <div className="space-y-2">
