@@ -42,4 +42,12 @@ export const ui = {
   motivation2: { en: "Sleep mode will reinforce today's learning.", ta: "தூக்க பயிற்சி இன்றைய கற்றலை வலுப்படுத்தும்.", hi: "स्लीप मोड आज की पढ़ाई को मजबूत करेगा।" },
   motivation3: { en: "You're doing amazing! Almost there!", ta: "நீங்கள் அருமையாக செய்கிறீர்கள்!", hi: "आप बहुत अच्छा कर रहे हैं!" },
   overallProgress: { en: "Overall Progress", ta: "ஒட்டுமொத்த முன்னேற்றம்", hi: "समग्र प्रगति" },
+  searchTopics: { en: "Search subjects, chapters...", ta: "பாடங்கள், அத்தியாயங்கள் தேடுக...", hi: "विषय, अध्याय खोजें..." },
+  sortBy: { en: "Sort by", ta: "வரிசைப்படுத்து", hi: "क्रमबद्ध करें" },
+  sortDefault: { en: "Default", ta: "இயல்புநிலை", hi: "डिफ़ॉल्ट" },
+  sortProgress: { en: "Progress", ta: "முன்னேற்றம்", hi: "प्रगति" },
+  sortCards: { en: "Cards Available", ta: "அட்டைகள்", hi: "कार्ड उपलब्ध" },
+  sortName: { en: "Name (A-Z)", ta: "பெயர் (A-Z)", hi: "नाम (A-Z)" },
+  hasCards: { en: "cards", ta: "அட்டைகள்", hi: "कार्ड" },
+  noResults: { en: "No results found", ta: "முடிவுகள் இல்லை", hi: "कोई परिणाम नहीं" },
 } as const;
