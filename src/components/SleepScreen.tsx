@@ -14,6 +14,11 @@ const audioTypes = [
   { id: "nature", label: "Nature", icon: Bird, emoji: "🐦" },
   { id: "white-noise", label: "White Noise", icon: Radio, emoji: "📻" },
   { id: "lullaby", label: "Lullaby", icon: Music, emoji: "🎵" },
+  { id: "alpha-waves", label: "Alpha Waves", icon: Radio, emoji: "🧠" },
+  { id: "gamma-waves", label: "Gamma Waves", icon: Radio, emoji: "⚡" },
+  { id: "ground-noise", label: "Ground Noise", icon: Radio, emoji: "🌍" },
+  { id: "sleep-music", label: "Sleep Music", icon: Music, emoji: "🎶" },
+  { id: "deep-focus", label: "Deep Focus", icon: Radio, emoji: "🎯" },
 ];
 
 const durationOptions = ["30 min", "1 hour", "2 hours", "4 hours", "8 hours"];
