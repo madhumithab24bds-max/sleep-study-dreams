@@ -414,9 +414,10 @@ const MemoryScreen = ({ selectedCourse, selectedSubject, studiedSubjects }: Prop
       {/* Main Tabs */}
       <div className="flex gap-1.5 mb-4">
         {([
-          { id: "quiz" as TabView, label: "📝 Quiz", icon: null },
-          { id: "performance" as TabView, label: "📊 Stats", icon: null },
-          { id: "upload" as TabView, label: "📤 Upload", icon: null },
+          { id: "quiz" as TabView, label: "📝 Quiz" },
+          { id: "conversation" as TabView, label: "💬 Chat" },
+          { id: "performance" as TabView, label: "📊 Stats" },
+          { id: "upload" as TabView, label: "📤 Upload" },
         ]).map((t) => (
           <button
             key={t.id}
