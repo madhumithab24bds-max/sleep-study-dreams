@@ -41,7 +41,14 @@ const MemoryScreen = ({ selectedCourse, selectedSubject, studiedSubjects }: Prop
   const [quizCount, setQuizCount] = useState(10);
   const [quizStarted, setQuizStarted] = useState(false);
 
-  const activeQuizSubject = quizSource === "studied" ? studiedPick : selectedSubject;
+  const activeQuizSubject = quizSource === "studied" ? studiedPick : quizSource === "subject" ? subjectPick : selectedSubject;
+
+  const allQuizSubjects = useMemo(() => Object.keys(quizBySubject).sort(), []);
+  const filteredQuizSubjects = useMemo(() => {
+    if (!subjectSearch.trim()) return allQuizSubjects;
+    const q = subjectSearch.toLowerCase();
+    return allQuizSubjects.filter(s => s.toLowerCase().includes(q));
+  }, [allQuizSubjects, subjectSearch]);
 
   const [quizzes, setQuizzes] = useState<QuizQuestion[]>([]);
   const [current, setCurrent] = useState(0);
