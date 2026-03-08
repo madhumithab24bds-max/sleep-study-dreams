@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Moon, BookOpen, Activity, HelpCircle, IndianRupee, Copy, ExternalLink } from "lucide-react";
+import { X, Moon, BookOpen, Activity, HelpCircle, IndianRupee, Copy, ExternalLink, Users } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 import logo from "@/assets/logo.png";
 import nightSkyBg from "@/assets/night-sky-bg.jpg";
 import { toast } from "sonner";
