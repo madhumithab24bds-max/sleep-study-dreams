@@ -144,19 +144,27 @@ const AudioLearning = () => {
   }, [volume, duration, stopPlayback]);
 
   const startPlayback = useCallback(() => {
-    if (selectedTopics.length === 0 && !customNote.trim()) {
-      toast.error("Please select topics or add study notes");
+    if (selectedTopics.length === 0 && !customNote.trim() && !uploadedText.trim()) {
+      toast.error("Please select topics, add notes, or upload study materials");
       return;
     }
 
     const lines = buildRevisionScript(selectedTopics);
     
+    // Add uploaded material content
+    if (uploadedText.trim()) {
+      lines.unshift("Let's begin with your uploaded study material.");
+      const sentences = uploadedText.split(/[.!?\n]+/).filter((s) => s.trim().length > 3);
+      sentences.forEach((s) => lines.push(s.trim() + "."));
+      lines.push("That completes your uploaded material.");
+    }
+
     // Add custom notes as spoken content
     if (customNote.trim()) {
-      lines.unshift("Let's start with your personal study notes.");
+      lines.push("Now let's go through your personal study notes.");
       const sentences = customNote.split(/[.!?\n]+/).filter((s) => s.trim());
       sentences.forEach((s) => lines.push(s.trim() + "."));
-      lines.push("Those were your personal notes. Now moving on.");
+      lines.push("Those were your personal notes.");
     }
 
     if (lines.length === 0) {
@@ -170,12 +178,11 @@ const AudioLearning = () => {
     setIsPlaying(true);
     setCurrentLineIdx(0);
 
-    // Start selected background sound
     playAudio(bgSound, bgVolume);
 
     setTimeout(() => speakLine(lines, 0), 2000);
     toast.success(`Audio learning started for ${duration.label}`);
-  }, [selectedTopics, customNote, bgSound, bgVolume, duration, speakLine]);
+  }, [selectedTopics, customNote, uploadedText, bgSound, bgVolume, duration, speakLine]);
 
   // Update background sound while playing
   useEffect(() => {
