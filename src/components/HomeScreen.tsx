@@ -1,9 +1,16 @@
-import { motion } from "framer-motion";
+import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Menu, X, Moon, BookOpen, Activity, HelpCircle } from "lucide-react";
 import logo from "@/assets/logo.png";
 import nightSkyBg from "@/assets/night-sky-bg.jpg";
 import { toast } from "sonner";
+import DreamJournal from "./DreamJournal";
+import DailyJournal from "./DailyJournal";
+import ActivityScreen from "./ActivityScreen";
+import HelpCenter from "./HelpCenter";
 
 type TabId = "home" | "study" | "sleep" | "memory" | "profile";
+type MenuPage = null | "dream" | "journal" | "activity" | "help";
 
 interface HomeScreenProps {
   onNavigate: (tab: TabId) => void;
