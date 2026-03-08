@@ -190,7 +190,15 @@ const AudioLearning = () => {
 
     playAudio(bgSound, bgVolume);
 
-    setTimeout(() => speakLine(lines, 0), 2000);
+    // Chrome workaround: periodically resume speech synthesis to prevent it from stopping
+    resumeIntervalRef.current = setInterval(() => {
+      if (speechSynthesis.speaking && speechSynthesis.paused) {
+        speechSynthesis.resume();
+      }
+    }, 5000);
+
+    // Start speaking immediately (no delay to preserve user gesture context)
+    speakLine(lines, 0);
     toast.success(`Audio learning started for ${duration.label}`);
   }, [selectedTopics, customNote, uploadedText, bgSound, bgVolume, duration, speakLine]);
 
