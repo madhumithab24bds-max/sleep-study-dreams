@@ -733,6 +733,7 @@ const MemoryScreen = ({ selectedCourse, selectedSubject, studiedSubjects }: Prop
                   { id: "studied" as QuizMode, label: "✅ What I Studied", desc: `${studiedSubjects.length} topics` },
                   { id: "weak" as QuizMode, label: "🎯 Weak Areas", desc: `${weakSubjects.length} topics` },
                   { id: "upload" as QuizMode, label: "📤 From Upload", desc: "AI generated" },
+                  { id: "subject" as QuizMode, label: "📋 Select Subject", desc: `${allQuizSubjects.length} subjects` },
                 ]).map((s) => (
                   <motion.button
                     key={s.id}
@@ -750,6 +751,36 @@ const MemoryScreen = ({ selectedCourse, selectedSubject, studiedSubjects }: Prop
                   </motion.button>
                 ))}
               </div>
+
+              {/* Subject picker */}
+              {quizSource === "subject" && (
+                <div className="space-y-2">
+                  <p className="text-xs font-display font-semibold text-foreground">Choose a subject:</p>
+                  <input
+                    type="text"
+                    placeholder="🔍 Search subjects..."
+                    value={subjectSearch}
+                    onChange={(e) => setSubjectSearch(e.target.value)}
+                    className="w-full px-3 py-2 rounded-xl bg-muted/30 border border-border text-xs text-foreground font-display placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary"
+                  />
+                  <div className="flex flex-wrap gap-1.5 max-h-48 overflow-y-auto">
+                    {filteredQuizSubjects.map((subj) => (
+                      <button
+                        key={subj}
+                        onClick={() => setSubjectPick(subj)}
+                        className={`px-3 py-1.5 rounded-xl text-[11px] font-display font-semibold transition-all ${
+                          subjectPick === subj ? "bg-primary text-primary-foreground" : "glass-card text-foreground"
+                        }`}
+                      >
+                        {subj}
+                      </button>
+                    ))}
+                    {filteredQuizSubjects.length === 0 && (
+                      <p className="text-[10px] text-muted-foreground font-display p-2">No subjects match your search</p>
+                    )}
+                  </div>
+                </div>
+              )}
 
               {/* Studied picker */}
               {quizSource === "studied" && (
