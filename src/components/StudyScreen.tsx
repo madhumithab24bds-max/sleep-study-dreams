@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronDown, GraduationCap, BookOpen, Languages, School, Building2 } from "lucide-react";
+import { ChevronDown, GraduationCap, BookOpen, Languages, School, Building2, CheckCircle2 } from "lucide-react";
 import { useState, useMemo } from "react";
 import { toast } from "sonner";
 import RevisionView from "./RevisionView";
@@ -199,22 +199,28 @@ const StudyScreen = ({ onCourseChange, onSubjectChange, onSubjectStudied, langua
               {lk(ui.selectGrade)}
             </h3>
             <div className="grid grid-cols-2 gap-2">
-              {indianGrades.map((grade, i) => (
-                <motion.button
-                  key={grade.id}
-                  onClick={() => handleGradeSelect(grade)}
-                  className={`glass-card p-3 flex items-center gap-2.5 text-left group transition-all ${
-                    selectedGrade === grade.id ? "ring-2 ring-primary bg-primary/10" : ""
-                  }`}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.02 * i }}
-                  whileTap={{ scale: 0.97 }}
-                >
-                  <span className="text-lg">{grade.emoji}</span>
-                  <span className="font-display font-semibold text-xs text-foreground flex-1 truncate">{lk(grade)}</span>
-                </motion.button>
-              ))}
+              {indianGrades.map((grade, i) => {
+                const gradeSubjects = grade.subjects[board];
+                const allChapterIds = gradeSubjects.flatMap(s => s.chapters.map(ch => ch.id));
+                const isGradeComplete = allChapterIds.length > 0 && allChapterIds.every(id => progress.isCompleted(id));
+                return (
+                  <motion.button
+                    key={grade.id}
+                    onClick={() => handleGradeSelect(grade)}
+                    className={`glass-card p-3 flex items-center gap-2.5 text-left group transition-all ${
+                      selectedGrade === grade.id ? "ring-2 ring-primary bg-primary/10" : ""
+                    } ${isGradeComplete ? "ring-2 ring-accent bg-accent/10" : ""}`}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.02 * i }}
+                    whileTap={{ scale: 0.97 }}
+                  >
+                    <span className="text-lg">{grade.emoji}</span>
+                    <span className="font-display font-semibold text-xs text-foreground flex-1 truncate">{lk(grade)}</span>
+                    {isGradeComplete && <CheckCircle2 size={16} className="text-accent shrink-0" />}
+                  </motion.button>
+                );
+              })}
             </div>
           </div>
 
