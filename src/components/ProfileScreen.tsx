@@ -142,12 +142,13 @@ const ProfileScreen = ({ onLanguageChange }: ProfileScreenProps) => {
 
       {/* User Card */}
       <motion.div className="glass-card p-5 flex items-center gap-4" custom={0} initial="hidden" animate="visible" variants={sectionVariants}>
-        <div className="relative">
-          <img src={logo} alt="Avatar" className="w-16 h-16 rounded-2xl bg-muted glow-moonlight" />
+        <button className="relative" onClick={() => setShowAvatarPicker(true)}>
+          <img src={avatarUrl || logo} alt="Avatar" className="w-16 h-16 rounded-2xl bg-muted glow-moonlight object-cover" />
           <span className="absolute -bottom-1 -right-1 bg-primary text-primary-foreground rounded-full w-6 h-6 flex items-center justify-center text-xs">
-            <Pencil size={12} />
+            <Camera size={12} />
           </span>
-        </div>
+        </button>
+        <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={handleFileUpload} />
         <div className="flex-1 min-w-0">
           <h2 className="font-display font-bold text-foreground text-lg truncate">{name}</h2>
           <p className="text-xs text-muted-foreground font-display">@{username}</p>
