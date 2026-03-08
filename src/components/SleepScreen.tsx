@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useMemo } from "react";
 import { toast } from "sonner";
 import { playAudio, stopAudio } from "@/lib/audioEngine";
 import { subjectAudioMap } from "@/lib/quizData";
+import AudioLearning from "./AudioLearning";
 
 const audioTypes = [
   { id: "whisper", label: "Whisper", icon: Volume2, emoji: "🤫" },
@@ -83,7 +84,10 @@ const SleepScreen = ({ selectedSubject }: SleepScreenProps) => {
 
   return (
     <div className="min-h-screen pb-24 pt-6 px-4 flex flex-col">
-      <h1 className="text-2xl font-display font-bold text-foreground mb-6">😴 Sleep Mode</h1>
+      <h1 className="text-2xl font-display font-bold text-foreground mb-4">😴 Sleep Mode</h1>
+
+      {/* Audio Learning Section */}
+      <AudioLearning />
 
       <div className="flex-1 flex flex-col items-center justify-center -mt-10">
         <motion.div
