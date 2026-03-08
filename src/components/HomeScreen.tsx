@@ -168,7 +168,7 @@ const HomeScreen = ({ onNavigate }: HomeScreenProps) => {
 
       <div className="mb-8 mt-8 px-4">
         <div className="glass-card p-6">
-          <h2 className="mb-3 text-lg font-display font-bold text-gradient-dream">🚀 Why ThukkamTutor?</h2>
+          <h2 className="mb-3 text-lg font-display font-bold text-gradient-dream">🚀 Why ThookamTutor?</h2>
           <div className="space-y-3 text-sm leading-relaxed text-muted-foreground">
             <p>
               <span className="font-semibold text-foreground">The Problem:</span> Students forget 70% of what they study overnight. Traditional revision is time-consuming and exhausting.
