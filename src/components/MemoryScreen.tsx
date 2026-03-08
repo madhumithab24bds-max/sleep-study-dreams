@@ -30,7 +30,7 @@ interface Props {
 }
 
 type MainTab = "revision" | "chat" | "quiz" | "upload";
-type QuizMode = "current" | "studied" | "weak" | "upload";
+type QuizMode = "current" | "studied" | "weak" | "upload" | "subject";
 
 const MemoryScreen = ({ selectedCourse, selectedSubject, studiedSubjects }: Props) => {
   const [mainTab, setMainTab] = useState<MainTab>("revision");
