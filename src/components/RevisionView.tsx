@@ -1,7 +1,7 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { RotateCcw, ChevronLeft, ChevronRight, BookOpen, X } from "lucide-react";
 import { useState } from "react";
-import { revisionBySubject } from "@/lib/revisionData";
+import { revisionBySubject, getRevisionItems } from "@/lib/revisionData";
 
 interface Props {
   subject: string;
@@ -10,7 +10,7 @@ interface Props {
 }
 
 const RevisionView = ({ subject, onClose, onCompleted }: Props) => {
-  const items = revisionBySubject[subject] || [];
+  const items = getRevisionItems(subject);
   const [index, setIndex] = useState(0);
   const [flipped, setFlipped] = useState(false);
   const [completed, setCompleted] = useState<Set<number>>(new Set());
