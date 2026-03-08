@@ -70,6 +70,15 @@ const AudioLearning = () => {
   const startTimeRef = useRef<number>(0);
   const linesRef = useRef<string[]>([]);
   const playingRef = useRef(false);
+  const resumeIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  // Preload voices on mount
+  useEffect(() => {
+    const loadVoices = () => speechSynthesis.getVoices();
+    loadVoices();
+    speechSynthesis.onvoiceschanged = loadVoices;
+    return () => { speechSynthesis.onvoiceschanged = null; };
+  }, []);
 
   const duration = DURATION_OPTIONS[durationIdx];
   const currentBg = BG_SOUND_OPTIONS.find((s) => s.id === bgSound)!;
