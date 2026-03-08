@@ -1,8 +1,9 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { CheckCircle, XCircle, Trophy, Volume2, VolumeX, BookOpen, Upload, BarChart3, Target, RefreshCw, Zap, FileText, Camera, Mic, MicOff, User, Settings2 } from "lucide-react";
+import { CheckCircle, XCircle, Trophy, Volume2, VolumeX, BookOpen, Upload, BarChart3, Target, RefreshCw, Zap, FileText, Camera, Mic, MicOff, User, Settings2, MessageCircle } from "lucide-react";
 import { useState, useMemo, useEffect, useCallback, useRef } from "react";
 import { quizBySubject, quizByCourse, subjectAudioMap, getRandomQuiz, getWeakTopicQuiz, type QuizQuestion } from "@/lib/quizData";
 import { playAudio, stopAudio, playSfx } from "@/lib/audioEngine";
+import ConversationMode from "./ConversationMode";
 import { recordQuizResult, loadPerformance, getWeakSubjects, getOverallAccuracy, getSubjectAccuracy } from "@/lib/performanceTracker";
 import {
   loadVoiceSettings,
@@ -26,7 +27,7 @@ interface Props {
 }
 
 type QuizMode = "current" | "studied" | "weak" | "upload";
-type TabView = "quiz" | "performance" | "upload";
+type TabView = "quiz" | "performance" | "upload" | "conversation";
 
 const MemoryScreen = ({ selectedCourse, selectedSubject, studiedSubjects }: Props) => {
   const [tabView, setTabView] = useState<TabView>("quiz");
@@ -414,9 +415,10 @@ const MemoryScreen = ({ selectedCourse, selectedSubject, studiedSubjects }: Prop
       {/* Main Tabs */}
       <div className="flex gap-1.5 mb-4">
         {([
-          { id: "quiz" as TabView, label: "📝 Quiz", icon: null },
-          { id: "performance" as TabView, label: "📊 Stats", icon: null },
-          { id: "upload" as TabView, label: "📤 Upload", icon: null },
+          { id: "quiz" as TabView, label: "📝 Quiz" },
+          { id: "conversation" as TabView, label: "💬 Chat" },
+          { id: "performance" as TabView, label: "📊 Stats" },
+          { id: "upload" as TabView, label: "📤 Upload" },
         ]).map((t) => (
           <button
             key={t.id}
@@ -429,6 +431,16 @@ const MemoryScreen = ({ selectedCourse, selectedSubject, studiedSubjects }: Prop
           </button>
         ))}
       </div>
+
+      {/* ─── CONVERSATION TAB ─── */}
+      {tabView === "conversation" && (
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+          <ConversationMode
+            subject={activeQuizSubject || (selectedCourse ? selectedCourse.charAt(0).toUpperCase() + selectedCourse.slice(1) : null)}
+            onBack={() => setTabView("quiz")}
+          />
+        </motion.div>
+      )}
 
       {/* ─── UPLOAD TAB ─── */}
       {tabView === "upload" && (
