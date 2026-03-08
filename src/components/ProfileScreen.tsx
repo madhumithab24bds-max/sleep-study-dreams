@@ -67,16 +67,6 @@ const ProfileScreen = ({ onLanguageChange }: ProfileScreenProps) => {
   const [grade, setGrade] = useState("Class 10");
   const [course, setCourse] = useState("");
   const [plan] = useState("Basic ₹50/mo");
-  const [showPayment, setShowPayment] = useState(false);
-
-  const UPI_ID = "madhukrr2006@oksbi";
-  const UPI_AMOUNT = "50";
-  const UPI_QR_URL = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(`upi://pay?pa=${UPI_ID}&pn=ThukkamTutor&am=${UPI_AMOUNT}&cu=INR&tn=ThukkamTutor%20Subscription`)}`;
-
-  const copyUpiId = () => {
-    navigator.clipboard.writeText(UPI_ID);
-    toast.success("UPI ID copied!");
-  };
 
   const screenTimeData = [
     { label: "Study", value: 65, emoji: "📱" },
