@@ -50,7 +50,11 @@ const sectionVariants = {
   visible: (i: number) => ({ opacity: 1, y: 0, transition: { delay: i * 0.06, duration: 0.35 } }),
 };
 
-const ProfileScreen = () => {
+interface ProfileScreenProps {
+  onLanguageChange?: (lang: string) => void;
+}
+
+const ProfileScreen = ({ onLanguageChange }: ProfileScreenProps) => {
   const [name, setName] = useState("Student");
   const [username, setUsername] = useState("student_123");
   const [editingName, setEditingName] = useState(false);
