@@ -28,6 +28,17 @@ const quickActions: { emoji: string; label: string; tab: TabId; note?: string }[
 const HomeScreen = ({ onNavigate }: HomeScreenProps) => {
   const [menuPage, setMenuPage] = useState<MenuPage>(null);
   const [showPayment, setShowPayment] = useState(false);
+  const [userCount, setUserCount] = useState<number | null>(null);
+
+  useEffect(() => {
+    const fetchUserCount = async () => {
+      const { count } = await supabase
+        .from("profiles")
+        .select("*", { count: "exact", head: true });
+      if (count !== null) setUserCount(count);
+    };
+    fetchUserCount();
+  }, []);
 
   const UPI_ID = "madhukrr2006@oksbi";
   const UPI_AMOUNT = "50";
