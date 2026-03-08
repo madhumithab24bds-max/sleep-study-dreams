@@ -72,7 +72,7 @@ const HomeScreen = ({ onNavigate }: HomeScreenProps) => {
             animate={{ opacity: 1 }}
             transition={{ delay: 0.3 }}
           >
-            ThukkamTutor
+            ThookamTutor
           </motion.h1>
           <motion.p
             className="text-sm font-display italic text-muted-foreground"
