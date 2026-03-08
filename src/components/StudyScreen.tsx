@@ -173,6 +173,30 @@ const courses: Course[] = [
       { title: "Nursing Care", emoji: "💉", count: 140, color: "from-primary/20 to-dream/20" },
     ],
   },
+  {
+    id: "nursing",
+    label: "B.Sc Nursing",
+    emoji: "👩‍⚕️",
+    subjects: [
+      { title: "Fundamentals of Nursing", emoji: "📋", count: 200, color: "from-primary/20 to-accent/20" },
+      { title: "Medical-Surgical Nursing", emoji: "🏥", count: 180, color: "from-secondary/20 to-primary/20" },
+      { title: "Anatomy", emoji: "🦴", count: 160, color: "from-dream/20 to-secondary/20" },
+      { title: "Physiology", emoji: "❤️", count: 150, color: "from-accent/20 to-dream/20" },
+      { title: "Microbiology", emoji: "🦠", count: 120, color: "from-primary/20 to-dream/20" },
+    ],
+  },
+  {
+    id: "pharmacy",
+    label: "Pharmacy",
+    emoji: "💊",
+    subjects: [
+      { title: "Pharmaceutics", emoji: "💊", count: 180, color: "from-primary/20 to-accent/20" },
+      { title: "Pharmacology", emoji: "🧪", count: 200, color: "from-secondary/20 to-primary/20" },
+      { title: "Pharmacognosy", emoji: "🌿", count: 150, color: "from-dream/20 to-secondary/20" },
+      { title: "Biochemistry", emoji: "🧬", count: 140, color: "from-accent/20 to-dream/20" },
+      { title: "Human Anatomy", emoji: "🦴", count: 130, color: "from-primary/20 to-dream/20" },
+    ],
+  },
 ];
 
 interface StudyScreenProps {
