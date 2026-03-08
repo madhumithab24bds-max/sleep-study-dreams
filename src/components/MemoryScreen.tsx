@@ -1,9 +1,22 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { CheckCircle, XCircle, Trophy, Volume2, VolumeX, BookOpen, Upload, BarChart3, Target, RefreshCw, Zap, FileText, Camera } from "lucide-react";
-import { useState, useMemo, useEffect, useCallback } from "react";
+import { CheckCircle, XCircle, Trophy, Volume2, VolumeX, BookOpen, Upload, BarChart3, Target, RefreshCw, Zap, FileText, Camera, Mic, MicOff, User, Settings2 } from "lucide-react";
+import { useState, useMemo, useEffect, useCallback, useRef } from "react";
 import { quizBySubject, quizByCourse, subjectAudioMap, getRandomQuiz, getWeakTopicQuiz, type QuizQuestion } from "@/lib/quizData";
 import { playAudio, stopAudio, playSfx } from "@/lib/audioEngine";
 import { recordQuizResult, loadPerformance, getWeakSubjects, getOverallAccuracy, getSubjectAccuracy } from "@/lib/performanceTracker";
+import {
+  loadVoiceSettings,
+  saveVoiceSettings,
+  speak,
+  stopVoice,
+  readQuestion,
+  explainAnswer,
+  preloadVoices,
+  isSpeaking,
+  type VoiceGender,
+} from "@/lib/voiceEngine";
+import { Slider } from "@/components/ui/slider";
+import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
 
 interface Props {
@@ -33,12 +46,35 @@ const MemoryScreen = ({ selectedCourse, selectedSubject, studiedSubjects }: Prop
   const [tappedIdx, setTappedIdx] = useState<number | null>(null);
   const [roundHistory, setRoundHistory] = useState<{ correct: boolean; question: string }[]>([]);
 
+  // Voice state
+  const [voiceSettings, setVoiceSettings] = useState(loadVoiceSettings);
+  const [showVoicePanel, setShowVoicePanel] = useState(false);
+  const [voiceActive, setVoiceActive] = useState(false); // is currently speaking
+  const [waitingForExplanation, setWaitingForExplanation] = useState(false);
+  const advanceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
   // Performance data
   const [perfData, setPerfData] = useState(loadPerformance());
   const weakSubjects = useMemo(() => getWeakSubjects(3), [perfData]);
 
   // Upload state
   const [uploadedFiles, setUploadedFiles] = useState<{ name: string; type: string }[]>([]);
+
+  // Preload speech synthesis voices
+  useEffect(() => {
+    preloadVoices();
+  }, []);
+
+  const updateVoiceSetting = <K extends keyof ReturnType<typeof loadVoiceSettings>>(
+    key: K,
+    value: ReturnType<typeof loadVoiceSettings>[K]
+  ) => {
+    setVoiceSettings((prev) => {
+      const next = { ...prev, [key]: value };
+      saveVoiceSettings(next);
+      return next;
+    });
+  };
 
   const startQuiz = useCallback((source: QuizMode) => {
     let questions: QuizQuestion[] = [];
@@ -68,10 +104,26 @@ const MemoryScreen = ({ selectedCourse, selectedSubject, studiedSubjects }: Prop
     setDone(false);
     setRoundHistory([]);
     setQuizStarted(true);
+    setWaitingForExplanation(false);
   }, [quizSource, activeQuizSubject, selectedCourse, quizCount, weakSubjects, studiedPick]);
 
+  // Auto-read question when it changes
   useEffect(() => {
-    return () => stopAudio();
+    if (quizStarted && !done && quizzes.length > 0 && voiceSettings.enabled) {
+      const q = quizzes[current];
+      const fullText = `Question ${current + 1}. ${q.q}`;
+      setVoiceActive(true);
+      readQuestion(fullText, voiceSettings, () => setVoiceActive(false));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [current, quizStarted, done, quizzes.length]);
+
+  useEffect(() => {
+    return () => {
+      stopAudio();
+      stopVoice();
+      if (advanceTimerRef.current) clearTimeout(advanceTimerRef.current);
+    };
   }, []);
 
   const label = activeQuizSubject || (selectedCourse ? selectedCourse.charAt(0).toUpperCase() + selectedCourse.slice(1) : "General");
@@ -86,6 +138,21 @@ const MemoryScreen = ({ selectedCourse, selectedSubject, studiedSubjects }: Prop
     else { playAudio(audioType, 30); setAudioPlaying(true); }
   }, [audioPlaying, audioType]);
 
+  const advanceToNext = useCallback(() => {
+    setWaitingForExplanation(false);
+    if (current < quizzes.length - 1) {
+      setCurrent((c) => c + 1);
+      setSelected(null);
+    } else {
+      setDone(true);
+      if (audioPlaying) { stopAudio(); setAudioPlaying(false); }
+      const finalScore = score;
+      const subj = activeQuizSubject || selectedCourse || "General";
+      const updated = recordQuizResult(subj, quizzes.length, finalScore);
+      setPerfData(updated);
+    }
+  }, [current, quizzes.length, audioPlaying, score, activeQuizSubject, selectedCourse]);
+
   const handleAnswer = (idx: number) => {
     if (selected !== null) return;
     setTappedIdx(idx);
@@ -95,24 +162,60 @@ const MemoryScreen = ({ selectedCourse, selectedSubject, studiedSubjects }: Prop
     if (isCorrect) setScore((s) => s + 1);
     setRoundHistory((prev) => [...prev, { correct: isCorrect, question: quizzes[current].q }]);
 
-    setTimeout(() => {
-      setTappedIdx(null);
-      if (current < quizzes.length - 1) {
-        setCurrent((c) => c + 1);
-        setSelected(null);
-      } else {
-        setDone(true);
-        if (audioPlaying) { stopAudio(); setAudioPlaying(false); }
-        // Record performance
-        const finalScore = isCorrect ? score + 1 : score;
-        const subj = activeQuizSubject || selectedCourse || "General";
-        const updated = recordQuizResult(subj, quizzes.length, finalScore);
-        setPerfData(updated);
-      }
-    }, 1000);
+    // Voice explanation
+    if (voiceSettings.enabled) {
+      setWaitingForExplanation(true);
+      setVoiceActive(true);
+      // Small delay so SFX plays first
+      setTimeout(() => {
+        explainAnswer(
+          quizzes[current].q,
+          quizzes[current].options[quizzes[current].answer],
+          isCorrect,
+          voiceSettings,
+          () => {
+            setVoiceActive(false);
+            setTappedIdx(null);
+            // Advance after explanation ends
+            advanceTimerRef.current = setTimeout(() => {
+              if (current < quizzes.length - 1) {
+                setCurrent((c) => c + 1);
+                setSelected(null);
+                setWaitingForExplanation(false);
+              } else {
+                setDone(true);
+                setWaitingForExplanation(false);
+                if (audioPlaying) { stopAudio(); setAudioPlaying(false); }
+                const finalScore = isCorrect ? score + 1 : score;
+                const subj = activeQuizSubject || selectedCourse || "General";
+                const updated = recordQuizResult(subj, quizzes.length, finalScore);
+                setPerfData(updated);
+              }
+            }, 600);
+          }
+        );
+      }, 400);
+    } else {
+      // No voice — advance after delay
+      setTimeout(() => {
+        setTappedIdx(null);
+        if (current < quizzes.length - 1) {
+          setCurrent((c) => c + 1);
+          setSelected(null);
+        } else {
+          setDone(true);
+          if (audioPlaying) { stopAudio(); setAudioPlaying(false); }
+          const finalScore = isCorrect ? score + 1 : score;
+          const subj = activeQuizSubject || selectedCourse || "General";
+          const updated = recordQuizResult(subj, quizzes.length, finalScore);
+          setPerfData(updated);
+        }
+      }, 1000);
+    }
   };
 
   const handleNextRound = () => {
+    stopVoice();
     startQuiz(quizSource);
   };
 
@@ -142,21 +245,171 @@ const MemoryScreen = ({ selectedCourse, selectedSubject, studiedSubjects }: Prop
     }
   };
 
+  const skipExplanation = () => {
+    stopVoice();
+    setVoiceActive(false);
+    setWaitingForExplanation(false);
+    setTappedIdx(null);
+    if (advanceTimerRef.current) clearTimeout(advanceTimerRef.current);
+    advanceToNext();
+  };
+
   return (
     <div className="min-h-screen pb-24 pt-6 px-4">
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <h1 className="text-2xl font-display font-bold text-foreground">🧠 Smart Quiz</h1>
-        <button
-          onClick={toggleAudio}
-          className={`glass-card px-3 py-1.5 flex items-center gap-1.5 text-xs font-display transition-colors ${
-            audioPlaying ? "text-primary border-primary/30" : "text-muted-foreground"
-          }`}
-        >
-          {audioPlaying ? <Volume2 size={14} /> : <VolumeX size={14} />}
-          {audioPlaying ? "Playing" : "Audio"}
-        </button>
+        <div className="flex items-center gap-2">
+          {/* Voice toggle */}
+          <button
+            onClick={() => setShowVoicePanel(!showVoicePanel)}
+            className={`glass-card px-3 py-1.5 flex items-center gap-1.5 text-xs font-display transition-colors ${
+              voiceSettings.enabled ? "text-accent border-accent/30" : "text-muted-foreground"
+            }`}
+          >
+            {voiceSettings.enabled ? <Mic size={14} /> : <MicOff size={14} />}
+            Voice
+          </button>
+          {/* Ambient audio toggle */}
+          <button
+            onClick={toggleAudio}
+            className={`glass-card px-3 py-1.5 flex items-center gap-1.5 text-xs font-display transition-colors ${
+              audioPlaying ? "text-primary border-primary/30" : "text-muted-foreground"
+            }`}
+          >
+            {audioPlaying ? <Volume2 size={14} /> : <VolumeX size={14} />}
+          </button>
+        </div>
       </div>
+
+      {/* Voice Control Panel */}
+      <AnimatePresence>
+        {showVoicePanel && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            className="overflow-hidden mb-4"
+          >
+            <div className="glass-card p-4 space-y-4">
+              <div className="flex items-center justify-between">
+                <h3 className="text-sm font-display font-bold text-foreground flex items-center gap-2">
+                  <Settings2 size={14} className="text-accent" />
+                  Voice Settings
+                </h3>
+                <Switch
+                  checked={voiceSettings.enabled}
+                  onCheckedChange={(v) => {
+                    updateVoiceSetting("enabled", v);
+                    if (!v) stopVoice();
+                    toast(v ? "🎙️ Voice enabled" : "🔇 Voice disabled");
+                  }}
+                />
+              </div>
+
+              {voiceSettings.enabled && (
+                <>
+                  {/* Gender */}
+                  <div>
+                    <p className="text-[10px] text-muted-foreground font-display mb-2">Voice Type</p>
+                    <div className="grid grid-cols-2 gap-2">
+                      {(["female", "male"] as VoiceGender[]).map((g) => (
+                        <button
+                          key={g}
+                          onClick={() => {
+                            updateVoiceSetting("gender", g);
+                            // Preview the voice
+                            speak("Hello! I'll be your study companion.", { ...voiceSettings, gender: g });
+                          }}
+                          className={`py-2.5 rounded-xl text-xs font-display font-semibold transition-all flex items-center justify-center gap-2 ${
+                            voiceSettings.gender === g
+                              ? "bg-accent/20 text-accent border border-accent/30"
+                              : "glass-card text-muted-foreground"
+                          }`}
+                        >
+                          <User size={12} />
+                          {g === "female" ? "👩‍🏫 Female" : "👨‍🏫 Male"}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Volume */}
+                  <div>
+                    <div className="flex items-center justify-between mb-2">
+                      <p className="text-[10px] text-muted-foreground font-display">Volume</p>
+                      <span className="text-[10px] text-accent font-display font-bold">{voiceSettings.volume}%</span>
+                    </div>
+                    <Slider
+                      value={[voiceSettings.volume]}
+                      onValueChange={([v]) => updateVoiceSetting("volume", v)}
+                      min={10}
+                      max={100}
+                      step={5}
+                      className="w-full"
+                    />
+                  </div>
+
+                  {/* Speed */}
+                  <div>
+                    <div className="flex items-center justify-between mb-2">
+                      <p className="text-[10px] text-muted-foreground font-display">Speed</p>
+                      <span className="text-[10px] text-accent font-display font-bold">{voiceSettings.rate}x</span>
+                    </div>
+                    <Slider
+                      value={[voiceSettings.rate * 100]}
+                      onValueChange={([v]) => updateVoiceSetting("rate", v / 100)}
+                      min={50}
+                      max={150}
+                      step={5}
+                      className="w-full"
+                    />
+                  </div>
+
+                  {/* Test button */}
+                  <button
+                    onClick={() => speak("This is how I will read questions and explain answers during your quiz.", voiceSettings)}
+                    className="w-full py-2 rounded-xl bg-accent/10 text-accent text-xs font-display font-semibold border border-accent/20"
+                  >
+                    🔊 Test Voice
+                  </button>
+                </>
+              )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Speaking indicator during quiz */}
+      {quizStarted && !done && voiceActive && (
+        <motion.div
+          initial={{ opacity: 0, y: -5 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-3 flex items-center justify-center gap-2"
+        >
+          <div className="flex items-center gap-1">
+            {[0, 1, 2, 3].map((i) => (
+              <motion.div
+                key={i}
+                className="w-1 bg-accent rounded-full"
+                animate={{ height: [4, 12, 4] }}
+                transition={{ duration: 0.6, repeat: Infinity, delay: i * 0.15 }}
+              />
+            ))}
+          </div>
+          <span className="text-[10px] text-accent font-display font-semibold">
+            {waitingForExplanation ? "Explaining answer..." : "Reading question..."}
+          </span>
+          {waitingForExplanation && (
+            <button
+              onClick={skipExplanation}
+              className="text-[10px] text-muted-foreground font-display underline ml-1"
+            >
+              Skip
+            </button>
+          )}
+        </motion.div>
+      )}
 
       {/* Main Tabs */}
       <div className="flex gap-1.5 mb-4">
@@ -167,7 +420,7 @@ const MemoryScreen = ({ selectedCourse, selectedSubject, studiedSubjects }: Prop
         ]).map((t) => (
           <button
             key={t.id}
-            onClick={() => setTabView(t.id)}
+            onClick={() => { setTabView(t.id); stopVoice(); }}
             className={`flex-1 py-2 rounded-xl text-xs font-display font-semibold transition-all ${
               tabView === t.id ? "bg-primary text-primary-foreground" : "glass-card text-muted-foreground"
             }`}
@@ -324,6 +577,23 @@ const MemoryScreen = ({ selectedCourse, selectedSubject, studiedSubjects }: Prop
           {/* Quiz source selector */}
           {!quizStarted && (
             <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
+              {/* Voice info banner */}
+              {voiceSettings.enabled && (
+                <div className="glass-card p-3 flex items-center gap-3 border-accent/20">
+                  <div className="w-8 h-8 rounded-full bg-accent/20 flex items-center justify-center shrink-0">
+                    <Mic size={14} className="text-accent" />
+                  </div>
+                  <div>
+                    <p className="text-xs font-display font-semibold text-foreground">
+                      🎙️ Voice Mode Active
+                    </p>
+                    <p className="text-[10px] text-muted-foreground">
+                      {voiceSettings.gender === "female" ? "👩‍🏫" : "👨‍🏫"} {voiceSettings.gender.charAt(0).toUpperCase() + voiceSettings.gender.slice(1)} voice will read questions & explain answers
+                    </p>
+                  </div>
+                </div>
+              )}
+
               {/* Source buttons */}
               <div className="grid grid-cols-2 gap-2">
                 {([
@@ -449,6 +719,18 @@ const MemoryScreen = ({ selectedCourse, selectedSubject, studiedSubjects }: Prop
                     <span className="text-[10px] text-muted-foreground font-display bg-muted/50 px-1.5 py-0.5 rounded-md">
                       {getTypeLabel(quizzes[current].type)}
                     </span>
+                    {voiceSettings.enabled && (
+                      <button
+                        onClick={() => {
+                          setVoiceActive(true);
+                          readQuestion(quizzes[current].q, voiceSettings, () => setVoiceActive(false));
+                        }}
+                        className="ml-auto text-accent"
+                        title="Re-read question"
+                      >
+                        <Volume2 size={14} />
+                      </button>
+                    )}
                   </div>
 
                   <h2 className="text-base font-display font-bold text-foreground mb-5 leading-snug">
@@ -473,6 +755,7 @@ const MemoryScreen = ({ selectedCourse, selectedSubject, studiedSubjects }: Prop
                           animate={isTapped ? { scale: [1, 0.95, 1.02, 1] } : {}}
                           transition={{ duration: 0.3 }}
                           whileTap={{ scale: 0.96 }}
+                          disabled={selected !== null}
                         >
                           <div className="flex items-center gap-3">
                             <span className="w-6 h-6 rounded-full bg-muted flex items-center justify-center text-xs text-muted-foreground shrink-0">
@@ -486,6 +769,22 @@ const MemoryScreen = ({ selectedCourse, selectedSubject, studiedSubjects }: Prop
                       );
                     })}
                   </div>
+
+                  {/* Explanation text shown while voice explains */}
+                  {selected !== null && voiceSettings.enabled && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 5 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="mt-4 p-3 rounded-xl bg-accent/10 border border-accent/20"
+                    >
+                      <p className="text-xs font-display text-accent font-semibold mb-1">
+                        {selected === quizzes[current].answer ? "✅ Correct!" : "❌ Incorrect"}
+                      </p>
+                      <p className="text-xs text-foreground/80 font-display">
+                        The answer is: <strong>{quizzes[current].options[quizzes[current].answer]}</strong>
+                      </p>
+                    </motion.div>
+                  )}
                 </motion.div>
               </AnimatePresence>
             </>
@@ -532,7 +831,7 @@ const MemoryScreen = ({ selectedCourse, selectedSubject, studiedSubjects }: Prop
                   <RefreshCw size={14} /> Next Round
                 </motion.button>
                 <motion.button
-                  onClick={() => { setQuizStarted(false); setDone(false); }}
+                  onClick={() => { setQuizStarted(false); setDone(false); stopVoice(); }}
                   className="py-3 rounded-xl glass-card text-foreground font-display font-semibold text-sm"
                   whileTap={{ scale: 0.96 }}
                 >
