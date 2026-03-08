@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, Moon, BookOpen, Activity, HelpCircle } from "lucide-react";
+import { Menu, X, Moon, BookOpen, Activity, HelpCircle, IndianRupee, Copy, ExternalLink } from "lucide-react";
 import logo from "@/assets/logo.png";
 import nightSkyBg from "@/assets/night-sky-bg.jpg";
 import { toast } from "sonner";
