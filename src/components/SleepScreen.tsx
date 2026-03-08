@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Moon, Volume2, Timer, Settings, Music, CloudRain, Waves, Wind, Bird, Radio } from "lucide-react";
+import { Moon } from "lucide-react";
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { toast } from "sonner";
 import { playAudio, stopAudio } from "@/lib/audioEngine";
@@ -7,21 +7,19 @@ import { subjectAudioMap } from "@/lib/quizData";
 import AudioLearning from "./AudioLearning";
 
 const audioTypes = [
-  { id: "whisper", label: "Whisper", icon: Volume2, emoji: "🤫" },
-  { id: "rain", label: "Rain Sounds", icon: CloudRain, emoji: "🌧️" },
-  { id: "ocean", label: "Ocean Waves", icon: Waves, emoji: "🌊" },
-  { id: "wind", label: "Wind", icon: Wind, emoji: "🍃" },
-  { id: "nature", label: "Nature", icon: Bird, emoji: "🐦" },
-  { id: "white-noise", label: "White Noise", icon: Radio, emoji: "📻" },
-  { id: "lullaby", label: "Lullaby", icon: Music, emoji: "🎵" },
-  { id: "alpha-waves", label: "Alpha Waves", icon: Radio, emoji: "🧠" },
-  { id: "gamma-waves", label: "Gamma Waves", icon: Radio, emoji: "⚡" },
-  { id: "ground-noise", label: "Ground Noise", icon: Radio, emoji: "🌍" },
-  { id: "sleep-music", label: "Sleep Music", icon: Music, emoji: "🎶" },
-  { id: "deep-focus", label: "Deep Focus", icon: Radio, emoji: "🎯" },
+  { id: "whisper", label: "Whisper", emoji: "🤫" },
+  { id: "rain", label: "Rain Sounds", emoji: "🌧️" },
+  { id: "ocean", label: "Ocean Waves", emoji: "🌊" },
+  { id: "wind", label: "Wind", emoji: "🍃" },
+  { id: "nature", label: "Nature", emoji: "🐦" },
+  { id: "white-noise", label: "White Noise", emoji: "📻" },
+  { id: "lullaby", label: "Lullaby", emoji: "🎵" },
+  { id: "alpha-waves", label: "Alpha Waves", emoji: "🧠" },
+  { id: "gamma-waves", label: "Gamma Waves", emoji: "⚡" },
+  { id: "ground-noise", label: "Ground Noise", emoji: "🌍" },
+  { id: "sleep-music", label: "Sleep Music", emoji: "🎶" },
+  { id: "deep-focus", label: "Deep Focus", emoji: "🎯" },
 ];
-
-const durationOptions = ["30 min", "1 hour", "2 hours", "4 hours", "8 hours"];
 
 interface SleepScreenProps {
   selectedSubject?: string | null;
@@ -29,6 +27,7 @@ interface SleepScreenProps {
 
 const SleepScreen = ({ selectedSubject }: SleepScreenProps) => {
   const [isActive, setIsActive] = useState(false);
+  const [volume] = useState(35);
 
   const defaultAudio = useMemo(() => {
     if (selectedSubject && subjectAudioMap[selectedSubject]) {
@@ -39,15 +38,11 @@ const SleepScreen = ({ selectedSubject }: SleepScreenProps) => {
 
   const [selectedAudio, setSelectedAudio] = useState(defaultAudio);
 
-  // Update audio when subject changes
   useEffect(() => {
     if (selectedSubject && subjectAudioMap[selectedSubject]) {
       setSelectedAudio(subjectAudioMap[selectedSubject]);
     }
   }, [selectedSubject]);
-  const [showAudioPicker, setShowAudioPicker] = useState(false);
-  const [volume, setVolume] = useState(35);
-  const [durationIndex, setDurationIndex] = useState(4);
 
   const currentAudio = audioTypes.find((a) => a.id === selectedAudio)!;
 
@@ -67,31 +62,20 @@ const SleepScreen = ({ selectedSubject }: SleepScreenProps) => {
     }
   };
 
-  // Update audio when volume or type changes while active
   useEffect(() => {
     if (isActive) {
       playAudio(selectedAudio, volume);
     }
   }, [selectedAudio, volume, isActive]);
 
-  // Cleanup on unmount
   useEffect(() => {
     return () => stopAudio();
   }, []);
-
-  const handleDurationCycle = () => {
-    setDurationIndex((prev) => {
-      const next = (prev + 1) % durationOptions.length;
-      toast.success(`Duration set to ${durationOptions[next]}`);
-      return next;
-    });
-  };
 
   return (
     <div className="min-h-screen pb-24 pt-6 px-4 flex flex-col">
       <h1 className="text-2xl font-display font-bold text-foreground mb-4">😴 Sleep Mode</h1>
 
-      {/* Audio Learning Section */}
       <AudioLearning />
 
       <div className="flex-1 flex flex-col items-center justify-center -mt-10">
@@ -134,72 +118,6 @@ const SleepScreen = ({ selectedSubject }: SleepScreenProps) => {
               {currentAudio.emoji} Playing {currentAudio.label}...
             </p>
             <p className="text-xs text-muted-foreground mt-1">🔊 Audio is playing through your speakers</p>
-          </motion.div>
-        )}
-      </div>
-
-      <div className="space-y-3 mt-4">
-        <div className="glass-card p-4 flex items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <Volume2 size={18} className="text-primary" />
-            <span className="text-sm font-display text-foreground">Volume</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <input
-              type="range"
-              min={0}
-              max={100}
-              value={volume}
-              onChange={(e) => setVolume(Number(e.target.value))}
-              className="w-24 accent-primary"
-            />
-            <span className="text-xs text-muted-foreground font-display w-9 text-right">{volume}%</span>
-          </div>
-        </div>
-
-        <button onClick={handleDurationCycle} className="glass-card p-4 flex items-center justify-between w-full">
-          <div className="flex items-center gap-3">
-            <Timer size={18} className="text-secondary" />
-            <span className="text-sm font-display text-foreground">Duration</span>
-          </div>
-          <span className="text-sm text-muted-foreground font-display">{durationOptions[durationIndex]}</span>
-        </button>
-
-        <button onClick={() => setShowAudioPicker(!showAudioPicker)} className="glass-card p-4 flex items-center justify-between w-full">
-          <div className="flex items-center gap-3">
-            <Settings size={18} className="text-accent" />
-            <span className="text-sm font-display text-foreground">Audio Type</span>
-          </div>
-          <span className="text-sm text-muted-foreground font-display">
-            {currentAudio.emoji} {currentAudio.label}
-          </span>
-        </button>
-
-        {showAudioPicker && (
-          <motion.div className="glass-card p-3 space-y-1" initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }}>
-            {audioTypes.map((audio) => {
-              const Icon = audio.icon;
-              const isSelected = selectedAudio === audio.id;
-              return (
-                <button
-                  key={audio.id}
-                  onClick={() => {
-                    setSelectedAudio(audio.id);
-                    setShowAudioPicker(false);
-                    toast.success(`${audio.label} selected`);
-                  }}
-                  className={`w-full flex items-center gap-3 p-3 rounded-xl transition-all ${
-                    isSelected ? "bg-primary/20 border border-primary/30" : "hover:bg-muted/50"
-                  }`}
-                >
-                  <span className="text-lg">{audio.emoji}</span>
-                  <Icon size={16} className={isSelected ? "text-primary" : "text-muted-foreground"} />
-                  <span className={`text-sm font-display ${isSelected ? "text-foreground font-semibold" : "text-muted-foreground"}`}>
-                    {audio.label}
-                  </span>
-                </button>
-              );
-            })}
           </motion.div>
         )}
       </div>
