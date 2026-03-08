@@ -259,7 +259,7 @@ const ProfileScreen = ({ onLanguageChange }: ProfileScreenProps) => {
 
         {/* Subscription */}
         <button
-          onClick={() => toast.success("Manage subscription (demo)")}
+          onClick={() => setShowPayment(true)}
           className="flex items-center justify-between py-3 w-full group"
         >
           <div className="flex items-center gap-3">
