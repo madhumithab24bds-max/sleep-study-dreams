@@ -11,7 +11,7 @@ interface FAQ {
 const faqs: FAQ[] = [
   {
     q: "How does Sleep Learning work?",
-    a: "ThukkamTutor plays gentle audio cues of study material during your light sleep phases. Research shows this can reinforce memory consolidation. Simply select a subject, go to Sleep mode, and place your phone nearby while sleeping.",
+    a: "ThookamTutor plays gentle audio cues of study material during your light sleep phases. Research shows this can reinforce memory consolidation. Simply select a subject, go to Sleep mode, and place your phone nearby while sleeping.",
     icon: <Moon size={16} className="text-dream" />,
   },
   {
