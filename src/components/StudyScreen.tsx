@@ -174,7 +174,12 @@ const courses: Course[] = [
   },
 ];
 
-const StudyScreen = () => {
+interface StudyScreenProps {
+  onCourseChange?: (courseId: string) => void;
+  onSubjectChange?: (subject: string | null) => void;
+}
+
+const StudyScreen = ({ onCourseChange, onSubjectChange }: StudyScreenProps) => {
   const [selectedCourse, setSelectedCourse] = useState<string | null>(null);
   const [showCourseList, setShowCourseList] = useState(true);
   const [language, setLanguage] = useState<"Tamil" | "English">("English");
@@ -186,6 +191,8 @@ const StudyScreen = () => {
     setSelectedCourse(courseId);
     setShowCourseList(false);
     setActiveSubject(null);
+    onCourseChange?.(courseId);
+    onSubjectChange?.(null);
 
     const picked = courses.find((course) => course.id === courseId);
     if (picked) toast.success(`${picked.label} selected`);
@@ -193,6 +200,7 @@ const StudyScreen = () => {
 
   const handleSubjectSelect = (subject: string) => {
     setActiveSubject(subject);
+    onSubjectChange?.(subject);
     toast.success(`${subject} ready for revision`);
   };
 

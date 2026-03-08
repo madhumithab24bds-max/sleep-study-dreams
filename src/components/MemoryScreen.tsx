@@ -1,18 +1,29 @@
 import { motion } from "framer-motion";
-import { Brain, CheckCircle, XCircle, Trophy } from "lucide-react";
-import { useState } from "react";
+import { CheckCircle, XCircle, Trophy } from "lucide-react";
+import { useState, useMemo } from "react";
+import { quizByCourse } from "@/lib/quizData";
 
-const quizzes = [
-  { q: "What is the Tamil word for 'Water'?", options: ["நீர்", "தீ", "காற்று", "மண்"], answer: 0 },
-  { q: "What is H₂O?", options: ["Hydrogen", "Oxygen", "Water", "Carbon"], answer: 2 },
-  { q: "Square root of 144?", options: ["11", "12", "13", "14"], answer: 1 },
-];
+interface Props {
+  selectedCourse: string | null;
+}
 
-const MemoryScreen = () => {
+const MemoryScreen = ({ selectedCourse }: Props) => {
+  const quizzes = useMemo(() => {
+    if (selectedCourse && quizByCourse[selectedCourse]) {
+      return quizByCourse[selectedCourse];
+    }
+    // Default fallback quiz
+    return quizByCourse["primary"];
+  }, [selectedCourse]);
+
   const [current, setCurrent] = useState(0);
   const [selected, setSelected] = useState<number | null>(null);
   const [score, setScore] = useState(0);
   const [done, setDone] = useState(false);
+
+  const courseLabel = selectedCourse
+    ? selectedCourse.charAt(0).toUpperCase() + selectedCourse.slice(1)
+    : "General";
 
   const handleAnswer = (idx: number) => {
     if (selected !== null) return;
@@ -37,11 +48,14 @@ const MemoryScreen = () => {
 
   return (
     <div className="min-h-screen pb-24 pt-6 px-4">
-      <h1 className="text-2xl font-display font-bold text-foreground mb-6">🧠 Memory Test</h1>
+      <h1 className="text-2xl font-display font-bold text-foreground mb-2">🧠 Memory Test</h1>
+      <p className="text-xs text-muted-foreground font-display mb-6">
+        📚 Course: <span className="text-primary font-semibold">{courseLabel}</span>
+        {!selectedCourse && " — Select a course in Study tab for specific quizzes"}
+      </p>
 
       {!done ? (
         <>
-          {/* Progress */}
           <div className="flex items-center gap-2 mb-6">
             {quizzes.map((_, i) => (
               <div
@@ -54,7 +68,7 @@ const MemoryScreen = () => {
           </div>
 
           <motion.div
-            key={current}
+            key={`${selectedCourse}-${current}`}
             className="glass-card p-6"
             initial={{ x: 30, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
@@ -121,7 +135,6 @@ const MemoryScreen = () => {
         </motion.div>
       )}
 
-      {/* Stats */}
       <div className="grid grid-cols-3 gap-3 mt-6">
         <div className="glass-card p-3 text-center">
           <p className="text-xl font-display font-bold text-primary">87%</p>

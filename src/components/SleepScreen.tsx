@@ -16,9 +16,22 @@ const audioTypes = [
 
 const durationOptions = ["30 min", "1 hour", "2 hours", "4 hours", "8 hours"];
 
-const SleepScreen = () => {
+interface SleepScreenProps {
+  selectedSubject?: string | null;
+}
+
+const SleepScreen = ({ selectedSubject }: SleepScreenProps) => {
   const [isActive, setIsActive] = useState(false);
-  const [selectedAudio, setSelectedAudio] = useState("whisper");
+
+  // Auto-select audio based on subject
+  const subjectAudio = selectedSubject
+    ? (() => {
+        const { subjectAudioMap } = require("@/lib/quizData");
+        return subjectAudioMap[selectedSubject] || "whisper";
+      })()
+    : "whisper";
+
+  const [selectedAudio, setSelectedAudio] = useState(subjectAudio);
   const [showAudioPicker, setShowAudioPicker] = useState(false);
   const [volume, setVolume] = useState(35);
   const [durationIndex, setDurationIndex] = useState(4);
