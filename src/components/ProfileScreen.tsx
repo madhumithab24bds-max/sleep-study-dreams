@@ -156,6 +156,44 @@ const ProfileScreen = ({ onLanguageChange }: ProfileScreenProps) => {
         </div>
       </motion.div>
 
+      {/* Avatar Picker Modal */}
+      {showAvatarPicker && (
+        <motion.div
+          className="fixed inset-0 z-50 flex items-end justify-center p-4 bg-black/60 backdrop-blur-sm"
+          initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+          onClick={() => setShowAvatarPicker(false)}
+        >
+          <motion.div
+            className="glass-card w-full max-w-sm p-5 space-y-4 relative max-h-[70vh] overflow-y-auto"
+            initial={{ y: 100, opacity: 0 }} animate={{ y: 0, opacity: 1 }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between">
+              <h3 className="font-display font-bold text-foreground">Choose Avatar</h3>
+              <button onClick={() => setShowAvatarPicker(false)} className="text-muted-foreground"><X size={18} /></button>
+            </div>
+            <div className="grid grid-cols-4 gap-3">
+              {presetAvatars.map((url) => (
+                <button
+                  key={url}
+                  onClick={() => selectAvatar(url)}
+                  className={`rounded-2xl p-1 border-2 transition-all ${avatarUrl === url ? "border-primary glow-primary" : "border-transparent hover:border-border"}`}
+                >
+                  <img src={url} alt="Avatar option" className="w-full aspect-square rounded-xl bg-muted" />
+                </button>
+              ))}
+            </div>
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              disabled={uploadingAvatar}
+              className="w-full glass-card p-3 flex items-center justify-center gap-2 text-sm font-display font-semibold text-primary"
+            >
+              <Camera size={16} /> {uploadingAvatar ? "Uploading…" : "Upload Your Photo"}
+            </button>
+          </motion.div>
+        </motion.div>
+      )}
+
       {/* Profile Settings */}
       <motion.div className="glass-card p-4 space-y-4" custom={1} initial="hidden" animate="visible" variants={sectionVariants}>
         <h3 className="font-display font-semibold text-foreground flex items-center gap-2">
