@@ -51,6 +51,7 @@ const StudyScreen = ({ onCourseChange, onSubjectChange, onSubjectStudied, langua
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState<"default" | "progress" | "cards" | "name">("default");
   const [showSortMenu, setShowSortMenu] = useState(false);
+  const [outlineSubject, setOutlineSubject] = useState<string | null>(null);
 
   // Progress tracking
   const progress = useStudyProgress();
