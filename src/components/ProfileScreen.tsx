@@ -228,7 +228,7 @@ const ProfileScreen = ({ onLanguageChange }: ProfileScreenProps) => {
           <div className="flex gap-2">
             <Input value={username} onChange={(e) => setUsername(e.target.value)} disabled={!editingUsername}
               className="bg-muted/50 border-border/50 text-foreground font-display h-9 text-sm rounded-xl" />
-            <button onClick={() => { if (editingUsername) handleSave("Username"); setEditingUsername(!editingUsername); }}
+            <button onClick={() => { if (editingUsername) handleSave("Username", username, "username"); setEditingUsername(!editingUsername); }}
               className="glass-card px-3 flex items-center text-primary hover:text-foreground transition-colors">
               {editingUsername ? <Check size={16} /> : <Pencil size={14} />}
             </button>
