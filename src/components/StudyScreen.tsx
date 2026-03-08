@@ -206,6 +206,62 @@ const StudyScreen = ({ onCourseChange, onSubjectChange, onSubjectStudied, langua
         overallPercent={overallPercent}
       />
 
+      {/* Search & Sort Bar */}
+      <div className="mb-5 space-y-2">
+        <div className="flex gap-2">
+          <div className="flex-1 glass-card flex items-center gap-2 px-3 py-2">
+            <Search size={15} className="text-muted-foreground shrink-0" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder={lk(ui.searchTopics)}
+              className="flex-1 bg-transparent text-sm font-display text-foreground placeholder:text-muted-foreground outline-none"
+            />
+            {searchQuery && (
+              <button onClick={() => setSearchQuery("")} className="text-muted-foreground">
+                <X size={14} />
+              </button>
+            )}
+          </div>
+          <div className="relative">
+            <button
+              onClick={() => setShowSortMenu(!showSortMenu)}
+              className={`glass-card p-2.5 transition-all ${sortBy !== "default" ? "ring-1 ring-primary bg-primary/10" : ""}`}
+            >
+              <SlidersHorizontal size={16} className={sortBy !== "default" ? "text-primary" : "text-muted-foreground"} />
+            </button>
+            <AnimatePresence>
+              {showSortMenu && (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.9, y: -5 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.9, y: -5 }}
+                  className="absolute right-0 top-full mt-1 z-50 glass-card p-1.5 min-w-[140px] shadow-lg"
+                >
+                  {([
+                    { key: "default", label: ui.sortDefault },
+                    { key: "progress", label: ui.sortProgress },
+                    { key: "cards", label: ui.sortCards },
+                    { key: "name", label: ui.sortName },
+                  ] as const).map((opt) => (
+                    <button
+                      key={opt.key}
+                      onClick={() => { setSortBy(opt.key); setShowSortMenu(false); }}
+                      className={`w-full text-left px-3 py-2 rounded-lg text-xs font-display transition-colors ${
+                        sortBy === opt.key ? "bg-primary/10 text-primary font-semibold" : "text-foreground hover:bg-muted/50"
+                      }`}
+                    >
+                      {lk(opt.label)}
+                    </button>
+                  ))}
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+        </div>
+      </div>
+
       {/* ═══ SCHOOL MODE ═══ */}
       {mode === "school" && (
         <>
