@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { Languages, ChevronRight, ChevronDown, GraduationCap } from "lucide-react";
 import { useState } from "react";
+import { toast } from "sonner";
 
 interface Course {
   id: string;
@@ -176,25 +177,44 @@ const courses: Course[] = [
 const StudyScreen = () => {
   const [selectedCourse, setSelectedCourse] = useState<string | null>(null);
   const [showCourseList, setShowCourseList] = useState(true);
+  const [language, setLanguage] = useState<"Tamil" | "English">("English");
+  const [activeSubject, setActiveSubject] = useState<string | null>(null);
 
   const currentCourse = courses.find((c) => c.id === selectedCourse);
+
+  const handleCourseSelect = (courseId: string) => {
+    setSelectedCourse(courseId);
+    setShowCourseList(false);
+    setActiveSubject(null);
+
+    const picked = courses.find((course) => course.id === courseId);
+    if (picked) toast.success(`${picked.label} selected`);
+  };
+
+  const handleSubjectSelect = (subject: string) => {
+    setActiveSubject(subject);
+    toast.success(`${subject} ready for revision`);
+  };
+
+  const toggleLanguage = () => {
+    setLanguage((prev) => {
+      const next = prev === "English" ? "Tamil" : "English";
+      toast.success(`Language switched to ${next}`);
+      return next;
+    });
+  };
 
   return (
     <div className="min-h-screen pb-24 pt-6 px-4">
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-display font-bold text-foreground">📖 Study</h1>
-        <button className="glass-card px-3 py-1.5 flex items-center gap-1.5 text-xs font-display text-muted-foreground">
+        <button onClick={toggleLanguage} className="glass-card px-3 py-1.5 flex items-center gap-1.5 text-xs font-display text-muted-foreground">
           <Languages size={14} />
-          Tamil / English
+          {language === "English" ? "Tamil / English" : "தமிழ் / English"}
         </button>
       </div>
 
-      {/* Today's Progress */}
-      <motion.div
-        className="glass-card p-5 mb-6"
-        initial={{ y: 20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-      >
+      <motion.div className="glass-card p-5 mb-6" initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }}>
         <h3 className="font-display font-semibold text-sm text-foreground mb-3">Today's Progress</h3>
         <div className="flex items-center gap-4">
           <div className="flex-1">
@@ -212,9 +232,8 @@ const StudyScreen = () => {
         <p className="text-xs text-muted-foreground mt-2">32 of 50 items reviewed</p>
       </motion.div>
 
-      {/* Course Selector */}
       <button
-        onClick={() => { setShowCourseList(!showCourseList); setSelectedCourse(null); }}
+        onClick={() => setShowCourseList((prev) => !prev)}
         className="glass-card p-4 flex items-center justify-between w-full mb-4"
       >
         <div className="flex items-center gap-3">
@@ -226,16 +245,12 @@ const StudyScreen = () => {
         <ChevronDown size={16} className={`text-muted-foreground transition-transform ${showCourseList ? "rotate-180" : ""}`} />
       </button>
 
-      {showCourseList && !selectedCourse && (
-        <motion.div
-          className="space-y-2 mb-6"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-        >
+      {showCourseList && (
+        <motion.div className="space-y-2 mb-6" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
           {courses.map((course, i) => (
             <motion.button
               key={course.id}
-              onClick={() => { setSelectedCourse(course.id); setShowCourseList(false); }}
+              onClick={() => handleCourseSelect(course.id)}
               className="glass-card p-3.5 flex items-center gap-3 w-full text-left group"
               initial={{ x: -20, opacity: 0 }}
               animate={{ x: 0, opacity: 1 }}
@@ -249,42 +264,59 @@ const StudyScreen = () => {
         </motion.div>
       )}
 
-      {/* Subjects for selected course */}
       {currentCourse && (
         <>
           <h3 className="font-display font-semibold text-foreground mb-3">
             {currentCourse.emoji} {currentCourse.label} — Subjects
           </h3>
           <div className="space-y-3">
-            {currentCourse.subjects.map((s, i) => (
-              <motion.button
-                key={s.title}
-                className="glass-card p-4 flex items-center gap-4 w-full text-left group"
-                initial={{ x: -20, opacity: 0 }}
-                animate={{ x: 0, opacity: 1 }}
-                transition={{ delay: 0.1 * i }}
-              >
-                <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${s.color} flex items-center justify-center text-2xl shrink-0`}>
-                  {s.emoji}
-                </div>
-                <div className="flex-1">
-                  <h4 className="font-display font-semibold text-sm text-foreground">{s.title}</h4>
-                  <p className="text-xs text-muted-foreground">{s.count} items to study</p>
-                </div>
-                <ChevronRight size={16} className="text-muted-foreground group-hover:text-foreground transition-colors" />
-              </motion.button>
-            ))}
+            {currentCourse.subjects.map((s, i) => {
+              const isActive = activeSubject === s.title;
+              return (
+                <motion.button
+                  key={s.title}
+                  onClick={() => handleSubjectSelect(s.title)}
+                  className={`glass-card p-4 flex items-center gap-4 w-full text-left group border ${
+                    isActive ? "border-primary/40 bg-primary/10" : "border-transparent"
+                  }`}
+                  initial={{ x: -20, opacity: 0 }}
+                  animate={{ x: 0, opacity: 1 }}
+                  transition={{ delay: 0.05 * i }}
+                >
+                  <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${s.color} flex items-center justify-center text-2xl shrink-0`}>
+                    {s.emoji}
+                  </div>
+                  <div className="flex-1">
+                    <h4 className="font-display font-semibold text-sm text-foreground">{s.title}</h4>
+                    <p className="text-xs text-muted-foreground">{s.count} items to study</p>
+                  </div>
+                  <ChevronRight size={16} className="text-muted-foreground group-hover:text-foreground transition-colors" />
+                </motion.button>
+              );
+            })}
           </div>
         </>
       )}
 
-      {/* Study Tip */}
-      <motion.div
-        className="glass-card p-4 mt-6 border-l-4 border-primary"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.8 }}
-      >
+      {activeSubject && (
+        <motion.div
+          className="glass-card p-4 mt-4 flex items-center justify-between"
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+        >
+          <p className="text-sm text-foreground font-display">
+            Selected: <span className="font-semibold">{activeSubject}</span>
+          </p>
+          <button
+            onClick={() => toast.success(`Started revision for ${activeSubject}`)}
+            className="rounded-lg bg-primary px-3 py-1.5 text-xs font-display font-semibold text-primary-foreground"
+          >
+            Start
+          </button>
+        </motion.div>
+      )}
+
+      <motion.div className="glass-card p-4 mt-6 border-l-4 border-primary" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.8 }}>
         <p className="text-xs text-muted-foreground">
           💡 <span className="text-foreground font-semibold">Tip:</span> Study 30 minutes before sleep for best memory consolidation results!
         </p>
