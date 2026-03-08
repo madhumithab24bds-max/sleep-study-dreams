@@ -7,21 +7,19 @@ import { subjectAudioMap } from "@/lib/quizData";
 import AudioLearning from "./AudioLearning";
 
 const audioTypes = [
-  { id: "whisper", label: "Whisper", icon: Volume2, emoji: "🤫" },
-  { id: "rain", label: "Rain Sounds", icon: CloudRain, emoji: "🌧️" },
-  { id: "ocean", label: "Ocean Waves", icon: Waves, emoji: "🌊" },
-  { id: "wind", label: "Wind", icon: Wind, emoji: "🍃" },
-  { id: "nature", label: "Nature", icon: Bird, emoji: "🐦" },
-  { id: "white-noise", label: "White Noise", icon: Radio, emoji: "📻" },
-  { id: "lullaby", label: "Lullaby", icon: Music, emoji: "🎵" },
-  { id: "alpha-waves", label: "Alpha Waves", icon: Radio, emoji: "🧠" },
-  { id: "gamma-waves", label: "Gamma Waves", icon: Radio, emoji: "⚡" },
-  { id: "ground-noise", label: "Ground Noise", icon: Radio, emoji: "🌍" },
-  { id: "sleep-music", label: "Sleep Music", icon: Music, emoji: "🎶" },
-  { id: "deep-focus", label: "Deep Focus", icon: Radio, emoji: "🎯" },
+  { id: "whisper", label: "Whisper", emoji: "🤫" },
+  { id: "rain", label: "Rain Sounds", emoji: "🌧️" },
+  { id: "ocean", label: "Ocean Waves", emoji: "🌊" },
+  { id: "wind", label: "Wind", emoji: "🍃" },
+  { id: "nature", label: "Nature", emoji: "🐦" },
+  { id: "white-noise", label: "White Noise", emoji: "📻" },
+  { id: "lullaby", label: "Lullaby", emoji: "🎵" },
+  { id: "alpha-waves", label: "Alpha Waves", emoji: "🧠" },
+  { id: "gamma-waves", label: "Gamma Waves", emoji: "⚡" },
+  { id: "ground-noise", label: "Ground Noise", emoji: "🌍" },
+  { id: "sleep-music", label: "Sleep Music", emoji: "🎶" },
+  { id: "deep-focus", label: "Deep Focus", emoji: "🎯" },
 ];
-
-const durationOptions = ["30 min", "1 hour", "2 hours", "4 hours", "8 hours"];
 
 interface SleepScreenProps {
   selectedSubject?: string | null;
@@ -29,6 +27,7 @@ interface SleepScreenProps {
 
 const SleepScreen = ({ selectedSubject }: SleepScreenProps) => {
   const [isActive, setIsActive] = useState(false);
+  const [volume] = useState(35);
 
   const defaultAudio = useMemo(() => {
     if (selectedSubject && subjectAudioMap[selectedSubject]) {
@@ -39,15 +38,11 @@ const SleepScreen = ({ selectedSubject }: SleepScreenProps) => {
 
   const [selectedAudio, setSelectedAudio] = useState(defaultAudio);
 
-  // Update audio when subject changes
   useEffect(() => {
     if (selectedSubject && subjectAudioMap[selectedSubject]) {
       setSelectedAudio(subjectAudioMap[selectedSubject]);
     }
   }, [selectedSubject]);
-  const [showAudioPicker, setShowAudioPicker] = useState(false);
-  const [volume, setVolume] = useState(35);
-  const [durationIndex, setDurationIndex] = useState(4);
 
   const currentAudio = audioTypes.find((a) => a.id === selectedAudio)!;
 
@@ -67,31 +62,20 @@ const SleepScreen = ({ selectedSubject }: SleepScreenProps) => {
     }
   };
 
-  // Update audio when volume or type changes while active
   useEffect(() => {
     if (isActive) {
       playAudio(selectedAudio, volume);
     }
   }, [selectedAudio, volume, isActive]);
 
-  // Cleanup on unmount
   useEffect(() => {
     return () => stopAudio();
   }, []);
-
-  const handleDurationCycle = () => {
-    setDurationIndex((prev) => {
-      const next = (prev + 1) % durationOptions.length;
-      toast.success(`Duration set to ${durationOptions[next]}`);
-      return next;
-    });
-  };
 
   return (
     <div className="min-h-screen pb-24 pt-6 px-4 flex flex-col">
       <h1 className="text-2xl font-display font-bold text-foreground mb-4">😴 Sleep Mode</h1>
 
-      {/* Audio Learning Section */}
       <AudioLearning />
 
       <div className="flex-1 flex flex-col items-center justify-center -mt-10">
@@ -137,9 +121,6 @@ const SleepScreen = ({ selectedSubject }: SleepScreenProps) => {
           </motion.div>
         )}
       </div>
-
-
-
     </div>
   );
 };
