@@ -364,6 +364,38 @@ const StudyScreen = ({ onCourseChange, onSubjectChange, onSubjectStudied, langua
                         <AnimatePresence>
                           {isExpanded && (
                             <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
+                              {/* Outline toggle */}
+                              <div className="pl-4 pr-2 pt-2 flex gap-2">
+                                <button
+                                  onClick={() => setOutlineSubject(outlineSubject === subject.id ? null : subject.id)}
+                                  className={`flex items-center gap-1.5 text-[10px] font-display font-semibold px-2.5 py-1.5 rounded-lg transition-all ${
+                                    outlineSubject === subject.id
+                                      ? "bg-primary/15 text-primary ring-1 ring-primary/30"
+                                      : "bg-muted/40 text-muted-foreground hover:bg-muted/60"
+                                  }`}
+                                >
+                                  <GitBranch size={12} />
+                                  Learning Path
+                                </button>
+                              </div>
+
+                              {/* Subject Outline Flowchart */}
+                              <AnimatePresence>
+                                {outlineSubject === subject.id && (
+                                  <div className="px-4">
+                                    <SubjectOutline
+                                      chapters={filteredChapters}
+                                      subjectName={lk(subject)}
+                                      subjectEmoji={subject.emoji}
+                                      subjectColor={subject.color}
+                                      lang={lang}
+                                      completedTopics={new Set(progress.completedTopics)}
+                                      onStudy={(en, display) => handleStartRevision(en, display)}
+                                    />
+                                  </div>
+                                )}
+                              </AnimatePresence>
+
                               <div className="pl-4 pr-2 py-2 space-y-1.5">
                                 {filteredChapters.map((ch, ci) => {
                                   const chCardCount = getRevisionItems(ch.en).length;
