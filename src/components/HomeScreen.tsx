@@ -60,7 +60,7 @@ const HomeScreen = ({ onNavigate }: HomeScreenProps) => {
         <div className="relative z-10 flex flex-col items-center px-6 pb-10 pt-12 text-center">
           <motion.img
             src={logo}
-            alt="ThukkamTutor Logo"
+            alt="ThookamTutor Logo"
             className="mb-4 h-28 w-28 drop-shadow-2xl"
             initial={{ y: -30, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
