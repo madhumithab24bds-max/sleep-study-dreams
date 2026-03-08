@@ -4,6 +4,7 @@ import { X, Moon, BookOpen, Activity, HelpCircle, IndianRupee, Copy, ExternalLin
 import logo from "@/assets/logo.png";
 import nightSkyBg from "@/assets/night-sky-bg.jpg";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 import DreamJournal from "./DreamJournal";
 import DailyJournal from "./DailyJournal";
 import ActivityScreen from "./ActivityScreen";
