@@ -406,6 +406,8 @@ const StudyScreen = ({ onCourseChange, onSubjectChange, onSubjectStudied }: Stud
           </p>
         </motion.div>
       )}
+        </>
+      )}
     </div>
   );
 };
