@@ -138,11 +138,18 @@ const AudioLearning = () => {
     const utterance = new SpeechSynthesisUtterance(lines[index]);
     utterance.volume = Math.max(0.1, Math.min(1, volume / 100));
     utterance.rate = 0.8;
-    utterance.pitch = voiceSettings.gender === "female" ? 1.05 : 0.85;
+    utterance.pitch = 1.1;
 
     const voices = speechSynthesis.getVoices();
-    const englishVoice = voices.find((v) => v.lang.startsWith("en"));
-    if (englishVoice) utterance.voice = englishVoice;
+    const englishVoices = voices.filter((v) => v.lang.startsWith("en"));
+    
+    // Prefer a female voice by name hints
+    const femaleNames = ["samantha", "victoria", "karen", "fiona", "moira", "tessa", "zira", "susan", "female", "google us english", "google uk english female"];
+    const femaleVoice = englishVoices.find((v) => 
+      femaleNames.some((name) => v.name.toLowerCase().includes(name))
+    );
+    const chosenVoice = femaleVoice || englishVoices[0];
+    if (chosenVoice) utterance.voice = chosenVoice;
 
     utterance.onend = () => {
       if (!playingRef.current) return;
