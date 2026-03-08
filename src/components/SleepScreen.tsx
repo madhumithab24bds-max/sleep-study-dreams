@@ -78,49 +78,8 @@ const SleepScreen = ({ selectedSubject }: SleepScreenProps) => {
 
       <AudioLearning />
 
-      <div className="flex-1 flex flex-col items-center justify-center -mt-10">
-        <motion.div
-          className="relative"
-          animate={isActive ? { scale: [1, 1.05, 1] } : {}}
-          transition={{ repeat: Infinity, duration: 3 }}
-        >
-          {isActive && (
-            <>
-              <motion.div
-                className="absolute inset-0 rounded-full border-2 border-primary/20"
-                style={{ margin: "-20px" }}
-                animate={{ scale: [1, 1.3], opacity: [0.5, 0] }}
-                transition={{ repeat: Infinity, duration: 2 }}
-              />
-              <motion.div
-                className="absolute inset-0 rounded-full border-2 border-primary/20"
-                style={{ margin: "-20px" }}
-                animate={{ scale: [1, 1.5], opacity: [0.3, 0] }}
-                transition={{ repeat: Infinity, duration: 2, delay: 0.5 }}
-              />
-            </>
-          )}
-          <button
-            onClick={handleSleepToggle}
-            className={`w-48 h-48 rounded-full flex flex-col items-center justify-center transition-all duration-500 ${
-              isActive ? "bg-primary/20 glow-primary" : "glass-card hover:bg-primary/10"
-            }`}
-          >
-            <Moon size={48} className={`mb-2 ${isActive ? "text-primary" : "text-muted-foreground"}`} />
-            <span className="font-display font-bold text-lg text-foreground">{isActive ? "Active" : "Start"}</span>
-            <span className="text-xs text-muted-foreground mt-1">{isActive ? "Tap to stop" : "Tap to begin"}</span>
-          </button>
-        </motion.div>
 
-        {isActive && (
-          <motion.div className="mt-8 text-center" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-            <p className="text-sm text-muted-foreground font-display">
-              {currentAudio.emoji} Playing {currentAudio.label}...
-            </p>
-            <p className="text-xs text-muted-foreground mt-1">🔊 Audio is playing through your speakers</p>
-          </motion.div>
-        )}
-      </div>
+
     </div>
   );
 };
