@@ -107,6 +107,12 @@ const HomeScreen = ({ onNavigate }: HomeScreenProps) => {
               </span>
             </motion.div>
           )}
+        </div>
+      </div>
+
+      <div className="relative z-10 -mt-4 px-4">
+        <div className="glass-card glow-primary flex items-center justify-around p-4">
+          {quickActions.map((action) => (
             <QuickAction
               key={action.label}
               emoji={action.emoji}
