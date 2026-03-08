@@ -3,6 +3,7 @@ import { CheckCircle, XCircle, Trophy, Volume2, VolumeX, BookOpen, Upload, BarCh
 import { useState, useMemo, useEffect, useCallback, useRef } from "react";
 import { quizBySubject, quizByCourse, subjectAudioMap, getRandomQuiz, getWeakTopicQuiz, type QuizQuestion } from "@/lib/quizData";
 import { playAudio, stopAudio, playSfx } from "@/lib/audioEngine";
+import ConversationMode from "./ConversationMode";
 import { recordQuizResult, loadPerformance, getWeakSubjects, getOverallAccuracy, getSubjectAccuracy } from "@/lib/performanceTracker";
 import {
   loadVoiceSettings,
