@@ -1,11 +1,12 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronDown, GraduationCap, BookOpen, Languages, School, Building2, CheckCircle2, Search, SlidersHorizontal, Layers, X } from "lucide-react";
+import { ChevronDown, GraduationCap, BookOpen, Languages, School, Building2, CheckCircle2, Search, SlidersHorizontal, Layers, X, GitBranch } from "lucide-react";
 import { useState, useMemo } from "react";
 import { toast } from "sonner";
 import RevisionView from "./RevisionView";
 import StudyProgressDashboard from "./study/StudyProgressDashboard";
 import CustomTopics from "./study/CustomTopics";
 import TopicCheckbox from "./study/TopicCheckbox";
+import SubjectOutline from "./study/SubjectOutline";
 import { useStudyProgress } from "@/hooks/useStudyProgress";
 import { indianGrades, type Board, type Medium, type Grade, type Subject } from "@/lib/indianSyllabus";
 import { higherEdCourses, type HECourse, type HEDepartment, type HEYear, type HESubject } from "@/lib/higherEducation";
