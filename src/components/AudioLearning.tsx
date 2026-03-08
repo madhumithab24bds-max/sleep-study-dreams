@@ -101,6 +101,7 @@ const AudioLearning = () => {
     speechSynthesis.cancel();
     stopAudio();
     if (timerRef.current) clearTimeout(timerRef.current);
+    if (resumeIntervalRef.current) clearInterval(resumeIntervalRef.current);
     setIsPlaying(false);
     setProgress(0);
     setCurrentLineIdx(0);
