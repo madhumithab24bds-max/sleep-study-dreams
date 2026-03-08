@@ -1,8 +1,9 @@
 import { motion } from "framer-motion";
 import { Moon, Volume2, Timer, Settings, Music, CloudRain, Waves, Wind, Bird, Radio } from "lucide-react";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { toast } from "sonner";
 import { playAudio, stopAudio } from "@/lib/audioEngine";
+import { subjectAudioMap } from "@/lib/quizData";
 
 const audioTypes = [
   { id: "whisper", label: "Whisper", icon: Volume2, emoji: "🤫" },
@@ -16,9 +17,28 @@ const audioTypes = [
 
 const durationOptions = ["30 min", "1 hour", "2 hours", "4 hours", "8 hours"];
 
-const SleepScreen = () => {
+interface SleepScreenProps {
+  selectedSubject?: string | null;
+}
+
+const SleepScreen = ({ selectedSubject }: SleepScreenProps) => {
   const [isActive, setIsActive] = useState(false);
-  const [selectedAudio, setSelectedAudio] = useState("whisper");
+
+  const defaultAudio = useMemo(() => {
+    if (selectedSubject && subjectAudioMap[selectedSubject]) {
+      return subjectAudioMap[selectedSubject];
+    }
+    return "whisper";
+  }, [selectedSubject]);
+
+  const [selectedAudio, setSelectedAudio] = useState(defaultAudio);
+
+  // Update audio when subject changes
+  useEffect(() => {
+    if (selectedSubject && subjectAudioMap[selectedSubject]) {
+      setSelectedAudio(subjectAudioMap[selectedSubject]);
+    }
+  }, [selectedSubject]);
   const [showAudioPicker, setShowAudioPicker] = useState(false);
   const [volume, setVolume] = useState(35);
   const [durationIndex, setDurationIndex] = useState(4);

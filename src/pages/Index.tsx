@@ -11,17 +11,24 @@ type TabId = "home" | "study" | "sleep" | "memory" | "profile";
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState<TabId>("home");
+  const [selectedCourse, setSelectedCourse] = useState<string | null>(null);
+  const [selectedSubject, setSelectedSubject] = useState<string | null>(null);
 
   const renderScreen = () => {
     switch (activeTab) {
       case "home":
         return <HomeScreen onNavigate={setActiveTab} />;
       case "study":
-        return <StudyScreen />;
+        return (
+          <StudyScreen
+            onCourseChange={setSelectedCourse}
+            onSubjectChange={setSelectedSubject}
+          />
+        );
       case "sleep":
-        return <SleepScreen />;
+        return <SleepScreen selectedSubject={selectedSubject} />;
       case "memory":
-        return <MemoryScreen />;
+        return <MemoryScreen selectedCourse={selectedCourse} />;
       case "profile":
         return <ProfileScreen />;
       default:
