@@ -1,29 +1,40 @@
 import { motion } from "framer-motion";
 import { CheckCircle, XCircle, Trophy } from "lucide-react";
-import { useState, useMemo } from "react";
-import { quizByCourse } from "@/lib/quizData";
+import { useState, useMemo, useEffect } from "react";
+import { quizBySubject, quizByCourse } from "@/lib/quizData";
 
 interface Props {
   selectedCourse: string | null;
+  selectedSubject: string | null;
 }
 
-const MemoryScreen = ({ selectedCourse }: Props) => {
+const MemoryScreen = ({ selectedCourse, selectedSubject }: Props) => {
   const quizzes = useMemo(() => {
+    // Prefer subject-specific quiz
+    if (selectedSubject && quizBySubject[selectedSubject]) {
+      return quizBySubject[selectedSubject];
+    }
+    // Fallback to course-level quiz
     if (selectedCourse && quizByCourse[selectedCourse]) {
       return quizByCourse[selectedCourse];
     }
-    // Default fallback quiz
     return quizByCourse["primary"];
-  }, [selectedCourse]);
+  }, [selectedCourse, selectedSubject]);
 
   const [current, setCurrent] = useState(0);
   const [selected, setSelected] = useState<number | null>(null);
   const [score, setScore] = useState(0);
   const [done, setDone] = useState(false);
 
-  const courseLabel = selectedCourse
-    ? selectedCourse.charAt(0).toUpperCase() + selectedCourse.slice(1)
-    : "General";
+  // Reset quiz when subject/course changes
+  useEffect(() => {
+    setCurrent(0);
+    setSelected(null);
+    setScore(0);
+    setDone(false);
+  }, [selectedCourse, selectedSubject]);
+
+  const label = selectedSubject || (selectedCourse ? selectedCourse.charAt(0).toUpperCase() + selectedCourse.slice(1) : "General");
 
   const handleAnswer = (idx: number) => {
     if (selected !== null) return;
@@ -50,8 +61,8 @@ const MemoryScreen = ({ selectedCourse }: Props) => {
     <div className="min-h-screen pb-24 pt-6 px-4">
       <h1 className="text-2xl font-display font-bold text-foreground mb-2">🧠 Memory Test</h1>
       <p className="text-xs text-muted-foreground font-display mb-6">
-        📚 Course: <span className="text-primary font-semibold">{courseLabel}</span>
-        {!selectedCourse && " — Select a course in Study tab for specific quizzes"}
+        📚 Topic: <span className="text-primary font-semibold">{label}</span>
+        {!selectedSubject && !selectedCourse && " — Select a course & subject in Study tab"}
       </p>
 
       {!done ? (
@@ -68,7 +79,7 @@ const MemoryScreen = ({ selectedCourse }: Props) => {
           </div>
 
           <motion.div
-            key={`${selectedCourse}-${current}`}
+            key={`${selectedSubject}-${selectedCourse}-${current}`}
             className="glass-card p-6"
             initial={{ x: 30, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}

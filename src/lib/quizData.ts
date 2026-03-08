@@ -4,103 +4,479 @@ export interface QuizQuestion {
   answer: number;
 }
 
-export const quizByCourse: Record<string, QuizQuestion[]> = {
-  lkg: [
-    { q: "Which letter comes after 'A'?", options: ["C", "B", "D", "E"], answer: 1 },
-    { q: "How many eyes do you have?", options: ["1", "3", "2", "4"], answer: 2 },
+// Quizzes organized by subject name
+export const quizBySubject: Record<string, QuizQuestion[]> = {
+  // LKG
+  "Alphabets (A-Z)": [
+    { q: "Which letter comes after 'C'?", options: ["B", "D", "E", "A"], answer: 1 },
+    { q: "Which is a vowel?", options: ["B", "C", "A", "D"], answer: 2 },
+    { q: "How many letters in the English alphabet?", options: ["24", "25", "26", "27"], answer: 2 },
+    { q: "Which letter comes before 'G'?", options: ["E", "F", "H", "D"], answer: 1 },
+    { q: "Which is the first letter?", options: ["B", "Z", "A", "C"], answer: 2 },
+  ],
+  "Numbers (1-10)": [
+    { q: "What comes after 5?", options: ["4", "6", "7", "3"], answer: 1 },
+    { q: "How many fingers on one hand?", options: ["4", "5", "6", "3"], answer: 1 },
+    { q: "What is 2 + 3?", options: ["4", "6", "5", "7"], answer: 2 },
+    { q: "Which is the biggest: 3, 7, 2, 5?", options: ["3", "7", "2", "5"], answer: 1 },
+    { q: "What comes before 10?", options: ["8", "11", "9", "7"], answer: 2 },
+  ],
+  "Colors & Shapes": [
     { q: "What color is the sky?", options: ["Red", "Green", "Blue", "Yellow"], answer: 2 },
-    { q: "Which shape has 3 sides?", options: ["Circle", "Square", "Triangle", "Rectangle"], answer: 2 },
-    { q: "What sound does a cat make?", options: ["Woof", "Meow", "Moo", "Baa"], answer: 1 },
+    { q: "Which shape has 4 equal sides?", options: ["Circle", "Square", "Triangle", "Oval"], answer: 1 },
+    { q: "What color is a banana?", options: ["Red", "Blue", "Green", "Yellow"], answer: 3 },
+    { q: "Which shape is round?", options: ["Square", "Triangle", "Circle", "Rectangle"], answer: 2 },
+    { q: "How many sides does a triangle have?", options: ["2", "3", "4", "5"], answer: 1 },
   ],
-  ukg: [
+  "Rhymes & Songs": [
+    { q: "Twinkle Twinkle Little ___?", options: ["Moon", "Sun", "Star", "Cloud"], answer: 2 },
+    { q: "Jack and Jill went up the ___?", options: ["Mountain", "Hill", "Tree", "Wall"], answer: 1 },
+    { q: "Baa Baa Black Sheep, have you any ___?", options: ["Milk", "Wool", "Food", "Hay"], answer: 1 },
+    { q: "Humpty Dumpty sat on a ___?", options: ["Chair", "Wall", "Bed", "Floor"], answer: 1 },
+    { q: "Mary had a little ___?", options: ["Cat", "Dog", "Lamb", "Duck"], answer: 2 },
+  ],
+
+  // UKG
+  "Tamil Letters": [
+    { q: "Tamil alphabet starts with?", options: ["அ", "ஆ", "இ", "உ"], answer: 0 },
+    { q: "How many vowels in Tamil?", options: ["10", "12", "14", "16"], answer: 1 },
+    { q: "'க' is a?", options: ["Vowel", "Consonant", "Number", "Symbol"], answer: 1 },
     { q: "What is the Tamil word for 'Water'?", options: ["நீர்", "தீ", "காற்று", "மண்"], answer: 0 },
-    { q: "What comes after 10?", options: ["9", "11", "12", "8"], answer: 1 },
+    { q: "'ஐ' is the ___ vowel?", options: ["8th", "9th", "10th", "11th"], answer: 1 },
+  ],
+  "English Words": [
+    { q: "What is the opposite of 'Hot'?", options: ["Warm", "Cold", "Cool", "Wet"], answer: 1 },
     { q: "Which is a fruit?", options: ["Carrot", "Potato", "Apple", "Onion"], answer: 2 },
+    { q: "'Cat' rhymes with?", options: ["Dog", "Bat", "Cup", "Sun"], answer: 1 },
+    { q: "Plural of 'Book'?", options: ["Bookes", "Books", "Bookies", "Booking"], answer: 1 },
+    { q: "Which is an animal?", options: ["Chair", "Lion", "Pen", "Ball"], answer: 1 },
+  ],
+  "Basic Math": [
+    { q: "What is 7 + 8?", options: ["14", "15", "16", "13"], answer: 1 },
+    { q: "What is 20 - 5?", options: ["14", "16", "15", "13"], answer: 2 },
+    { q: "Which is greater: 18 or 13?", options: ["13", "18", "Same", "Cannot tell"], answer: 1 },
     { q: "How many days in a week?", options: ["5", "6", "7", "8"], answer: 2 },
+    { q: "What is 3 × 2?", options: ["5", "6", "7", "8"], answer: 1 },
+  ],
+  "EVS Basics": [
     { q: "Which animal gives us milk?", options: ["Dog", "Cat", "Cow", "Hen"], answer: 2 },
+    { q: "Plants need ___ to grow?", options: ["Darkness", "Sunlight", "Ice", "Noise"], answer: 1 },
+    { q: "Which season is very hot?", options: ["Winter", "Rainy", "Summer", "Autumn"], answer: 2 },
+    { q: "We breathe in?", options: ["CO₂", "Oxygen", "Nitrogen", "Smoke"], answer: 1 },
+    { q: "Water comes from?", options: ["Trees", "Rain", "Sun", "Moon"], answer: 1 },
   ],
-  primary: [
-    { q: "What is 15 + 27?", options: ["41", "42", "43", "44"], answer: 1 },
-    { q: "Which planet is closest to the Sun?", options: ["Venus", "Mercury", "Earth", "Mars"], answer: 1 },
-    { q: "What is H₂O?", options: ["Hydrogen", "Oxygen", "Water", "Carbon"], answer: 2 },
-    { q: "Who is the father of our nation?", options: ["Nehru", "Gandhi", "Bose", "Patel"], answer: 1 },
-    { q: "How many states in India?", options: ["28", "29", "30", "27"], answer: 0 },
-  ],
-  middle: [
-    { q: "Square root of 144?", options: ["11", "12", "13", "14"], answer: 1 },
-    { q: "Which gas do plants absorb?", options: ["O₂", "N₂", "CO₂", "H₂"], answer: 2 },
+
+  // Primary (1st-5th)
+  "Tamil": [
     { q: "Who wrote Thirukkural?", options: ["Kambar", "Thiruvalluvar", "Bharathi", "Ilango"], answer: 1 },
-    { q: "What is the SI unit of force?", options: ["Joule", "Newton", "Watt", "Pascal"], answer: 1 },
-    { q: "Which river is the longest in India?", options: ["Yamuna", "Godavari", "Ganga", "Krishna"], answer: 2 },
+    { q: "How many chapters in Thirukkural?", options: ["133", "130", "120", "140"], answer: 0 },
+    { q: "'Silapathikaram' was written by?", options: ["Kambar", "Ilango Adigal", "Bharathi", "Avvaiyar"], answer: 1 },
+    { q: "Tamil is one of the ___ classical languages?", options: ["Oldest", "Newest", "Rarest", "Smallest"], answer: 0 },
+    { q: "'அன்பு' means?", options: ["Anger", "Love", "Fear", "Joy"], answer: 1 },
   ],
-  high: [
-    { q: "What is the chemical formula of glucose?", options: ["C₆H₁₂O₆", "C₂H₅OH", "CH₄", "NaCl"], answer: 0 },
-    { q: "Ohm's law relates V, I and?", options: ["P", "R", "C", "L"], answer: 1 },
+  "English": [
+    { q: "Past tense of 'go'?", options: ["Goed", "Gone", "Went", "Going"], answer: 2 },
+    { q: "A noun is a ___ word?", options: ["Action", "Naming", "Describing", "Joining"], answer: 1 },
+    { q: "'She ___ to school daily' (fill)?", options: ["go", "goes", "going", "gone"], answer: 1 },
+    { q: "Synonym of 'happy'?", options: ["Sad", "Angry", "Joyful", "Tired"], answer: 2 },
+    { q: "An adjective describes a?", options: ["Verb", "Noun", "Pronoun", "Adverb"], answer: 1 },
+  ],
+  "Mathematics": [
+    { q: "What is 15 + 27?", options: ["41", "42", "43", "44"], answer: 1 },
+    { q: "What is 144 ÷ 12?", options: ["11", "12", "13", "14"], answer: 1 },
+    { q: "Perimeter of a square with side 5?", options: ["15", "20", "25", "10"], answer: 1 },
+    { q: "What is 8 × 7?", options: ["54", "56", "58", "48"], answer: 1 },
+    { q: "Fraction ½ + ½ = ?", options: ["½", "¼", "1", "2"], answer: 2 },
+  ],
+  "Maths": [
+    { q: "Square root of 144?", options: ["11", "12", "13", "14"], answer: 1 },
+    { q: "What is the LCM of 4 and 6?", options: ["8", "10", "12", "24"], answer: 2 },
+    { q: "Value of π (approx)?", options: ["3.14", "2.14", "4.14", "3.41"], answer: 0 },
+    { q: "If x + 5 = 12, x = ?", options: ["5", "6", "7", "8"], answer: 2 },
+    { q: "Area of rectangle (l=5, b=3)?", options: ["8", "15", "16", "10"], answer: 1 },
+  ],
+  "Science": [
+    { q: "What is H₂O?", options: ["Hydrogen", "Oxygen", "Water", "Carbon"], answer: 2 },
+    { q: "Which planet is closest to the Sun?", options: ["Venus", "Mercury", "Earth", "Mars"], answer: 1 },
+    { q: "Photosynthesis needs?", options: ["Darkness", "Sunlight", "Ice", "Wind"], answer: 1 },
+    { q: "Magnet attracts?", options: ["Wood", "Iron", "Plastic", "Glass"], answer: 1 },
+    { q: "Boiling point of water?", options: ["50°C", "100°C", "150°C", "200°C"], answer: 1 },
+  ],
+  "Social Science": [
+    { q: "Who is the father of our nation?", options: ["Nehru", "Gandhi", "Bose", "Patel"], answer: 1 },
+    { q: "Capital of India?", options: ["Mumbai", "Chennai", "New Delhi", "Kolkata"], answer: 2 },
+    { q: "How many states in India?", options: ["28", "29", "30", "27"], answer: 0 },
+    { q: "Independence Day of India?", options: ["Jan 26", "Aug 15", "Oct 2", "Nov 14"], answer: 1 },
+    { q: "Longest river in India?", options: ["Yamuna", "Godavari", "Ganga", "Krishna"], answer: 2 },
+  ],
+
+  // High School (9th-10th)
+  "Physics": [
+    { q: "SI unit of force?", options: ["Joule", "Newton", "Watt", "Pascal"], answer: 1 },
+    { q: "Speed of light (approx)?", options: ["3×10⁶", "3×10⁸", "3×10¹⁰", "3×10⁴"], answer: 1 },
+    { q: "Ohm's law: V = ?", options: ["IR", "I/R", "R/I", "I+R"], answer: 0 },
     { q: "Who discovered gravity?", options: ["Einstein", "Newton", "Galileo", "Kepler"], answer: 1 },
-    { q: "What is the LCM of 12 and 18?", options: ["24", "36", "48", "72"], answer: 1 },
-    { q: "Photosynthesis occurs in?", options: ["Mitochondria", "Nucleus", "Chloroplast", "Ribosome"], answer: 2 },
+    { q: "Unit of power?", options: ["Newton", "Joule", "Watt", "Ampere"], answer: 2 },
   ],
-  hsc: [
-    { q: "Derivative of sin(x) is?", options: ["cos(x)", "-cos(x)", "tan(x)", "-sin(x)"], answer: 0 },
+  "Chemistry": [
+    { q: "Chemical formula of glucose?", options: ["C₆H₁₂O₆", "C₂H₅OH", "CH₄", "NaCl"], answer: 0 },
+    { q: "pH of pure water?", options: ["6", "7", "8", "5"], answer: 1 },
     { q: "Which element has atomic number 79?", options: ["Silver", "Gold", "Platinum", "Copper"], answer: 1 },
-    { q: "Speed of light is approximately?", options: ["3×10⁶ m/s", "3×10⁸ m/s", "3×10¹⁰ m/s", "3×10⁴ m/s"], answer: 1 },
+    { q: "Noble gases are in group?", options: ["1", "17", "18", "2"], answer: 2 },
+    { q: "Atomic number of Carbon?", options: ["5", "6", "7", "8"], answer: 1 },
+  ],
+
+  // HSC
+  "Tamil / English": [
+    { q: "Who is Bharathiyar?", options: ["Scientist", "Poet", "King", "Painter"], answer: 1 },
+    { q: "'To be or not to be' is from?", options: ["Macbeth", "Hamlet", "Othello", "Tempest"], answer: 1 },
+    { q: "Bharathidasan is known as?", options: ["Mahakavi", "Pudhumaipithan", "Paavendar", "Kavimani"], answer: 2 },
+    { q: "Shakespeare's birth year?", options: ["1564", "1464", "1664", "1764"], answer: 0 },
+    { q: "Tamil literature's Sangam age has ___ Sangams?", options: ["2", "3", "4", "5"], answer: 1 },
+  ],
+  "Maths / Biology": [
+    { q: "Derivative of sin(x)?", options: ["cos(x)", "-cos(x)", "tan(x)", "-sin(x)"], answer: 0 },
+    { q: "DNA stands for?", options: ["Deoxy Nucleic Acid", "Deoxyribonucleic Acid", "Di Nucleic Acid", "Dual Nucleic Acid"], answer: 1 },
+    { q: "∫ x dx = ?", options: ["x", "x²/2", "2x", "x²"], answer: 1 },
+    { q: "Mitochondria is the powerhouse of?", options: ["Nucleus", "Cell", "Atom", "Body"], answer: 1 },
+    { q: "Binary of 10?", options: ["1010", "1100", "1001", "1000"], answer: 0 },
+  ],
+  "Computer Science": [
     { q: "Binary of 10 (decimal)?", options: ["1010", "1100", "1001", "1000"], answer: 0 },
-    { q: "pH of pure water at 25°C?", options: ["6", "7", "8", "5"], answer: 1 },
+    { q: "RAM stands for?", options: ["Read Access Memory", "Random Access Memory", "Run All Memory", "Real Active Memory"], answer: 1 },
+    { q: "Which is not a programming language?", options: ["Python", "Java", "HTML", "C++"], answer: 2 },
+    { q: "1 byte = ___ bits?", options: ["4", "8", "16", "32"], answer: 1 },
+    { q: "CPU stands for?", options: ["Central Process Unit", "Central Processing Unit", "Computer Personal Unit", "Central Program Utility"], answer: 1 },
   ],
-  engineering: [
+
+  // Engineering
+  "Engineering Maths": [
+    { q: "Laplace transform of 1?", options: ["1/s", "s", "1/s²", "1"], answer: 0 },
+    { q: "Eigenvalue of identity matrix?", options: ["0", "1", "−1", "∞"], answer: 1 },
+    { q: "Fourier series decomposes into?", options: ["Polynomials", "Sines/cosines", "Exponentials", "Logarithms"], answer: 1 },
+    { q: "Rank of a 3×3 identity matrix?", options: ["1", "2", "3", "0"], answer: 2 },
+    { q: "∇ operator is called?", options: ["Del", "Delta", "Sigma", "Lambda"], answer: 0 },
+  ],
+  "Data Structures": [
     { q: "Big-O of binary search?", options: ["O(n)", "O(log n)", "O(n²)", "O(1)"], answer: 1 },
-    { q: "Kirchhoff's Current Law states sum of currents at a node is?", options: ["Maximum", "Zero", "One", "Infinity"], answer: 1 },
-    { q: "Laplace transform of 1 is?", options: ["1/s", "s", "1/s²", "1"], answer: 0 },
-    { q: "Which data structure uses LIFO?", options: ["Queue", "Stack", "Array", "Tree"], answer: 1 },
+    { q: "Which uses LIFO?", options: ["Queue", "Stack", "Array", "Tree"], answer: 1 },
+    { q: "Which uses FIFO?", options: ["Stack", "Queue", "Tree", "Graph"], answer: 1 },
+    { q: "Worst case of quicksort?", options: ["O(n)", "O(n log n)", "O(n²)", "O(log n)"], answer: 2 },
+    { q: "A binary tree node has max ___ children?", options: ["1", "2", "3", "4"], answer: 1 },
+  ],
+  "Thermodynamics": [
+    { q: "First law is about?", options: ["Entropy", "Energy conservation", "Momentum", "Heat death"], answer: 1 },
     { q: "Carnot efficiency depends on?", options: ["Pressure", "Volume", "Temperature", "Mass"], answer: 2 },
+    { q: "Entropy of isolated system?", options: ["Decreases", "Stays same", "Increases", "Zero"], answer: 2 },
+    { q: "Absolute zero in Celsius?", options: ["-273.15°C", "-100°C", "0°C", "-373°C"], answer: 0 },
+    { q: "Unit of entropy?", options: ["J/K", "J·K", "W/K", "N/K"], answer: 0 },
   ],
-  mbbs: [
-    { q: "Largest organ in the human body?", options: ["Liver", "Skin", "Brain", "Lung"], answer: 1 },
-    { q: "Normal blood pH range?", options: ["6.8-7.0", "7.35-7.45", "7.5-8.0", "6.5-7.0"], answer: 1 },
-    { q: "Which vitamin is produced by sunlight?", options: ["A", "B12", "C", "D"], answer: 3 },
-    { q: "How many bones in an adult body?", options: ["206", "208", "210", "204"], answer: 0 },
-    { q: "Insulin is produced by?", options: ["Liver", "Pancreas", "Kidney", "Thyroid"], answer: 1 },
+  "Circuit Theory": [
+    { q: "KCL states sum of currents at a node is?", options: ["Maximum", "Zero", "One", "Infinity"], answer: 1 },
+    { q: "Resistors in series: total R = ?", options: ["R1+R2", "R1×R2", "1/R1+1/R2", "R1-R2"], answer: 0 },
+    { q: "Unit of capacitance?", options: ["Henry", "Farad", "Ohm", "Tesla"], answer: 1 },
+    { q: "AC frequency in India?", options: ["50 Hz", "60 Hz", "100 Hz", "25 Hz"], answer: 0 },
+    { q: "Impedance unit?", options: ["Farad", "Henry", "Ohm", "Watt"], answer: 2 },
   ],
-  dental: [
-    { q: "How many permanent teeth in adults?", options: ["28", "30", "32", "34"], answer: 2 },
-    { q: "Hardest substance in the human body?", options: ["Bone", "Enamel", "Dentin", "Cartilage"], answer: 1 },
-    { q: "Which tooth is also called the 'eye tooth'?", options: ["Incisor", "Canine", "Premolar", "Molar"], answer: 1 },
-    { q: "Fluoride helps prevent?", options: ["Gum disease", "Tooth decay", "Bad breath", "Tooth loss"], answer: 1 },
-    { q: "Primary teeth are also called?", options: ["Permanent", "Deciduous", "Wisdom", "Supernumerary"], answer: 1 },
+  "Programming": [
+    { q: "Which is not an OOP concept?", options: ["Inheritance", "Compilation", "Polymorphism", "Encapsulation"], answer: 1 },
+    { q: "Python is ___ typed?", options: ["Statically", "Dynamically", "Weakly", "Not"], answer: 1 },
+    { q: "'int' in C is typically ___ bytes?", options: ["2", "4", "8", "1"], answer: 1 },
+    { q: "Git is used for?", options: ["Compiling", "Version control", "Testing", "Deploying"], answer: 1 },
+    { q: "SQL stands for?", options: ["Simple Query Language", "Structured Query Language", "Standard Query Logic", "System Query Language"], answer: 1 },
   ],
-  mba: [
-    { q: "SWOT stands for Strengths, Weaknesses, Opportunities and?", options: ["Targets", "Threats", "Trends", "Tasks"], answer: 1 },
+
+  // MBBS
+  "Anatomy": [
+    { q: "How many bones in adult body?", options: ["206", "208", "210", "204"], answer: 0 },
+    { q: "Largest bone?", options: ["Humerus", "Femur", "Tibia", "Fibula"], answer: 1 },
+    { q: "Smallest bone?", options: ["Stapes", "Incus", "Malleus", "Hyoid"], answer: 0 },
+    { q: "How many ribs?", options: ["10 pairs", "12 pairs", "14 pairs", "8 pairs"], answer: 1 },
+    { q: "Largest organ?", options: ["Liver", "Skin", "Brain", "Lung"], answer: 1 },
+  ],
+  "Physiology": [
+    { q: "Normal blood pH?", options: ["6.8-7.0", "7.35-7.45", "7.5-8.0", "6.5-7.0"], answer: 1 },
+    { q: "Normal heart rate (adults)?", options: ["40-60", "60-100", "100-120", "80-140"], answer: 1 },
+    { q: "Normal BP?", options: ["120/80", "140/90", "100/60", "160/100"], answer: 0 },
+    { q: "RBC lifespan?", options: ["60 days", "90 days", "120 days", "150 days"], answer: 2 },
+    { q: "Pacemaker of heart?", options: ["AV node", "SA node", "Bundle of His", "Purkinje"], answer: 1 },
+  ],
+  "Biochemistry": [
+    { q: "pH of blood?", options: ["7.0", "7.4", "6.8", "8.0"], answer: 1 },
+    { q: "Enzyme that digests starch?", options: ["Lipase", "Amylase", "Protease", "Trypsin"], answer: 1 },
+    { q: "ATP full form?", options: ["Adenosine Triphosphate", "Amino Triphosphate", "Adenine Triphosphate", "Acid Triphosphate"], answer: 0 },
+    { q: "Krebs cycle occurs in?", options: ["Cytoplasm", "Nucleus", "Mitochondria", "Ribosome"], answer: 2 },
+    { q: "Cholesterol is a?", options: ["Protein", "Lipid", "Carbohydrate", "Vitamin"], answer: 1 },
+  ],
+  "Pharmacology": [
+    { q: "Aspirin is a?", options: ["Antibiotic", "NSAID", "Steroid", "Opioid"], answer: 1 },
+    { q: "Insulin is used for?", options: ["Hypertension", "Diabetes", "Asthma", "Arthritis"], answer: 1 },
+    { q: "Paracetamol is also called?", options: ["Ibuprofen", "Acetaminophen", "Aspirin", "Naproxen"], answer: 1 },
+    { q: "Penicillin was discovered by?", options: ["Pasteur", "Fleming", "Koch", "Jenner"], answer: 1 },
+    { q: "Route 'IV' means?", options: ["Into vein", "Into muscle", "Under skin", "By mouth"], answer: 0 },
+  ],
+  "Pathology": [
+    { q: "Study of diseases is?", options: ["Physiology", "Pathology", "Anatomy", "Pharmacology"], answer: 1 },
+    { q: "Malignant tumor of epithelial origin?", options: ["Sarcoma", "Carcinoma", "Lymphoma", "Melanoma"], answer: 1 },
+    { q: "Inflammation marker?", options: ["CRP", "HDL", "LDL", "BUN"], answer: 0 },
+    { q: "Anemia means low?", options: ["WBC", "Platelets", "Hemoglobin", "Plasma"], answer: 2 },
+    { q: "Biopsy means?", options: ["Blood test", "Tissue examination", "Urine test", "X-ray"], answer: 1 },
+  ],
+
+  // Dental (BDS)
+  "Oral Anatomy": [
+    { q: "Permanent teeth count?", options: ["28", "30", "32", "34"], answer: 2 },
+    { q: "Hardest substance in body?", options: ["Bone", "Enamel", "Dentin", "Cartilage"], answer: 1 },
+    { q: "Primary teeth count?", options: ["16", "18", "20", "24"], answer: 2 },
+    { q: "TMJ stands for?", options: ["Temporo Mandibular Joint", "Total Mouth Joint", "Tooth Molar Junction", "Tissue Membrane Joint"], answer: 0 },
+    { q: "Mandible is the?", options: ["Upper jaw", "Lower jaw", "Cheek bone", "Skull bone"], answer: 1 },
+  ],
+  "Dental Materials": [
+    { q: "Amalgam contains?", options: ["Gold", "Mercury", "Platinum", "Copper only"], answer: 1 },
+    { q: "GIC stands for?", options: ["Glass Ionomer Cement", "Gold Inlay Cast", "Gum Irrigation Chemical", "Gel Ion Compound"], answer: 0 },
+    { q: "Impression material?", options: ["Amalgam", "Alginate", "Composite", "Porcelain"], answer: 1 },
+    { q: "Porcelain is used for?", options: ["Fillings only", "Crowns", "Extraction", "Anesthesia"], answer: 1 },
+    { q: "Setting reaction of plaster is?", options: ["Endothermic", "Exothermic", "Neutral", "Isothermic"], answer: 1 },
+  ],
+  "Oral Pathology": [
+    { q: "Ameloblastoma arises from?", options: ["Bone", "Enamel organ", "Pulp", "Gingiva"], answer: 1 },
+    { q: "Leukoplakia is a?", options: ["Red lesion", "White lesion", "Blue lesion", "Black lesion"], answer: 1 },
+    { q: "Dental caries is caused by?", options: ["Virus", "Bacteria", "Fungus", "Parasite"], answer: 1 },
+    { q: "Periapical cyst is also called?", options: ["Dentigerous", "Radicular", "Lateral", "Residual"], answer: 1 },
+    { q: "Most common oral cancer?", options: ["Adenocarcinoma", "SCC", "Melanoma", "Lymphoma"], answer: 1 },
+  ],
+  "Prosthodontics": [
+    { q: "Complete denture replaces?", options: ["Some teeth", "All teeth", "One tooth", "Gums only"], answer: 1 },
+    { q: "RPD stands for?", options: ["Removable Partial Denture", "Root Planning Device", "Resin Polymer Disc", "Rapid Prosthetic Design"], answer: 0 },
+    { q: "Facebow records?", options: ["Bite force", "Jaw relation", "Tooth color", "Gum depth"], answer: 1 },
+    { q: "Overjet is ___ overlap?", options: ["Vertical", "Horizontal", "Lateral", "Diagonal"], answer: 1 },
+    { q: "Occlusal rim is made of?", options: ["Acrylic", "Wax", "Metal", "Porcelain"], answer: 1 },
+  ],
+  "Orthodontics": [
+    { q: "Malocclusion classification by?", options: ["Dewey", "Angle", "Kennedy", "Black"], answer: 1 },
+    { q: "Class II div 1 has?", options: ["Retruded maxilla", "Protruded maxilla", "Normal bite", "Open bite"], answer: 1 },
+    { q: "Cephalometry studies?", options: ["Teeth", "Skull", "Gums", "Tongue"], answer: 1 },
+    { q: "NiTi wire is?", options: ["Rigid", "Superelastic", "Brittle", "Heavy"], answer: 1 },
+    { q: "Ideal overbite?", options: ["0mm", "2-3mm", "5mm", "8mm"], answer: 1 },
+  ],
+  "Periodontics": [
+    { q: "Periodontium includes?", options: ["Enamel", "Gingiva", "Crown", "Pulp"], answer: 1 },
+    { q: "Gingivitis is inflammation of?", options: ["Bone", "Gums", "Pulp", "Tongue"], answer: 1 },
+    { q: "Scaling removes?", options: ["Enamel", "Calculus", "Dentin", "Cementum"], answer: 1 },
+    { q: "Probing depth normal?", options: ["1-3mm", "4-6mm", "7-9mm", "10mm+"], answer: 0 },
+    { q: "BOP stands for?", options: ["Bleeding on Probing", "Base of Periodontium", "Bone Over Pulp", "Bracket on Premolar"], answer: 0 },
+  ],
+  "Endodontics": [
+    { q: "Root canal treats?", options: ["Gums", "Pulp", "Enamel", "Bone"], answer: 1 },
+    { q: "Apex locator measures?", options: ["Tooth color", "Working length", "Bite force", "Cavity depth"], answer: 1 },
+    { q: "Gutta percha is used to?", options: ["Clean", "Fill", "Cut", "Drill"], answer: 1 },
+    { q: "Pulp test checks?", options: ["Vitality", "Color", "Size", "Shape"], answer: 0 },
+    { q: "NaOCl is used as?", options: ["Filler", "Irrigant", "Cement", "Anesthetic"], answer: 1 },
+  ],
+  "Oral Surgery": [
+    { q: "Forceps are used for?", options: ["Filling", "Extraction", "Scaling", "Polishing"], answer: 1 },
+    { q: "Local anesthetic used?", options: ["Paracetamol", "Lidocaine", "Aspirin", "Amoxicillin"], answer: 1 },
+    { q: "Impacted tooth is?", options: ["Decayed", "Unerupted", "Loose", "Stained"], answer: 1 },
+    { q: "Dry socket occurs after?", options: ["Filling", "Extraction", "Scaling", "RCT"], answer: 1 },
+    { q: "Suture material?", options: ["Wire", "Silk", "Rubber", "Plastic"], answer: 1 },
+  ],
+  "Pedodontics": [
+    { q: "First primary tooth erupts at?", options: ["3 months", "6 months", "9 months", "12 months"], answer: 1 },
+    { q: "Space maintainer is for?", options: ["Adults", "Children", "Elderly", "Infants"], answer: 1 },
+    { q: "Pulpotomy is done on?", options: ["Permanent teeth", "Primary teeth", "Both", "Neither"], answer: 1 },
+    { q: "Fluoride varnish prevents?", options: ["Gum disease", "Caries", "Fracture", "Staining"], answer: 1 },
+    { q: "Natal teeth are present at?", options: ["Birth", "1 year", "2 years", "6 months"], answer: 0 },
+  ],
+  "Community Dentistry": [
+    { q: "Fluoride in water prevents?", options: ["Gum disease", "Dental caries", "Oral cancer", "Fractures"], answer: 1 },
+    { q: "DMFT index measures?", options: ["Gum health", "Caries experience", "Oral hygiene", "Malocclusion"], answer: 1 },
+    { q: "WHO stands for?", options: ["World Health Organization", "World Hygiene Office", "Western Health Order", "World Hospital Org"], answer: 0 },
+    { q: "Primary prevention includes?", options: ["Treatment", "Fluoridation", "Surgery", "Extraction"], answer: 1 },
+    { q: "OHI-S measures?", options: ["Caries", "Oral hygiene", "Fluorosis", "Malocclusion"], answer: 1 },
+  ],
+  "Oral Medicine & Radiology": [
+    { q: "OPG shows?", options: ["Single tooth", "Full jaw", "Soft tissue", "Brain"], answer: 1 },
+    { q: "IOPA is a ___ radiograph?", options: ["Extraoral", "Intraoral", "CT", "MRI"], answer: 1 },
+    { q: "Radiolucent appears?", options: ["White", "Dark", "Gray", "Red"], answer: 1 },
+    { q: "Lichen planus shows?", options: ["Red spots", "White striae", "Black patches", "Blue dots"], answer: 1 },
+    { q: "CBCT stands for?", options: ["Cone Beam CT", "Central Bone CT", "Clinical Body CT", "Curved Beam CT"], answer: 0 },
+  ],
+  "Conservative Dentistry": [
+    { q: "Composite resin is?", options: ["Metal", "Tooth-colored", "Glass", "Ceramic"], answer: 1 },
+    { q: "Cavity classification by?", options: ["Angle", "Black", "Kennedy", "Dewey"], answer: 1 },
+    { q: "Bonding agent is applied?", options: ["After filling", "Before filling", "After extraction", "Never"], answer: 1 },
+    { q: "Class I cavity is on?", options: ["Proximal", "Occlusal", "Cervical", "Incisal"], answer: 1 },
+    { q: "Etching uses?", options: ["Phosphoric acid", "Citric acid", "Acetic acid", "Sulfuric acid"], answer: 0 },
+  ],
+
+  // MBA
+  "Marketing": [
+    { q: "4 P's include all EXCEPT?", options: ["Price", "Product", "People", "Place"], answer: 2 },
+    { q: "USP stands for?", options: ["Unique Selling Proposition", "Universal Sales Plan", "United Service Provider", "User Support Platform"], answer: 0 },
+    { q: "Market segmentation divides by?", options: ["Products", "Customers", "Employees", "Suppliers"], answer: 1 },
+    { q: "B2C means?", options: ["Business to Customer", "Brand to Company", "Buy to Consume", "Business to Corporation"], answer: 0 },
+    { q: "AIDA model: A stands for?", options: ["Action", "Attention", "Awareness", "Appeal"], answer: 1 },
+  ],
+  "Finance": [
     { q: "ROI stands for?", options: ["Rate of Interest", "Return on Investment", "Revenue on Input", "Risk of Inflation"], answer: 1 },
-    { q: "4 P's of Marketing include all EXCEPT?", options: ["Price", "Product", "People", "Place"], answer: 2 },
-    { q: "Who wrote 'The Wealth of Nations'?", options: ["Keynes", "Adam Smith", "Marx", "Ricardo"], answer: 1 },
-    { q: "Break-even point is when?", options: ["Profit > Loss", "Revenue = Cost", "Revenue > Cost", "Cost = 0"], answer: 1 },
+    { q: "Balance sheet shows?", options: ["Profit", "Assets & Liabilities", "Sales", "Marketing budget"], answer: 1 },
+    { q: "NPV stands for?", options: ["Net Present Value", "New Product Value", "National Price Variation", "Net Profit Volume"], answer: 0 },
+    { q: "Bull market means?", options: ["Falling prices", "Rising prices", "Stable prices", "No trading"], answer: 1 },
+    { q: "P/E ratio measures?", options: ["Debt", "Valuation", "Revenue", "Growth"], answer: 1 },
   ],
-  bed: [
-    { q: "Bloom's Taxonomy is related to?", options: ["Finance", "Learning objectives", "Sports", "Medicine"], answer: 1 },
-    { q: "Who proposed the theory of multiple intelligences?", options: ["Piaget", "Gardner", "Vygotsky", "Skinner"], answer: 1 },
-    { q: "Formative assessment is done?", options: ["At the end", "During learning", "Before admission", "Never"], answer: 1 },
-    { q: "ZPD concept was given by?", options: ["Piaget", "Bruner", "Vygotsky", "Dewey"], answer: 2 },
-    { q: "NCF 2005 emphasizes?", options: ["Rote learning", "Activity-based learning", "Punishment", "Competition"], answer: 1 },
+  "HR Management": [
+    { q: "KPI stands for?", options: ["Key Performance Indicator", "Knowledge Process Input", "Key Process Integration", "Knowledge Performance Index"], answer: 0 },
+    { q: "360-degree feedback involves?", options: ["Boss only", "Multiple sources", "Self only", "Peers only"], answer: 1 },
+    { q: "Maslow's top need?", options: ["Safety", "Social", "Esteem", "Self-actualization"], answer: 3 },
+    { q: "HR stands for?", options: ["High Revenue", "Human Resources", "Head Relations", "Hire & Retain"], answer: 1 },
+    { q: "Attrition means?", options: ["Hiring", "Employee leaving", "Promotion", "Training"], answer: 1 },
   ],
-  arts: [
-    { q: "Who painted the Mona Lisa?", options: ["Picasso", "Da Vinci", "Van Gogh", "Monet"], answer: 1 },
-    { q: "GDP stands for?", options: ["Gross Domestic Product", "General Data Protocol", "Grand Development Plan", "Global Digital Platform"], answer: 0 },
-    { q: "The Indus Valley Civilization is also known as?", options: ["Vedic", "Harappan", "Mauryan", "Gupta"], answer: 1 },
-    { q: "Who is the father of Psychology?", options: ["Freud", "Wundt", "Jung", "Pavlov"], answer: 1 },
-    { q: "Democracy means rule by the?", options: ["King", "Military", "People", "Religion"], answer: 2 },
+  "Operations": [
+    { q: "JIT stands for?", options: ["Just in Time", "Joint Integration Task", "Job Improvement Tool", "Just in Track"], answer: 0 },
+    { q: "Six Sigma aims for?", options: ["More defects", "Zero defects", "More cost", "More waste"], answer: 1 },
+    { q: "Supply chain includes?", options: ["Marketing only", "Production to delivery", "HR only", "Finance only"], answer: 1 },
+    { q: "Lean manufacturing reduces?", options: ["Quality", "Waste", "Workers", "Products"], answer: 1 },
+    { q: "FIFO stands for?", options: ["First In First Out", "Fast In Fast Out", "Final Input Final Output", "Fixed In Fixed Out"], answer: 0 },
   ],
-  allied: [
-    { q: "WBC stands for?", options: ["White Blood Cells", "Whole Body Count", "Water Based Chemical", "Wide Band Communication"], answer: 0 },
-    { q: "Normal body temperature in °F?", options: ["96.8", "97.8", "98.6", "99.6"], answer: 2 },
-    { q: "X-rays were discovered by?", options: ["Curie", "Röntgen", "Edison", "Tesla"], answer: 1 },
-    { q: "Which blood group is universal donor?", options: ["A", "B", "AB", "O"], answer: 3 },
-    { q: "Stethoscope was invented by?", options: ["Laennec", "Pasteur", "Fleming", "Lister"], answer: 0 },
+  "Business Strategy": [
+    { q: "SWOT: T stands for?", options: ["Targets", "Threats", "Trends", "Tasks"], answer: 1 },
+    { q: "Porter's forces are?", options: ["3", "4", "5", "6"], answer: 2 },
+    { q: "BCG matrix has ___ quadrants?", options: ["2", "3", "4", "5"], answer: 2 },
+    { q: "Blue ocean means?", options: ["Existing market", "New market space", "Declining market", "Saturated market"], answer: 1 },
+    { q: "Break-even: Revenue = ?", options: ["Profit", "Cost", "Loss", "Zero"], answer: 1 },
   ],
+
+  // B.Ed
+  "Pedagogy": [
+    { q: "Bloom's Taxonomy is about?", options: ["Finance", "Learning objectives", "Sports", "Medicine"], answer: 1 },
+    { q: "Constructivism says learners?", options: ["Memorize", "Build knowledge", "Copy", "Listen only"], answer: 1 },
+    { q: "Scaffolding is by?", options: ["Piaget", "Bruner", "Skinner", "Freud"], answer: 1 },
+    { q: "Pedagogy means teaching?", options: ["Adults", "Children", "Elderly", "Animals"], answer: 1 },
+    { q: "NCF 2005 promotes?", options: ["Rote learning", "Activity-based", "Punishment", "Competition"], answer: 1 },
+  ],
+  "Child Psychology": [
+    { q: "Piaget's stages are?", options: ["3", "4", "5", "6"], answer: 1 },
+    { q: "ZPD by?", options: ["Piaget", "Bruner", "Vygotsky", "Dewey"], answer: 2 },
+    { q: "Multiple intelligences by?", options: ["Piaget", "Gardner", "Vygotsky", "Skinner"], answer: 1 },
+    { q: "Erikson proposed ___ stages?", options: ["6", "7", "8", "9"], answer: 2 },
+    { q: "Operant conditioning by?", options: ["Pavlov", "Skinner", "Piaget", "Freud"], answer: 1 },
+  ],
+  "Teaching Methods": [
+    { q: "Project method by?", options: ["Kilpatrick", "Dewey", "Froebel", "Montessori"], answer: 0 },
+    { q: "Micro-teaching duration?", options: ["5-10 min", "30 min", "1 hour", "2 hours"], answer: 0 },
+    { q: "Formative assessment is?", options: ["Final exam", "During learning", "Entrance test", "Annual"], answer: 1 },
+    { q: "Socratic method uses?", options: ["Lectures", "Questions", "Punishment", "Memorization"], answer: 1 },
+    { q: "Flipped classroom: homework is?", options: ["Reading", "Watching lectures", "Writing", "Nothing"], answer: 1 },
+  ],
+  "Classroom Mgmt": [
+    { q: "Classroom management aims for?", options: ["Control", "Learning environment", "Silence", "Punishment"], answer: 1 },
+    { q: "Positive reinforcement means?", options: ["Punishment", "Reward", "Ignore", "Scold"], answer: 1 },
+    { q: "Inclusive education includes?", options: ["Only gifted", "All learners", "Only disabled", "Only rich"], answer: 1 },
+    { q: "Seating arrangement affects?", options: ["Nothing", "Learning", "Building", "Salary"], answer: 1 },
+    { q: "Time-on-task means?", options: ["Break time", "Engaged learning time", "Free time", "Lunch time"], answer: 1 },
+  ],
+  "Assessment": [
+    { q: "Summative assessment is at?", options: ["Start", "Middle", "End", "Never"], answer: 2 },
+    { q: "Rubric is a?", options: ["Textbook", "Scoring guide", "Test paper", "Lesson plan"], answer: 1 },
+    { q: "Norm-referenced compares to?", options: ["Standard", "Other students", "Self", "Teacher"], answer: 1 },
+    { q: "Reliability means?", options: ["Valid", "Consistent", "Fair", "Easy"], answer: 1 },
+    { q: "Portfolio assessment collects?", options: ["One test", "Student work samples", "Fees", "Attendance"], answer: 1 },
+  ],
+
+  // Allied Health
+  "Human Anatomy": [
+    { q: "Largest bone?", options: ["Humerus", "Femur", "Tibia", "Fibula"], answer: 1 },
+    { q: "Heart has ___ chambers?", options: ["2", "3", "4", "5"], answer: 2 },
+    { q: "Cranial nerves count?", options: ["10", "12", "14", "8"], answer: 1 },
+    { q: "Largest muscle?", options: ["Biceps", "Gluteus maximus", "Deltoid", "Triceps"], answer: 1 },
+    { q: "Vertebral column has ___ bones?", options: ["26", "30", "33", "36"], answer: 2 },
+  ],
+  "Microbiology": [
+    { q: "Bacteria are ___ celled?", options: ["Multi", "Single", "No", "Double"], answer: 1 },
+    { q: "Penicillin kills?", options: ["Virus", "Bacteria", "Fungus", "All"], answer: 1 },
+    { q: "COVID-19 is caused by?", options: ["Bacteria", "Virus", "Fungus", "Parasite"], answer: 1 },
+    { q: "Gram stain differentiates?", options: ["Viruses", "Bacteria types", "Fungi", "Parasites"], answer: 1 },
+    { q: "Autoclave uses?", options: ["Cold", "Steam pressure", "UV light", "Chemicals"], answer: 1 },
+  ],
+  "Clinical Lab": [
+    { q: "CBC tests?", options: ["Urine", "Blood cells", "Stool", "Saliva"], answer: 1 },
+    { q: "Normal WBC count?", options: ["4000-11000", "1000-2000", "15000-20000", "500-1000"], answer: 0 },
+    { q: "ESR measures?", options: ["Sugar", "Inflammation", "Oxygen", "pH"], answer: 1 },
+    { q: "Blood glucose unit?", options: ["mg/dL", "g/L", "mol/L", "IU/mL"], answer: 0 },
+    { q: "Universal donor group?", options: ["A", "B", "AB", "O"], answer: 3 },
+  ],
+  "Radiology": [
+    { q: "X-rays discovered by?", options: ["Curie", "Röntgen", "Edison", "Tesla"], answer: 1 },
+    { q: "CT uses?", options: ["Sound", "X-rays", "Magnets", "Light"], answer: 1 },
+    { q: "MRI uses?", options: ["X-rays", "Magnetic fields", "Sound", "Gamma rays"], answer: 1 },
+    { q: "Ultrasound uses?", options: ["X-rays", "Sound waves", "Magnets", "Light"], answer: 1 },
+    { q: "Lead apron protects from?", options: ["Sound", "Radiation", "Heat", "Cold"], answer: 1 },
+  ],
+  "Nursing Care": [
+    { q: "Normal body temp (°F)?", options: ["96.8", "97.8", "98.6", "99.6"], answer: 2 },
+    { q: "Pulse is felt at?", options: ["Elbow", "Wrist", "Knee", "Ankle"], answer: 1 },
+    { q: "Stethoscope invented by?", options: ["Laennec", "Pasteur", "Fleming", "Lister"], answer: 0 },
+    { q: "Hand hygiene prevents?", options: ["Hair loss", "Infection", "Fever", "Pain"], answer: 1 },
+    { q: "Triage means?", options: ["Treatment", "Sorting patients", "Discharge", "Admission"], answer: 1 },
+  ],
+
+  // Arts & Science
+  "Literature": [
+    { q: "Shakespeare wrote?", options: ["Novels", "Plays & Sonnets", "Textbooks", "News"], answer: 1 },
+    { q: "Hamlet is a?", options: ["Comedy", "Tragedy", "History", "Romance"], answer: 1 },
+    { q: "Haiku has ___ lines?", options: ["2", "3", "4", "5"], answer: 1 },
+    { q: "'1984' was written by?", options: ["Dickens", "Orwell", "Austen", "Hardy"], answer: 1 },
+    { q: "Sonnet has ___ lines?", options: ["10", "12", "14", "16"], answer: 2 },
+  ],
+  "History": [
+    { q: "Indus Valley is also called?", options: ["Vedic", "Harappan", "Mauryan", "Gupta"], answer: 1 },
+    { q: "French Revolution year?", options: ["1776", "1789", "1799", "1804"], answer: 1 },
+    { q: "First World War started?", options: ["1912", "1914", "1916", "1918"], answer: 1 },
+    { q: "Ashoka belonged to?", options: ["Gupta", "Maurya", "Chola", "Mughal"], answer: 1 },
+    { q: "Berlin Wall fell in?", options: ["1987", "1989", "1991", "1993"], answer: 1 },
+  ],
+  "Economics": [
+    { q: "GDP stands for?", options: ["Gross Domestic Product", "General Data Protocol", "Grand Dev Plan", "Global Digital Platform"], answer: 0 },
+    { q: "Inflation means prices?", options: ["Fall", "Rise", "Stay same", "Disappear"], answer: 1 },
+    { q: "Supply and demand set?", options: ["Color", "Price", "Weight", "Size"], answer: 1 },
+    { q: "Adam Smith wrote?", options: ["Das Kapital", "Wealth of Nations", "The Republic", "Leviathan"], answer: 1 },
+    { q: "Fiscal policy involves?", options: ["Trade", "Govt spending & tax", "Banking", "Farming"], answer: 1 },
+  ],
+  "Political Science": [
+    { q: "Democracy means rule by?", options: ["King", "Military", "People", "Religion"], answer: 2 },
+    { q: "UN was founded in?", options: ["1940", "1945", "1950", "1955"], answer: 1 },
+    { q: "India's Constitution adopted?", options: ["1947", "1948", "1950", "1952"], answer: 2 },
+    { q: "Lok Sabha members?", options: ["245", "345", "545", "645"], answer: 2 },
+    { q: "Right to vote is a ___ right?", options: ["Fundamental", "Political", "Social", "Economic"], answer: 1 },
+  ],
+  "Psychology": [
+    { q: "Father of Psychology?", options: ["Freud", "Wundt", "Jung", "Pavlov"], answer: 1 },
+    { q: "Id, Ego, Superego by?", options: ["Jung", "Freud", "Adler", "Maslow"], answer: 1 },
+    { q: "Classical conditioning by?", options: ["Skinner", "Pavlov", "Watson", "Thorndike"], answer: 1 },
+    { q: "IQ stands for?", options: ["Intelligence Quotient", "Internal Quality", "Instant Query", "Intellectual Quantity"], answer: 0 },
+    { q: "Cognitive dissonance by?", options: ["Festinger", "Freud", "Piaget", "Bandura"], answer: 0 },
+  ],
+};
+
+// Fallback: get quiz by course (picks first subject's quiz or a default)
+export const quizByCourse: Record<string, QuizQuestion[]> = {
+  lkg: quizBySubject["Alphabets (A-Z)"],
+  ukg: quizBySubject["Tamil Letters"],
+  primary: quizBySubject["Mathematics"],
+  middle: quizBySubject["Maths"],
+  high: quizBySubject["Science"],
+  hsc: quizBySubject["Physics"],
+  engineering: quizBySubject["Data Structures"],
+  mbbs: quizBySubject["Anatomy"],
+  dental: quizBySubject["Oral Anatomy"],
+  mba: quizBySubject["Marketing"],
+  bed: quizBySubject["Pedagogy"],
+  arts: quizBySubject["Literature"],
+  allied: quizBySubject["Human Anatomy"],
 };
 
 // Map subjects to relevant audio types for sleep learning
 export const subjectAudioMap: Record<string, string> = {
-  // Calming subjects → Ocean/Rain
   "Alphabets (A-Z)": "lullaby",
   "Numbers (1-10)": "lullaby",
   "Colors & Shapes": "lullaby",
