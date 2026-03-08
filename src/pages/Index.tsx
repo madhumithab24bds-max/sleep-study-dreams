@@ -34,6 +34,19 @@ const Index = () => {
             onSubjectStudied={handleSubjectStudied}
           />
         );
+      case "mystudy":
+        return (
+          <MyStudyScreen
+            onNavigateToSleep={(subject) => {
+              setSelectedSubject(subject);
+              setActiveTab("sleep");
+            }}
+            onNavigateToQuiz={(subject) => {
+              setSelectedSubject(subject);
+              setActiveTab("memory");
+            }}
+          />
+        );
       case "sleep":
         return <SleepScreen selectedSubject={selectedSubject} />;
       case "memory":
