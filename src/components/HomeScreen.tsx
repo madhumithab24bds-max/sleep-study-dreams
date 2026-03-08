@@ -174,7 +174,7 @@ const HomeScreen = ({ onNavigate }: HomeScreenProps) => {
               <span className="font-semibold text-foreground">The Problem:</span> Students forget 70% of what they study overnight. Traditional revision is time-consuming and exhausting.
             </p>
             <p>
-              <span className="font-semibold text-foreground">Our Solution:</span> ThukkamTutor uses scientifically-backed sleep learning techniques — playing gentle audio cues during light sleep phases to reinforce memory consolidation.
+              <span className="font-semibold text-foreground">Our Solution:</span> ThookamTutor uses scientifically-backed sleep learning techniques — playing gentle audio cues during light sleep phases to reinforce memory consolidation.
             </p>
             <p>
               <span className="font-semibold text-foreground">Market:</span> 300M+ students in India alone. Sleep learning is a ₹500Cr untapped market.
