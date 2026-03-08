@@ -3,12 +3,11 @@ import StarField from "@/components/StarField";
 import BottomNav from "@/components/BottomNav";
 import HomeScreen from "@/components/HomeScreen";
 import StudyScreen from "@/components/StudyScreen";
-import MyStudyScreen from "@/components/MyStudyScreen";
 import SleepScreen from "@/components/SleepScreen";
 import MemoryScreen from "@/components/MemoryScreen";
 import ProfileScreen from "@/components/ProfileScreen";
 
-type TabId = "home" | "study" | "mystudy" | "sleep" | "memory" | "profile";
+type TabId = "home" | "study" | "sleep" | "memory" | "profile";
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState<TabId>("home");
