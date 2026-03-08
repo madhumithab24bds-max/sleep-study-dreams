@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, Moon, BookOpen, Activity, HelpCircle, IndianRupee, Copy, ExternalLink } from "lucide-react";
+import { X, Moon, BookOpen, Activity, HelpCircle, IndianRupee, Copy, ExternalLink } from "lucide-react";
 import logo from "@/assets/logo.png";
 import nightSkyBg from "@/assets/night-sky-bg.jpg";
 import { toast } from "sonner";
@@ -16,13 +16,6 @@ interface HomeScreenProps {
   onNavigate: (tab: TabId) => void;
 }
 
-const features = [
-  { title: "Study Before Sleep", desc: "Review vocabulary, formulas & concepts", emoji: "📖" },
-  { title: "Sleep Learning Mode", desc: "Gentle audio cues while you rest", emoji: "😴" },
-  { title: "Morning Memory Test", desc: "Quick quizzes to check retention", emoji: "🧠" },
-  { title: "Dream Journal", desc: "Record your dreams after waking", emoji: "✍️" },
-  { title: "Exam Boost Mode", desc: "Intensive revision for exam prep", emoji: "🎯" },
-];
 
 const quickActions: { emoji: string; label: string; tab: TabId; note?: string }[] = [
   { emoji: "😴", label: "Sleep Now", tab: "sleep" },
@@ -32,7 +25,6 @@ const quickActions: { emoji: string; label: string; tab: TabId; note?: string }[
 ];
 
 const HomeScreen = ({ onNavigate }: HomeScreenProps) => {
-  const [menuOpen, setMenuOpen] = useState(false);
   const [menuPage, setMenuPage] = useState<MenuPage>(null);
   const [showPayment, setShowPayment] = useState(false);
 
@@ -52,7 +44,6 @@ const HomeScreen = ({ onNavigate }: HomeScreenProps) => {
 
   const openMenuPage = (page: MenuPage) => {
     setMenuPage(page);
-    setMenuOpen(false);
   };
 
   // If a menu page is active, render it full-screen
@@ -63,61 +54,9 @@ const HomeScreen = ({ onNavigate }: HomeScreenProps) => {
 
   return (
     <div className="min-h-screen pb-24">
-      {/* Menu overlay */}
-      <AnimatePresence>
-        {menuOpen && (
-          <motion.div
-            className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={() => setMenuOpen(false)}
-          >
-            <motion.div
-              className="absolute top-0 right-0 w-64 h-full bg-card border-l border-border/20 p-6"
-              initial={{ x: 264 }}
-              animate={{ x: 0 }}
-              exit={{ x: 264 }}
-              transition={{ type: "spring", damping: 25 }}
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="flex items-center justify-between mb-8">
-                <h3 className="font-display font-bold text-foreground">Menu</h3>
-                <button onClick={() => setMenuOpen(false)} className="text-muted-foreground">
-                  <X size={20} />
-                </button>
-              </div>
-              <div className="space-y-2">
-                {[
-                  { id: "dream" as MenuPage, label: "Dream Journal", icon: <Moon size={18} className="text-dream" />, emoji: "🌙" },
-                  { id: "journal" as MenuPage, label: "Daily Journal", icon: <BookOpen size={18} className="text-secondary" />, emoji: "📓" },
-                  { id: "activity" as MenuPage, label: "Activity", icon: <Activity size={18} className="text-primary" />, emoji: "📊" },
-                  { id: "help" as MenuPage, label: "Help Center", icon: <HelpCircle size={18} className="text-accent" />, emoji: "❓" },
-                ].map((item) => (
-                  <button
-                    key={item.id}
-                    onClick={() => openMenuPage(item.id)}
-                    className="w-full glass-card p-3.5 flex items-center gap-3 text-left group"
-                  >
-                    {item.icon}
-                    <span className="font-display font-semibold text-sm text-foreground">{item.label}</span>
-                  </button>
-                ))}
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
       <div className="relative overflow-hidden rounded-b-3xl">
         <img src={nightSkyBg} alt="Night sky" className="absolute inset-0 h-full w-full object-cover opacity-60" />
         <div className="absolute inset-0 bg-gradient-to-b from-background/30 via-background/50 to-background" />
-        {/* Menu button */}
-        <button
-          onClick={() => setMenuOpen(true)}
-          className="absolute top-4 right-4 z-20 glass-card p-2.5 rounded-xl"
-        >
-          <Menu size={20} className="text-foreground" />
-        </button>
         <div className="relative z-10 flex flex-col items-center px-6 pb-10 pt-12 text-center">
           <motion.img
             src={logo}
@@ -160,24 +99,28 @@ const HomeScreen = ({ onNavigate }: HomeScreenProps) => {
       </div>
 
       <div className="mt-8 px-4">
-        <h2 className="mb-4 text-lg font-display font-bold text-foreground">Core Features</h2>
-        <div className="space-y-3">
-          {features.map((feature, i) => (
-            <motion.div
-              key={feature.title}
-              className="glass-card flex items-center gap-4 p-4"
-              initial={{ x: -30, opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
+        <h2 className="mb-4 text-lg font-display font-bold text-foreground">Explore</h2>
+        <div className="grid grid-cols-2 gap-3">
+          {[
+            { id: "dream" as MenuPage, label: "Dream Journal", icon: <Moon size={22} className="text-dream" />, desc: "Record your dreams" },
+            { id: "journal" as MenuPage, label: "Daily Journal", icon: <BookOpen size={22} className="text-secondary" />, desc: "Write daily notes" },
+            { id: "activity" as MenuPage, label: "Activity", icon: <Activity size={22} className="text-primary" />, desc: "Track your progress" },
+            { id: "help" as MenuPage, label: "Help Center", icon: <HelpCircle size={22} className="text-accent" />, desc: "Get support" },
+          ].map((item, i) => (
+            <motion.button
+              key={item.id}
+              onClick={() => setMenuPage(item.id)}
+              className="glass-card p-4 flex flex-col items-center gap-2 text-center"
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.1 * i + 0.3 }}
             >
-              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-primary/15 text-2xl">
-                {feature.emoji}
+              <div className="w-11 h-11 rounded-xl bg-primary/10 flex items-center justify-center">
+                {item.icon}
               </div>
-              <div>
-                <h3 className="text-sm font-display font-semibold text-foreground">{feature.title}</h3>
-                <p className="text-xs text-muted-foreground">{feature.desc}</p>
-              </div>
-            </motion.div>
+              <h3 className="text-sm font-display font-semibold text-foreground">{item.label}</h3>
+              <p className="text-[10px] text-muted-foreground">{item.desc}</p>
+            </motion.button>
           ))}
         </div>
       </div>
