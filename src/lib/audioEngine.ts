@@ -440,31 +440,23 @@ export const playAudio = (type: string, volume: number) => {
 
   const vol = Math.max(0, Math.min(1, volume / 100));
 
-  switch (type) {
-    case "whisper":
-      playWhisper(ctx, vol);
-      break;
-    case "rain":
-      playRain(ctx, vol);
-      break;
-    case "ocean":
-      playOcean(ctx, vol);
-      break;
-    case "wind":
-      playWind(ctx, vol);
-      break;
-    case "nature":
-      playNature(ctx, vol);
-      break;
-    case "white-noise":
-      playWhiteNoise(ctx, vol);
-      break;
-    case "lullaby":
-      playLullaby(ctx, vol);
-      break;
-    default:
-      playWhiteNoise(ctx, vol);
-  }
+  const players: Record<string, (ctx: AudioContext, vol: number) => void> = {
+    whisper: playWhisper,
+    rain: playRain,
+    ocean: playOcean,
+    wind: playWind,
+    nature: playNature,
+    "white-noise": playWhiteNoise,
+    lullaby: playLullaby,
+    "alpha-waves": playAlphaWaves,
+    "gamma-waves": playGammaWaves,
+    "ground-noise": playGroundNoise,
+    "sleep-music": playSleepMusic,
+    "deep-focus": playDeepFocus,
+  };
+
+  const player = players[type] || playWhiteNoise;
+  player(ctx, vol);
 };
 
 export const stopAudio = () => {
