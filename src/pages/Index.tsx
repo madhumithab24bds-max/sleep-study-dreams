@@ -33,7 +33,7 @@ const Index = () => {
     <div className="relative min-h-screen max-w-lg mx-auto">
       <StarField />
       <div className="relative z-10">{renderScreen()}</div>
-      <BottomNav activeTab={activeTab} onTabChange={setActiveTab} />
+      <BottomNav activeTab={activeTab} onTabChange={(tab) => setActiveTab(tab as TabId)} />
     </div>
   );
 };
