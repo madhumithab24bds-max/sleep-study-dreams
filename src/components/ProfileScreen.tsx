@@ -2,9 +2,9 @@ import { motion } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 import {
   Settings, Globe, Bell, LogOut,
-  User, Vibrate, Clock, Palette, Pencil, Check, Smartphone
+  User, Vibrate, Clock, Palette, Pencil, Check, Smartphone, Camera, X
 } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { toast } from "sonner";
 import { Switch } from "@/components/ui/switch";
 import { Input } from "@/components/ui/input";
@@ -35,6 +35,21 @@ const academicLevels = [
   ]},
 ];
 
+const presetAvatars = [
+  "https://api.dicebear.com/9.x/adventurer/svg?seed=Felix",
+  "https://api.dicebear.com/9.x/adventurer/svg?seed=Luna",
+  "https://api.dicebear.com/9.x/adventurer/svg?seed=Mia",
+  "https://api.dicebear.com/9.x/adventurer/svg?seed=Leo",
+  "https://api.dicebear.com/9.x/adventurer/svg?seed=Zoe",
+  "https://api.dicebear.com/9.x/adventurer/svg?seed=Max",
+  "https://api.dicebear.com/9.x/adventurer/svg?seed=Bella",
+  "https://api.dicebear.com/9.x/adventurer/svg?seed=Sam",
+  "https://api.dicebear.com/9.x/adventurer/svg?seed=Aria",
+  "https://api.dicebear.com/9.x/adventurer/svg?seed=Kai",
+  "https://api.dicebear.com/9.x/adventurer/svg?seed=Nova",
+  "https://api.dicebear.com/9.x/adventurer/svg?seed=Finn",
+];
+
 const sectionVariants = {
   hidden: { opacity: 0, y: 16 },
   visible: (i: number) => ({ opacity: 1, y: 0, transition: { delay: i * 0.06, duration: 0.35 } }),
@@ -55,9 +70,26 @@ const ProfileScreen = ({ onLanguageChange }: ProfileScreenProps) => {
   const [sleepReminderOn, setSleepReminderOn] = useState(true);
   const [selectedTheme, setSelectedTheme] = useState(loadSavedTheme());
   const [academicLevel, setAcademicLevel] = useState("Class 10");
+  const [avatarUrl, setAvatarUrl] = useState("");
+  const [showAvatarPicker, setShowAvatarPicker] = useState(false);
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     applyTheme(selectedTheme);
+    // Load avatar from profile
+    const loadAvatar = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user) {
+        const { data } = await supabase
+          .from("profiles")
+          .select("avatar_url")
+          .eq("user_id", session.user.id)
+          .maybeSingle();
+        if (data?.avatar_url) setAvatarUrl(data.avatar_url);
+      }
+    };
+    loadAvatar();
   }, []);
 
   const handleSave = (field: string) => {
@@ -71,6 +103,35 @@ const ProfileScreen = ({ onLanguageChange }: ProfileScreenProps) => {
     toast.success(`Theme: ${t?.label}`);
   };
 
+  const selectAvatar = async (url: string) => {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session?.user) return;
+    const { error } = await supabase
+      .from("profiles")
+      .update({ avatar_url: url })
+      .eq("user_id", session.user.id);
+    if (error) { toast.error("Failed to update avatar"); return; }
+    setAvatarUrl(url);
+    setShowAvatarPicker(false);
+    toast.success("Avatar updated!");
+  };
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session?.user) return;
+    setUploadingAvatar(true);
+    const ext = file.name.split(".").pop();
+    const path = `${session.user.id}/avatar.${ext}`;
+    const { error } = await supabase.storage.from("avatars").upload(path, file, { upsert: true });
+    if (error) { toast.error("Upload failed"); setUploadingAvatar(false); return; }
+    const { data: urlData } = supabase.storage.from("avatars").getPublicUrl(path);
+    const publicUrl = urlData.publicUrl + "?t=" + Date.now();
+    await selectAvatar(publicUrl);
+    setUploadingAvatar(false);
+  };
+
   return (
     <div className="min-h-screen pb-28 pt-6 px-4 space-y-5">
       {/* Header */}
@@ -81,18 +142,57 @@ const ProfileScreen = ({ onLanguageChange }: ProfileScreenProps) => {
 
       {/* User Card */}
       <motion.div className="glass-card p-5 flex items-center gap-4" custom={0} initial="hidden" animate="visible" variants={sectionVariants}>
-        <div className="relative">
-          <img src={logo} alt="Avatar" className="w-16 h-16 rounded-2xl bg-muted glow-moonlight" />
+        <button className="relative" onClick={() => setShowAvatarPicker(true)}>
+          <img src={avatarUrl || logo} alt="Avatar" className="w-16 h-16 rounded-2xl bg-muted glow-moonlight object-cover" />
           <span className="absolute -bottom-1 -right-1 bg-primary text-primary-foreground rounded-full w-6 h-6 flex items-center justify-center text-xs">
-            <Pencil size={12} />
+            <Camera size={12} />
           </span>
-        </div>
+        </button>
+        <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={handleFileUpload} />
         <div className="flex-1 min-w-0">
           <h2 className="font-display font-bold text-foreground text-lg truncate">{name}</h2>
           <p className="text-xs text-muted-foreground font-display">@{username}</p>
           <p className="text-xs text-primary font-display mt-1">5 day streak 🔥</p>
         </div>
       </motion.div>
+
+      {/* Avatar Picker Modal */}
+      {showAvatarPicker && (
+        <motion.div
+          className="fixed inset-0 z-50 flex items-end justify-center p-4 bg-black/60 backdrop-blur-sm"
+          initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+          onClick={() => setShowAvatarPicker(false)}
+        >
+          <motion.div
+            className="glass-card w-full max-w-sm p-5 space-y-4 relative max-h-[70vh] overflow-y-auto"
+            initial={{ y: 100, opacity: 0 }} animate={{ y: 0, opacity: 1 }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between">
+              <h3 className="font-display font-bold text-foreground">Choose Avatar</h3>
+              <button onClick={() => setShowAvatarPicker(false)} className="text-muted-foreground"><X size={18} /></button>
+            </div>
+            <div className="grid grid-cols-4 gap-3">
+              {presetAvatars.map((url) => (
+                <button
+                  key={url}
+                  onClick={() => selectAvatar(url)}
+                  className={`rounded-2xl p-1 border-2 transition-all ${avatarUrl === url ? "border-primary glow-primary" : "border-transparent hover:border-border"}`}
+                >
+                  <img src={url} alt="Avatar option" className="w-full aspect-square rounded-xl bg-muted" />
+                </button>
+              ))}
+            </div>
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              disabled={uploadingAvatar}
+              className="w-full glass-card p-3 flex items-center justify-center gap-2 text-sm font-display font-semibold text-primary"
+            >
+              <Camera size={16} /> {uploadingAvatar ? "Uploading…" : "Upload Your Photo"}
+            </button>
+          </motion.div>
+        </motion.div>
+      )}
 
       {/* Profile Settings */}
       <motion.div className="glass-card p-4 space-y-4" custom={1} initial="hidden" animate="visible" variants={sectionVariants}>
