@@ -46,7 +46,7 @@ const faqs: FAQ[] = [
   },
   {
     q: "What languages are supported?",
-    a: "ThukkamTutor supports Tamil and English. You can switch between languages in the Study section using the language toggle at the top.",
+    a: "ThookamTutor supports Tamil and English. You can switch between languages in the Study section using the language toggle at the top.",
     icon: <HelpCircle size={16} className="text-primary" />,
   },
 ];
