@@ -431,6 +431,16 @@ const MemoryScreen = ({ selectedCourse, selectedSubject, studiedSubjects }: Prop
         ))}
       </div>
 
+      {/* ─── CONVERSATION TAB ─── */}
+      {tabView === "conversation" && (
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+          <ConversationMode
+            subject={activeQuizSubject || (selectedCourse ? selectedCourse.charAt(0).toUpperCase() + selectedCourse.slice(1) : null)}
+            onBack={() => setTabView("quiz")}
+          />
+        </motion.div>
+      )}
+
       {/* ─── UPLOAD TAB ─── */}
       {tabView === "upload" && (
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
