@@ -97,6 +97,8 @@ export function getRevisionItems(subject: string): RevisionItem[] {
   }
   return [];
 }
+
+export const revisionBySubject: Record<string, RevisionItem[]> = {
   "Alphabets (A-Z)": [
     { front: "A", back: "🍎 Apple" }, { front: "B", back: "🏀 Ball" }, { front: "C", back: "🐱 Cat" },
     { front: "D", back: "🐶 Dog" }, { front: "E", back: "🐘 Elephant" }, { front: "F", back: "🐸 Frog" },
