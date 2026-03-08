@@ -26,7 +26,7 @@ function collectActivity(): ActivityItem[] {
 
   // Quiz performance data
   try {
-    const perf = localStorage.getItem("thukkam_performance");
+    const perf = localStorage.getItem("thookam_performance");
     if (perf) {
       const data = JSON.parse(perf);
       Object.entries(data).forEach(([subject, info]: [string, any]) => {
