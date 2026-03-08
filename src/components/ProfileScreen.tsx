@@ -50,7 +50,11 @@ const sectionVariants = {
   visible: (i: number) => ({ opacity: 1, y: 0, transition: { delay: i * 0.06, duration: 0.35 } }),
 };
 
-const ProfileScreen = () => {
+interface ProfileScreenProps {
+  onLanguageChange?: (lang: string) => void;
+}
+
+const ProfileScreen = ({ onLanguageChange }: ProfileScreenProps) => {
   const [name, setName] = useState("Student");
   const [username, setUsername] = useState("student_123");
   const [editingName, setEditingName] = useState(false);
@@ -199,7 +203,7 @@ const ProfileScreen = () => {
             <Globe size={18} className="text-primary" />
             <span className="text-sm font-display text-foreground">Language</span>
           </div>
-          <Select value={language} onValueChange={(v) => { setLanguage(v); toast.success(`Language: ${languages.find(l => l.value === v)?.label}`); }}>
+          <Select value={language} onValueChange={(v) => { setLanguage(v); onLanguageChange?.(v); toast.success(`Language: ${languages.find(l => l.value === v)?.label}`); }}>
             <SelectTrigger className="w-32 bg-muted/50 border-border/50 text-foreground font-display h-8 text-xs rounded-xl">
               <SelectValue />
             </SelectTrigger>
