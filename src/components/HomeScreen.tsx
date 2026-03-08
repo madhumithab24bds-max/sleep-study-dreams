@@ -213,7 +213,7 @@ const HomeScreen = ({ onNavigate }: HomeScreenProps) => {
                 <div className="w-12 h-12 rounded-2xl bg-primary/20 flex items-center justify-center mx-auto mb-3">
                   <IndianRupee size={24} className="text-primary" />
                 </div>
-                <h2 className="font-display font-bold text-lg text-foreground">Subscribe to ThukkamTutor</h2>
+                <h2 className="font-display font-bold text-lg text-foreground">Subscribe to ThookamTutor</h2>
                 <p className="text-xs text-muted-foreground mt-1">Unlock all premium features</p>
               </div>
 
