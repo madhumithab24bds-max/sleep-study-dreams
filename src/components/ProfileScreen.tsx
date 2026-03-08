@@ -97,7 +97,11 @@ const ProfileScreen = ({ onLanguageChange }: ProfileScreenProps) => {
     loadProfile();
   }, []);
 
-  const handleSave = (field: string) => {
+  const handleSave = async (field: string, value: string, column: string) => {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session?.user) return;
+    const { error } = await supabase.from("profiles").update({ [column]: value }).eq("user_id", session.user.id);
+    if (error) { toast.error(`Failed to update ${field}`); return; }
     toast.success(`${field} updated`);
   };
 
