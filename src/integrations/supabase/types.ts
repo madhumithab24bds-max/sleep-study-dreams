@@ -17,6 +17,7 @@ export type Database = {
       profiles: {
         Row: {
           academic_level: string
+          avatar_url: string
           created_at: string
           display_name: string
           id: string
@@ -28,6 +29,7 @@ export type Database = {
         }
         Insert: {
           academic_level?: string
+          avatar_url?: string
           created_at?: string
           display_name?: string
           id?: string
@@ -39,6 +41,7 @@ export type Database = {
         }
         Update: {
           academic_level?: string
+          avatar_url?: string
           created_at?: string
           display_name?: string
           id?: string
