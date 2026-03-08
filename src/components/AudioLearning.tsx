@@ -237,6 +237,11 @@ const AudioLearning = () => {
           />
         </div>
 
+        {/* PDF/Image Upload */}
+        <div className="mb-3">
+          <StudyMaterialUpload onTextExtracted={setUploadedText} />
+        </div>
+
         {/* Topic Selection */}
         <div className="space-y-2">
           <label className="text-xs font-display text-muted-foreground">📖 Or select from your subjects</label>
