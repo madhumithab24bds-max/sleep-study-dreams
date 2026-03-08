@@ -991,9 +991,4 @@ export const revisionBySubject: Record<string, RevisionItem[]> = {
     { front: "12 + 8 = ?", back: "20" },
     { front: "20 - 7 = ?", back: "13" },
   ],
-  "Alphabets (A-Z)": [
-    { front: "A", back: "🍎 Apple" }, { front: "B", back: "🏀 Ball" },
-    { front: "C", back: "🐱 Cat" }, { front: "D", back: "🐶 Dog" },
-    { front: "Z", back: "🦓 Zebra" },
-  ],
 };
