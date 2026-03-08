@@ -160,24 +160,28 @@ const HomeScreen = ({ onNavigate }: HomeScreenProps) => {
       </div>
 
       <div className="mt-8 px-4">
-        <h2 className="mb-4 text-lg font-display font-bold text-foreground">Core Features</h2>
-        <div className="space-y-3">
-          {features.map((feature, i) => (
-            <motion.div
-              key={feature.title}
-              className="glass-card flex items-center gap-4 p-4"
-              initial={{ x: -30, opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
+        <h2 className="mb-4 text-lg font-display font-bold text-foreground">Explore</h2>
+        <div className="grid grid-cols-2 gap-3">
+          {[
+            { id: "dream" as MenuPage, label: "Dream Journal", icon: <Moon size={22} className="text-dream" />, desc: "Record your dreams" },
+            { id: "journal" as MenuPage, label: "Daily Journal", icon: <BookOpen size={22} className="text-secondary" />, desc: "Write daily notes" },
+            { id: "activity" as MenuPage, label: "Activity", icon: <Activity size={22} className="text-primary" />, desc: "Track your progress" },
+            { id: "help" as MenuPage, label: "Help Center", icon: <HelpCircle size={22} className="text-accent" />, desc: "Get support" },
+          ].map((item, i) => (
+            <motion.button
+              key={item.id}
+              onClick={() => setMenuPage(item.id)}
+              className="glass-card p-4 flex flex-col items-center gap-2 text-center"
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.1 * i + 0.3 }}
             >
-              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-primary/15 text-2xl">
-                {feature.emoji}
+              <div className="w-11 h-11 rounded-xl bg-primary/10 flex items-center justify-center">
+                {item.icon}
               </div>
-              <div>
-                <h3 className="text-sm font-display font-semibold text-foreground">{feature.title}</h3>
-                <p className="text-xs text-muted-foreground">{feature.desc}</p>
-              </div>
-            </motion.div>
+              <h3 className="text-sm font-display font-semibold text-foreground">{item.label}</h3>
+              <p className="text-[10px] text-muted-foreground">{item.desc}</p>
+            </motion.button>
           ))}
         </div>
       </div>
