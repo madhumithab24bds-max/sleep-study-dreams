@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronDown, GraduationCap, BookOpen, Languages, School, Building2, CheckCircle2 } from "lucide-react";
+import { ChevronDown, GraduationCap, BookOpen, Languages, School, Building2, CheckCircle2, Search, SlidersHorizontal, Layers, X } from "lucide-react";
 import { useState, useMemo } from "react";
 import { toast } from "sonner";
 import RevisionView from "./RevisionView";
@@ -10,6 +10,7 @@ import { useStudyProgress } from "@/hooks/useStudyProgress";
 import { indianGrades, type Board, type Medium, type Grade, type Subject } from "@/lib/indianSyllabus";
 import { higherEdCourses, type HECourse, type HEDepartment, type HEYear, type HESubject } from "@/lib/higherEducation";
 import { type AppLang, t, ui } from "@/lib/i18n";
+import { getRevisionItems } from "@/lib/revisionData";
 
 interface StudyScreenProps {
   onCourseChange?: (courseId: string) => void;
@@ -45,6 +46,11 @@ const StudyScreen = ({ onCourseChange, onSubjectChange, onSubjectStudied, langua
   const [selectedYear, setSelectedYear] = useState<string | null>(null);
   const [expandedHESubject, setExpandedHESubject] = useState<string | null>(null);
 
+  // Search & Sort
+  const [searchQuery, setSearchQuery] = useState("");
+  const [sortBy, setSortBy] = useState<"default" | "progress" | "cards" | "name">("default");
+  const [showSortMenu, setShowSortMenu] = useState(false);
+
   // Progress tracking
   const progress = useStudyProgress();
 
@@ -52,7 +58,35 @@ const StudyScreen = ({ onCourseChange, onSubjectChange, onSubjectStudied, langua
   const lk = (item: { en: string; ta: string; hi: string }) => t(lang, item.en, item.ta, item.hi);
 
   const currentGrade = indianGrades.find((g) => g.id === selectedGrade);
-  const subjects = currentGrade ? currentGrade.subjects[board] : [];
+  const allSubjects = currentGrade ? currentGrade.subjects[board] : [];
+
+  // Filter subjects by search query
+  const subjects = useMemo(() => {
+    let filtered = allSubjects;
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase();
+      filtered = allSubjects.filter(s =>
+        lk(s).toLowerCase().includes(q) ||
+        s.en.toLowerCase().includes(q) ||
+        s.chapters.some(ch => lk(ch).toLowerCase().includes(q) || ch.en.toLowerCase().includes(q))
+      );
+    }
+    // Sort
+    if (sortBy === "name") {
+      filtered = [...filtered].sort((a, b) => lk(a).localeCompare(lk(b)));
+    } else if (sortBy === "progress") {
+      filtered = [...filtered].sort((a, b) =>
+        progress.getSubjectProgress(b.chapters.map(ch => ch.id)) - progress.getSubjectProgress(a.chapters.map(ch => ch.id))
+      );
+    } else if (sortBy === "cards") {
+      filtered = [...filtered].sort((a, b) => {
+        const aCards = a.chapters.reduce((sum, ch) => sum + getRevisionItems(ch.en).length, 0);
+        const bCards = b.chapters.reduce((sum, ch) => sum + getRevisionItems(ch.en).length, 0);
+        return bCards - aCards;
+      });
+    }
+    return filtered;
+  }, [allSubjects, searchQuery, sortBy, lang, progress.completedTopics]);
 
   // Higher ed lookups
   const heCourse = higherEdCourses.find((c) => c.id === selectedCourse);
@@ -172,6 +206,62 @@ const StudyScreen = ({ onCourseChange, onSubjectChange, onSubjectStudied, langua
         overallPercent={overallPercent}
       />
 
+      {/* Search & Sort Bar */}
+      <div className="mb-5 space-y-2">
+        <div className="flex gap-2">
+          <div className="flex-1 glass-card flex items-center gap-2 px-3 py-2">
+            <Search size={15} className="text-muted-foreground shrink-0" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder={lk(ui.searchTopics)}
+              className="flex-1 bg-transparent text-sm font-display text-foreground placeholder:text-muted-foreground outline-none"
+            />
+            {searchQuery && (
+              <button onClick={() => setSearchQuery("")} className="text-muted-foreground">
+                <X size={14} />
+              </button>
+            )}
+          </div>
+          <div className="relative">
+            <button
+              onClick={() => setShowSortMenu(!showSortMenu)}
+              className={`glass-card p-2.5 transition-all ${sortBy !== "default" ? "ring-1 ring-primary bg-primary/10" : ""}`}
+            >
+              <SlidersHorizontal size={16} className={sortBy !== "default" ? "text-primary" : "text-muted-foreground"} />
+            </button>
+            <AnimatePresence>
+              {showSortMenu && (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.9, y: -5 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.9, y: -5 }}
+                  className="absolute right-0 top-full mt-1 z-50 glass-card p-1.5 min-w-[140px] shadow-lg"
+                >
+                  {([
+                    { key: "default", label: ui.sortDefault },
+                    { key: "progress", label: ui.sortProgress },
+                    { key: "cards", label: ui.sortCards },
+                    { key: "name", label: ui.sortName },
+                  ] as const).map((opt) => (
+                    <button
+                      key={opt.key}
+                      onClick={() => { setSortBy(opt.key); setShowSortMenu(false); }}
+                      className={`w-full text-left px-3 py-2 rounded-lg text-xs font-display transition-colors ${
+                        sortBy === opt.key ? "bg-primary/10 text-primary font-semibold" : "text-foreground hover:bg-muted/50"
+                      }`}
+                    >
+                      {lk(opt.label)}
+                    </button>
+                  ))}
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+        </div>
+      </div>
+
       {/* ═══ SCHOOL MODE ═══ */}
       {mode === "school" && (
         <>
@@ -233,8 +323,19 @@ const StudyScreen = ({ onCourseChange, onSubjectChange, onSubjectStudied, langua
                   {currentGrade.emoji} {lk(currentGrade)} — {lk(ui.subjects)}
                 </h3>
                 <div className="space-y-2">
+                  {subjects.length === 0 && searchQuery && (
+                    <motion.div className="glass-card p-6 text-center" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                      <Search size={28} className="mx-auto text-muted-foreground mb-2" />
+                      <p className="text-sm text-muted-foreground font-display">{lk(ui.noResults)}</p>
+                    </motion.div>
+                  )}
                   {subjects.map((subject, i) => {
                     const isExpanded = expandedSubject === subject.id;
+                    const subjectCardCount = subject.chapters.reduce((sum, ch) => sum + getRevisionItems(ch.en).length, 0);
+                    // Filter chapters by search within expanded subject
+                    const filteredChapters = searchQuery.trim()
+                      ? subject.chapters.filter(ch => lk(ch).toLowerCase().includes(searchQuery.toLowerCase()) || ch.en.toLowerCase().includes(searchQuery.toLowerCase()))
+                      : subject.chapters;
                     return (
                       <motion.div key={subject.id} initial={{ x: -20, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ delay: 0.04 * i }}>
                         <button
@@ -244,11 +345,16 @@ const StudyScreen = ({ onCourseChange, onSubjectChange, onSubjectStudied, langua
                           <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${subject.color} flex items-center justify-center text-xl shrink-0`}>{subject.emoji}</div>
                           <div className="flex-1 min-w-0">
                             <h4 className="font-display font-semibold text-sm text-foreground truncate">{lk(subject)}</h4>
-                            <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-2 flex-wrap">
                               <p className="text-xs text-muted-foreground">{subject.chapters.length} {lk(ui.chapters)}</p>
                               <span className="text-xs font-display font-bold text-primary">
                                 {progress.getSubjectProgress(subject.chapters.map(ch => ch.id))}%
                               </span>
+                              {subjectCardCount > 0 && (
+                                <span className="text-[10px] font-display font-semibold text-accent bg-accent/10 px-1.5 py-0.5 rounded-md flex items-center gap-0.5">
+                                  <Layers size={10} /> {subjectCardCount} {lk(ui.hasCards)}
+                                </span>
+                              )}
                             </div>
                           </div>
                           <ChevronDown size={16} className={`text-muted-foreground transition-transform ${isExpanded ? "rotate-180" : ""}`} />
@@ -257,22 +363,30 @@ const StudyScreen = ({ onCourseChange, onSubjectChange, onSubjectStudied, langua
                           {isExpanded && (
                             <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
                               <div className="pl-4 pr-2 py-2 space-y-1.5">
-                                {subject.chapters.map((ch, ci) => (
-                                  <motion.div key={ch.id} initial={{ x: -10, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ delay: 0.03 * ci }} className="glass-card p-3 flex items-center gap-3">
-                                    <TopicCheckbox
-                                      completed={progress.isCompleted(ch.id)}
-                                      onToggle={() => progress.toggleTopic(ch.id)}
-                                    />
-                                    <span className="text-xs font-display text-primary font-bold w-6">{ci + 1}</span>
-                                    <span className={`font-display text-sm flex-1 ${progress.isCompleted(ch.id) ? "line-through text-muted-foreground" : "text-foreground"}`}>{lk(ch)}</span>
-                                    <button
-                                      onClick={(e) => { e.stopPropagation(); handleStartRevision(ch.en, lk(ch)); }}
-                                      className="text-xs font-display font-semibold text-primary bg-primary/10 px-2 py-1 rounded-lg"
-                                    >
-                                      {lk(ui.study_btn)}
-                                    </button>
-                                  </motion.div>
-                                ))}
+                                {filteredChapters.map((ch, ci) => {
+                                  const chCardCount = getRevisionItems(ch.en).length;
+                                  return (
+                                    <motion.div key={ch.id} initial={{ x: -10, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ delay: 0.03 * ci }} className="glass-card p-3 flex items-center gap-3">
+                                      <TopicCheckbox
+                                        completed={progress.isCompleted(ch.id)}
+                                        onToggle={() => progress.toggleTopic(ch.id)}
+                                      />
+                                      <span className="text-xs font-display text-primary font-bold w-6">{ci + 1}</span>
+                                      <div className="flex-1 min-w-0">
+                                        <span className={`font-display text-sm block ${progress.isCompleted(ch.id) ? "line-through text-muted-foreground" : "text-foreground"}`}>{lk(ch)}</span>
+                                        {chCardCount > 0 && (
+                                          <span className="text-[9px] font-display text-accent/80">{chCardCount} {lk(ui.hasCards)}</span>
+                                        )}
+                                      </div>
+                                      <button
+                                        onClick={(e) => { e.stopPropagation(); handleStartRevision(ch.en, lk(ch)); }}
+                                        className="text-xs font-display font-semibold text-primary bg-primary/10 px-2 py-1 rounded-lg shrink-0"
+                                      >
+                                        {lk(ui.study_btn)}
+                                      </button>
+                                    </motion.div>
+                                  );
+                                })}
                                 <button
                                   onClick={() => handleStartRevision(subject.en, lk(subject))}
                                   className="w-full rounded-lg bg-primary/10 border border-primary/20 px-3 py-2 text-xs font-display font-semibold text-primary active:scale-95 transition-transform mt-2"
