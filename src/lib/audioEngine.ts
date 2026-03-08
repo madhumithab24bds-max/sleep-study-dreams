@@ -285,6 +285,45 @@ export const stopAudio = () => {
 
 export const updateVolume = (volume: number) => {
   if (!audioContext || !isPlaying) return;
-  // Reconnect with new volume by replaying — simpler than tracking all gain nodes
-  // We don't restart here; volume changes take effect on next play
+};
+
+// Quick sound effects for UI interactions
+export const playSfx = (type: "tap" | "correct" | "wrong") => {
+  const ctx = getContext();
+  if (ctx.state === "suspended") ctx.resume();
+
+  const osc = ctx.createOscillator();
+  const env = ctx.createGain();
+  env.connect(ctx.destination);
+  osc.connect(env);
+
+  const now = ctx.currentTime;
+
+  switch (type) {
+    case "tap":
+      osc.type = "sine";
+      osc.frequency.value = 600;
+      env.gain.setValueAtTime(0.08, now);
+      env.gain.linearRampToValueAtTime(0, now + 0.08);
+      osc.start(now);
+      osc.stop(now + 0.08);
+      break;
+    case "correct":
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(523, now);
+      osc.frequency.linearRampToValueAtTime(784, now + 0.15);
+      env.gain.setValueAtTime(0.1, now);
+      env.gain.linearRampToValueAtTime(0, now + 0.3);
+      osc.start(now);
+      osc.stop(now + 0.3);
+      break;
+    case "wrong":
+      osc.type = "square";
+      osc.frequency.value = 200;
+      env.gain.setValueAtTime(0.06, now);
+      env.gain.linearRampToValueAtTime(0, now + 0.2);
+      osc.start(now);
+      osc.stop(now + 0.2);
+      break;
+  }
 };
