@@ -308,7 +308,7 @@ const StudyScreen = ({ onCourseChange, onSubjectChange }: StudyScreenProps) => {
         </>
       )}
 
-      {activeSubject && (
+      {activeSubject && !revisionSubject && (
         <motion.div
           className="glass-card p-4 mt-4 flex items-center justify-between"
           initial={{ opacity: 0, y: 10 }}
@@ -318,19 +318,27 @@ const StudyScreen = ({ onCourseChange, onSubjectChange }: StudyScreenProps) => {
             Selected: <span className="font-semibold">{activeSubject}</span>
           </p>
           <button
-            onClick={() => toast.success(`Started revision for ${activeSubject}`)}
-            className="rounded-lg bg-primary px-3 py-1.5 text-xs font-display font-semibold text-primary-foreground"
+            onClick={() => setRevisionSubject(activeSubject)}
+            className="rounded-lg bg-primary px-3 py-1.5 text-xs font-display font-semibold text-primary-foreground active:scale-95 transition-transform"
           >
-            Start
+            Start Revision
           </button>
         </motion.div>
       )}
 
-      <motion.div className="glass-card p-4 mt-6 border-l-4 border-primary" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.8 }}>
-        <p className="text-xs text-muted-foreground">
-          💡 <span className="text-foreground font-semibold">Tip:</span> Study 30 minutes before sleep for best memory consolidation results!
-        </p>
-      </motion.div>
+      {revisionSubject && (
+        <div className="mt-4">
+          <RevisionView subject={revisionSubject} onClose={() => setRevisionSubject(null)} />
+        </div>
+      )}
+
+      {!revisionSubject && (
+        <motion.div className="glass-card p-4 mt-6 border-l-4 border-primary" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.8 }}>
+          <p className="text-xs text-muted-foreground">
+            💡 <span className="text-foreground font-semibold">Tip:</span> Study 30 minutes before sleep for best memory consolidation results!
+          </p>
+        </motion.div>
+      )}
     </div>
   );
 };
