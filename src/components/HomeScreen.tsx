@@ -34,6 +34,16 @@ const quickActions: { emoji: string; label: string; tab: TabId; note?: string }[
 const HomeScreen = ({ onNavigate }: HomeScreenProps) => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [menuPage, setMenuPage] = useState<MenuPage>(null);
+  const [showPayment, setShowPayment] = useState(false);
+
+  const UPI_ID = "madhukrr2006@oksbi";
+  const UPI_AMOUNT = "50";
+  const UPI_QR_URL = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(`upi://pay?pa=${UPI_ID}&pn=ThukkamTutor&am=${UPI_AMOUNT}&cu=INR&tn=ThukkamTutor%20Subscription`)}`;
+
+  const copyUpiId = () => {
+    navigator.clipboard.writeText(UPI_ID);
+    toast.success("UPI ID copied!");
+  };
 
   const handleQuickAction = (tab: TabId, note?: string) => {
     onNavigate(tab);
