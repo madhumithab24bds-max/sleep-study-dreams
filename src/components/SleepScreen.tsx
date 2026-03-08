@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { Moon, Volume2, Timer, Settings, Music, CloudRain, Waves, Wind, Bird, Radio } from "lucide-react";
 import { useState } from "react";
+import { toast } from "sonner";
 
 const audioTypes = [
   { id: "whisper", label: "Whisper", icon: Volume2, emoji: "🤫" },
@@ -12,18 +13,35 @@ const audioTypes = [
   { id: "lullaby", label: "Lullaby", icon: Music, emoji: "🎵" },
 ];
 
+const durationOptions = ["30 min", "1 hour", "2 hours", "4 hours", "8 hours"];
+
 const SleepScreen = () => {
   const [isActive, setIsActive] = useState(false);
   const [selectedAudio, setSelectedAudio] = useState("whisper");
   const [showAudioPicker, setShowAudioPicker] = useState(false);
+  const [volume, setVolume] = useState(35);
+  const [durationIndex, setDurationIndex] = useState(4);
 
   const currentAudio = audioTypes.find((a) => a.id === selectedAudio)!;
+
+  const handleSleepToggle = () => {
+    const nextState = !isActive;
+    setIsActive(nextState);
+    toast.success(nextState ? `Sleep mode started with ${currentAudio.label}` : "Sleep mode stopped");
+  };
+
+  const handleDurationCycle = () => {
+    setDurationIndex((prev) => {
+      const next = (prev + 1) % durationOptions.length;
+      toast.success(`Duration set to ${durationOptions[next]}`);
+      return next;
+    });
+  };
 
   return (
     <div className="min-h-screen pb-24 pt-6 px-4 flex flex-col">
       <h1 className="text-2xl font-display font-bold text-foreground mb-6">😴 Sleep Mode</h1>
 
-      {/* Main Sleep Control */}
       <div className="flex-1 flex flex-col items-center justify-center -mt-10">
         <motion.div
           className="relative"
@@ -47,63 +65,55 @@ const SleepScreen = () => {
             </>
           )}
           <button
-            onClick={() => setIsActive(!isActive)}
+            onClick={handleSleepToggle}
             className={`w-48 h-48 rounded-full flex flex-col items-center justify-center transition-all duration-500 ${
-              isActive
-                ? "bg-primary/20 glow-primary"
-                : "glass-card hover:bg-primary/10"
+              isActive ? "bg-primary/20 glow-primary" : "glass-card hover:bg-primary/10"
             }`}
           >
             <Moon size={48} className={`mb-2 ${isActive ? "text-primary" : "text-muted-foreground"}`} />
-            <span className="font-display font-bold text-lg text-foreground">
-              {isActive ? "Active" : "Start"}
-            </span>
-            <span className="text-xs text-muted-foreground mt-1">
-              {isActive ? "Tap to stop" : "Tap to begin"}
-            </span>
+            <span className="font-display font-bold text-lg text-foreground">{isActive ? "Active" : "Start"}</span>
+            <span className="text-xs text-muted-foreground mt-1">{isActive ? "Tap to stop" : "Tap to begin"}</span>
           </button>
         </motion.div>
 
         {isActive && (
-          <motion.div
-            className="mt-8 text-center"
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-          >
+          <motion.div className="mt-8 text-center" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
             <p className="text-sm text-muted-foreground font-display">
               {currentAudio.emoji} Playing {currentAudio.label}...
             </p>
-            <p className="text-xs text-muted-foreground mt-1">
-              Monitoring sleep patterns via sensors
-            </p>
+            <p className="text-xs text-muted-foreground mt-1">Monitoring sleep patterns via sensors</p>
           </motion.div>
         )}
       </div>
 
-      {/* Settings */}
       <div className="space-y-3 mt-4">
-        <div className="glass-card p-4 flex items-center justify-between">
+        <div className="glass-card p-4 flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <Volume2 size={18} className="text-primary" />
             <span className="text-sm font-display text-foreground">Volume</span>
           </div>
-          <div className="w-24 h-1.5 rounded-full bg-muted overflow-hidden">
-            <div className="w-1/3 h-full rounded-full bg-primary" />
+          <div className="flex items-center gap-2">
+            <input
+              type="range"
+              min={0}
+              max={100}
+              value={volume}
+              onChange={(e) => setVolume(Number(e.target.value))}
+              className="w-24 accent-primary"
+            />
+            <span className="text-xs text-muted-foreground font-display w-9 text-right">{volume}%</span>
           </div>
         </div>
-        <div className="glass-card p-4 flex items-center justify-between">
+
+        <button onClick={handleDurationCycle} className="glass-card p-4 flex items-center justify-between w-full">
           <div className="flex items-center gap-3">
             <Timer size={18} className="text-secondary" />
             <span className="text-sm font-display text-foreground">Duration</span>
           </div>
-          <span className="text-sm text-muted-foreground font-display">8 hours</span>
-        </div>
+          <span className="text-sm text-muted-foreground font-display">{durationOptions[durationIndex]}</span>
+        </button>
 
-        {/* Audio Type Selector */}
-        <button
-          onClick={() => setShowAudioPicker(!showAudioPicker)}
-          className="glass-card p-4 flex items-center justify-between w-full"
-        >
+        <button onClick={() => setShowAudioPicker(!showAudioPicker)} className="glass-card p-4 flex items-center justify-between w-full">
           <div className="flex items-center gap-3">
             <Settings size={18} className="text-accent" />
             <span className="text-sm font-display text-foreground">Audio Type</span>
@@ -114,11 +124,7 @@ const SleepScreen = () => {
         </button>
 
         {showAudioPicker && (
-          <motion.div
-            className="glass-card p-3 space-y-1"
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-          >
+          <motion.div className="glass-card p-3 space-y-1" initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }}>
             {audioTypes.map((audio) => {
               const Icon = audio.icon;
               const isSelected = selectedAudio === audio.id;
@@ -128,11 +134,10 @@ const SleepScreen = () => {
                   onClick={() => {
                     setSelectedAudio(audio.id);
                     setShowAudioPicker(false);
+                    toast.success(`${audio.label} selected`);
                   }}
                   className={`w-full flex items-center gap-3 p-3 rounded-xl transition-all ${
-                    isSelected
-                      ? "bg-primary/20 border border-primary/30"
-                      : "hover:bg-muted/50"
+                    isSelected ? "bg-primary/20 border border-primary/30" : "hover:bg-muted/50"
                   }`}
                 >
                   <span className="text-lg">{audio.emoji}</span>
