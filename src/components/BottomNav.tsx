@@ -15,7 +15,7 @@ const tabs = [
 
 const BottomNav = ({ activeTab, onTabChange }: BottomNavProps) => {
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 glass-card rounded-none border-t border-border/20 px-2 py-1 safe-area-bottom">
+    <nav className="fixed bottom-0 left-0 right-0 z-50 glass-card rounded-none border-t border-border/20 px-2 py-1 pb-[env(safe-area-inset-bottom)]">
       <div className="flex justify-around items-center max-w-lg mx-auto">
         {tabs.map((tab) => {
           const isActive = activeTab === tab.id;

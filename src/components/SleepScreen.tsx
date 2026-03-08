@@ -1,9 +1,23 @@
 import { motion } from "framer-motion";
-import { Moon, Volume2, Timer, Play, Settings } from "lucide-react";
+import { Moon, Volume2, Timer, Settings, Music, CloudRain, Waves, Wind, Bird, Radio } from "lucide-react";
 import { useState } from "react";
+
+const audioTypes = [
+  { id: "whisper", label: "Whisper", icon: Volume2, emoji: "🤫" },
+  { id: "rain", label: "Rain Sounds", icon: CloudRain, emoji: "🌧️" },
+  { id: "ocean", label: "Ocean Waves", icon: Waves, emoji: "🌊" },
+  { id: "wind", label: "Wind", icon: Wind, emoji: "🍃" },
+  { id: "nature", label: "Nature", icon: Bird, emoji: "🐦" },
+  { id: "white-noise", label: "White Noise", icon: Radio, emoji: "📻" },
+  { id: "lullaby", label: "Lullaby", icon: Music, emoji: "🎵" },
+];
 
 const SleepScreen = () => {
   const [isActive, setIsActive] = useState(false);
+  const [selectedAudio, setSelectedAudio] = useState("whisper");
+  const [showAudioPicker, setShowAudioPicker] = useState(false);
+
+  const currentAudio = audioTypes.find((a) => a.id === selectedAudio)!;
 
   return (
     <div className="min-h-screen pb-24 pt-6 px-4 flex flex-col">
@@ -16,7 +30,6 @@ const SleepScreen = () => {
           animate={isActive ? { scale: [1, 1.05, 1] } : {}}
           transition={{ repeat: Infinity, duration: 3 }}
         >
-          {/* Outer glow rings */}
           {isActive && (
             <>
               <motion.div
@@ -58,7 +71,7 @@ const SleepScreen = () => {
             animate={{ opacity: 1, y: 0 }}
           >
             <p className="text-sm text-muted-foreground font-display">
-              🎵 Playing soft audio cues...
+              {currentAudio.emoji} Playing {currentAudio.label}...
             </p>
             <p className="text-xs text-muted-foreground mt-1">
               Monitoring sleep patterns via sensors
@@ -85,13 +98,53 @@ const SleepScreen = () => {
           </div>
           <span className="text-sm text-muted-foreground font-display">8 hours</span>
         </div>
-        <div className="glass-card p-4 flex items-center justify-between">
+
+        {/* Audio Type Selector */}
+        <button
+          onClick={() => setShowAudioPicker(!showAudioPicker)}
+          className="glass-card p-4 flex items-center justify-between w-full"
+        >
           <div className="flex items-center gap-3">
             <Settings size={18} className="text-accent" />
             <span className="text-sm font-display text-foreground">Audio Type</span>
           </div>
-          <span className="text-sm text-muted-foreground font-display">Whisper</span>
-        </div>
+          <span className="text-sm text-muted-foreground font-display">
+            {currentAudio.emoji} {currentAudio.label}
+          </span>
+        </button>
+
+        {showAudioPicker && (
+          <motion.div
+            className="glass-card p-3 space-y-1"
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+          >
+            {audioTypes.map((audio) => {
+              const Icon = audio.icon;
+              const isSelected = selectedAudio === audio.id;
+              return (
+                <button
+                  key={audio.id}
+                  onClick={() => {
+                    setSelectedAudio(audio.id);
+                    setShowAudioPicker(false);
+                  }}
+                  className={`w-full flex items-center gap-3 p-3 rounded-xl transition-all ${
+                    isSelected
+                      ? "bg-primary/20 border border-primary/30"
+                      : "hover:bg-muted/50"
+                  }`}
+                >
+                  <span className="text-lg">{audio.emoji}</span>
+                  <Icon size={16} className={isSelected ? "text-primary" : "text-muted-foreground"} />
+                  <span className={`text-sm font-display ${isSelected ? "text-foreground font-semibold" : "text-muted-foreground"}`}>
+                    {audio.label}
+                  </span>
+                </button>
+              );
+            })}
+          </motion.div>
+        )}
       </div>
     </div>
   );
