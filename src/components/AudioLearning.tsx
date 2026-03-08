@@ -70,6 +70,15 @@ const AudioLearning = () => {
   const startTimeRef = useRef<number>(0);
   const linesRef = useRef<string[]>([]);
   const playingRef = useRef(false);
+  const resumeIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  // Preload voices on mount
+  useEffect(() => {
+    const loadVoices = () => speechSynthesis.getVoices();
+    loadVoices();
+    speechSynthesis.onvoiceschanged = loadVoices;
+    return () => { speechSynthesis.onvoiceschanged = null; };
+  }, []);
 
   const duration = DURATION_OPTIONS[durationIdx];
   const currentBg = BG_SOUND_OPTIONS.find((s) => s.id === bgSound)!;
@@ -92,6 +101,7 @@ const AudioLearning = () => {
     speechSynthesis.cancel();
     stopAudio();
     if (timerRef.current) clearTimeout(timerRef.current);
+    if (resumeIntervalRef.current) clearInterval(resumeIntervalRef.current);
     setIsPlaying(false);
     setProgress(0);
     setCurrentLineIdx(0);
@@ -180,7 +190,15 @@ const AudioLearning = () => {
 
     playAudio(bgSound, bgVolume);
 
-    setTimeout(() => speakLine(lines, 0), 2000);
+    // Chrome workaround: periodically resume speech synthesis to prevent it from stopping
+    resumeIntervalRef.current = setInterval(() => {
+      if (speechSynthesis.speaking && speechSynthesis.paused) {
+        speechSynthesis.resume();
+      }
+    }, 5000);
+
+    // Start speaking immediately (no delay to preserve user gesture context)
+    speakLine(lines, 0);
     toast.success(`Audio learning started for ${duration.label}`);
   }, [selectedTopics, customNote, uploadedText, bgSound, bgVolume, duration, speakLine]);
 
@@ -208,6 +226,7 @@ const AudioLearning = () => {
       speechSynthesis.cancel();
       stopAudio();
       if (timerRef.current) clearTimeout(timerRef.current);
+      if (resumeIntervalRef.current) clearInterval(resumeIntervalRef.current);
     };
   }, []);
 
