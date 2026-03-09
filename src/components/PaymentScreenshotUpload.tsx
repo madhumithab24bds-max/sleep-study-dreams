@@ -140,19 +140,32 @@ const PaymentScreenshotUpload = () => {
             )}
           </motion.div>
         ) : (
-          <motion.button
-            key="upload-btn"
+          <motion.div
+            key="upload-btns"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            onClick={() => fileRef.current?.click()}
-            className="w-full flex flex-col items-center gap-3 py-6 rounded-xl border-2 border-dashed border-primary/30 bg-primary/5 hover:bg-primary/10 transition-colors"
+            className="grid grid-cols-2 gap-3"
           >
-            <Upload size={24} className="text-primary" />
-            <span className="text-xs font-display font-semibold text-muted-foreground">
-              Tap to upload screenshot
-            </span>
-          </motion.button>
+            <button
+              onClick={() => fileRef.current?.click()}
+              className="flex flex-col items-center gap-3 py-6 rounded-xl border-2 border-dashed border-primary/30 bg-primary/5 hover:bg-primary/10 transition-colors"
+            >
+              <ImagePlus size={24} className="text-primary" />
+              <span className="text-xs font-display font-semibold text-muted-foreground">
+                From Gallery
+              </span>
+            </button>
+            <button
+              onClick={() => (window as any).__camRef?.click()}
+              className="flex flex-col items-center gap-3 py-6 rounded-xl border-2 border-dashed border-secondary/30 bg-secondary/5 hover:bg-secondary/10 transition-colors"
+            >
+              <Camera size={24} className="text-secondary" />
+              <span className="text-xs font-display font-semibold text-muted-foreground">
+                Take Photo
+              </span>
+            </button>
+          </motion.div>
         )}
       </AnimatePresence>
     </div>
