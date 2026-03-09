@@ -79,8 +79,20 @@ const PaymentScreenshotUpload = () => {
         After paying via UPI, upload a screenshot to activate your subscription.
       </p>
 
+      {/* Gallery / file picker */}
       <input
         ref={fileRef}
+        type="file"
+        accept="image/png,image/jpeg,image/jpg,image/webp"
+        className="hidden"
+        onChange={(e) => {
+          const file = e.target.files?.[0];
+          if (file) handleUpload(file);
+        }}
+      />
+      {/* Camera capture */}
+      <input
+        ref={(el) => { (window as any).__camRef = el; }}
         type="file"
         accept="image/*"
         capture="environment"
