@@ -4,7 +4,11 @@ import { Camera, Upload, CheckCircle2, Loader2, X, ImagePlus } from "lucide-reac
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
-const PaymentScreenshotUpload = () => {
+interface PaymentScreenshotUploadProps {
+  onUploadSuccess?: () => void;
+}
+
+const PaymentScreenshotUpload = ({ onUploadSuccess }: PaymentScreenshotUploadProps) => {
   const [uploading, setUploading] = useState(false);
   const [uploaded, setUploaded] = useState(false);
   const [preview, setPreview] = useState<string | null>(null);
@@ -53,6 +57,7 @@ const PaymentScreenshotUpload = () => {
 
       setUploaded(true);
       toast.success("Screenshot uploaded! We'll verify your payment shortly.");
+      onUploadSuccess?.();
     } catch (err: any) {
       toast.error(err.message || "Upload failed");
       setPreview(null);
