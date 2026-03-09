@@ -9,6 +9,7 @@ import DreamJournal from "./DreamJournal";
 import DailyJournal from "./DailyJournal";
 import ActivityScreen from "./ActivityScreen";
 import HelpCenter from "./HelpCenter";
+import PaymentScreenshotUpload from "./PaymentScreenshotUpload";
 
 type TabId = "home" | "study" | "sleep" | "memory" | "profile";
 type MenuPage = null | "dream" | "journal" | "activity" | "help";
