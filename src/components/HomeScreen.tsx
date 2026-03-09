@@ -166,6 +166,7 @@ const HomeScreen = ({ onNavigate }: HomeScreenProps) => {
             Subscribe Now – ₹50/month
           </button>
         </motion.div>
+        <PaymentScreenshotUpload />
       </div>
 
       <div className="mb-8 mt-8 px-4">
