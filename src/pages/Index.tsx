@@ -108,13 +108,18 @@ const Index = () => {
     );
   }
 
-  // Still checking profile status
-  if (profileComplete === null) {
+  // Still checking profile/subscription status
+  if (profileComplete === null || subscribed === null) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="animate-pulse text-muted-foreground font-display">Loading...</div>
       </div>
     );
+  }
+
+  // Show subscription gate if not subscribed
+  if (!subscribed) {
+    return <SubscriptionGate onSubscribed={() => setSubscribed(true)} />;
   }
 
   const renderScreen = () => {
