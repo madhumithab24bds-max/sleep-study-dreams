@@ -22,6 +22,7 @@ interface PaymentLog {
   upi_id: string;
   status: string;
   created_at: string;
+  screenshot_url: string;
 }
 
 const AdminDashboard = () => {
