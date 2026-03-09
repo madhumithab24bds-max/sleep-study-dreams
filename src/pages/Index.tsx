@@ -41,10 +41,11 @@ const Index = () => {
     return () => subscription.unsubscribe();
   }, []);
 
-  // Check profile completion when session changes
+  // Check profile completion and subscription when session changes
   useEffect(() => {
     if (!session?.user) {
       setProfileComplete(null);
+      setSubscribed(null);
       return;
     }
 
@@ -63,7 +64,19 @@ const Index = () => {
       }
     };
 
+    const checkSubscription = async () => {
+      const { data } = await supabase
+        .from("payment_logs")
+        .select("id")
+        .eq("user_id", session.user.id)
+        .eq("status", "screenshot_uploaded")
+        .limit(1);
+
+      setSubscribed(data && data.length > 0);
+    };
+
     checkProfile();
+    checkSubscription();
   }, [session]);
 
   const handleSubjectStudied = (subject: string) => {
