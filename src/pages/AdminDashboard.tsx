@@ -31,6 +31,18 @@ const AdminDashboard = () => {
   const [users, setUsers] = useState<UserProfile[]>([]);
   const [payments, setPayments] = useState<PaymentLog[]>([]);
   const [tab, setTab] = useState<"users" | "payments">("users");
+  const [viewingImage, setViewingImage] = useState<string | null>(null);
+
+  const getScreenshotUrl = (path: string) => {
+    if (!path) return null;
+    const { data } = supabase.storage.from("payment-screenshots").getPublicUrl(path);
+    return data?.publicUrl || null;
+  };
+
+  const getSignedUrl = async (path: string) => {
+    const { data } = await supabase.storage.from("payment-screenshots").createSignedUrl(path, 300);
+    return data?.signedUrl || null;
+  };
 
   useEffect(() => {
     const checkAdmin = async () => {
