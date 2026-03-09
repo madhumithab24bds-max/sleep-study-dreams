@@ -9,6 +9,7 @@ import DreamJournal from "./DreamJournal";
 import DailyJournal from "./DailyJournal";
 import ActivityScreen from "./ActivityScreen";
 import HelpCenter from "./HelpCenter";
+import PaymentScreenshotUpload from "./PaymentScreenshotUpload";
 
 type TabId = "home" | "study" | "sleep" | "memory" | "profile";
 type MenuPage = null | "dream" | "journal" | "activity" | "help";
@@ -165,6 +166,7 @@ const HomeScreen = ({ onNavigate }: HomeScreenProps) => {
             Subscribe Now – ₹50/month
           </button>
         </motion.div>
+        <PaymentScreenshotUpload />
       </div>
 
       <div className="mb-8 mt-8 px-4">

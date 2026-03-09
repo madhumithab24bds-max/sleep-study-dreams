@@ -20,6 +20,7 @@ export type Database = {
           created_at: string
           id: string
           plan: string
+          screenshot_url: string | null
           status: string
           upi_id: string
           user_id: string
@@ -29,6 +30,7 @@ export type Database = {
           created_at?: string
           id?: string
           plan?: string
+          screenshot_url?: string | null
           status?: string
           upi_id: string
           user_id: string
@@ -38,6 +40,7 @@ export type Database = {
           created_at?: string
           id?: string
           plan?: string
+          screenshot_url?: string | null
           status?: string
           upi_id?: string
           user_id?: string
