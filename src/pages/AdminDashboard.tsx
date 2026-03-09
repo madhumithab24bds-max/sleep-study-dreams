@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
-import { ArrowLeft, Users, IndianRupee, Shield } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { ArrowLeft, Users, IndianRupee, Shield, ImageIcon, X } from "lucide-react";
 
 interface UserProfile {
   user_id: string;
@@ -22,6 +22,7 @@ interface PaymentLog {
   upi_id: string;
   status: string;
   created_at: string;
+  screenshot_url: string;
 }
 
 const AdminDashboard = () => {
@@ -30,6 +31,18 @@ const AdminDashboard = () => {
   const [users, setUsers] = useState<UserProfile[]>([]);
   const [payments, setPayments] = useState<PaymentLog[]>([]);
   const [tab, setTab] = useState<"users" | "payments">("users");
+  const [viewingImage, setViewingImage] = useState<string | null>(null);
+
+  const getScreenshotUrl = (path: string) => {
+    if (!path) return null;
+    const { data } = supabase.storage.from("payment-screenshots").getPublicUrl(path);
+    return data?.publicUrl || null;
+  };
+
+  const getSignedUrl = async (path: string) => {
+    const { data } = await supabase.storage.from("payment-screenshots").createSignedUrl(path, 300);
+    return data?.signedUrl || null;
+  };
 
   useEffect(() => {
     const checkAdmin = async () => {
@@ -186,11 +199,55 @@ const AdminDashboard = () => {
                   <span>UPI:</span><span className="text-foreground font-medium">{payment.upi_id}</span>
                   <span>Date:</span><span className="text-foreground font-medium">{new Date(payment.created_at).toLocaleString()}</span>
                 </div>
+                {payment.screenshot_url && (
+                  <button
+                    onClick={async () => {
+                      const url = await getSignedUrl(payment.screenshot_url);
+                      if (url) setViewingImage(url);
+                    }}
+                    className="mt-3 w-full flex items-center justify-center gap-2 py-2 rounded-lg bg-primary/10 text-primary text-xs font-display font-semibold hover:bg-primary/20 transition-colors"
+                  >
+                    <ImageIcon size={14} /> View Screenshot
+                  </button>
+                )}
               </motion.div>
             ))}
           </div>
         )}
       </div>
+
+      {/* Screenshot Lightbox */}
+      <AnimatePresence>
+        {viewingImage && (
+          <motion.div
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setViewingImage(null)}
+          >
+            <motion.div
+              className="relative max-w-lg w-full"
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <button
+                onClick={() => setViewingImage(null)}
+                className="absolute -top-3 -right-3 z-10 p-1.5 rounded-full bg-background text-muted-foreground hover:text-foreground"
+              >
+                <X size={16} />
+              </button>
+              <img
+                src={viewingImage}
+                alt="Payment screenshot"
+                className="w-full rounded-xl border border-border max-h-[80vh] object-contain bg-background"
+              />
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
