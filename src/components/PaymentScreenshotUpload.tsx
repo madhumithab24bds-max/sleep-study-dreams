@@ -57,6 +57,7 @@ const PaymentScreenshotUpload = ({ onUploadSuccess }: PaymentScreenshotUploadPro
 
       setUploaded(true);
       toast.success("Screenshot uploaded! We'll verify your payment shortly.");
+      onUploadSuccess?.();
     } catch (err: any) {
       toast.error(err.message || "Upload failed");
       setPreview(null);

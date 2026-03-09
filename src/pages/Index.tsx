@@ -10,6 +10,7 @@ import MemoryScreen from "@/components/MemoryScreen";
 import ProfileScreen from "@/components/ProfileScreen";
 import AuthScreen from "@/components/AuthScreen";
 import ProfileSetup from "@/components/ProfileSetup";
+import SubscriptionGate from "@/components/SubscriptionGate";
 
 type TabId = "home" | "study" | "sleep" | "memory" | "profile";
 
@@ -17,6 +18,7 @@ const Index = () => {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const [profileComplete, setProfileComplete] = useState<boolean | null>(null);
+  const [subscribed, setSubscribed] = useState<boolean | null>(null);
   const [activeTab, setActiveTab] = useState<TabId>("home");
   const [selectedCourse, setSelectedCourse] = useState<string | null>(null);
   const [selectedSubject, setSelectedSubject] = useState<string | null>(null);
