@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
-import { ArrowLeft, Users, IndianRupee, Shield } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { ArrowLeft, Users, IndianRupee, Shield, ImageIcon, X } from "lucide-react";
 
 interface UserProfile {
   user_id: string;
