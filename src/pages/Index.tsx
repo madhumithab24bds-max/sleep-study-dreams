@@ -10,7 +10,6 @@ import MemoryScreen from "@/components/MemoryScreen";
 import ProfileScreen from "@/components/ProfileScreen";
 import AuthScreen from "@/components/AuthScreen";
 import ProfileSetup from "@/components/ProfileSetup";
-import SubscriptionGate from "@/components/SubscriptionGate";
 
 type TabId = "home" | "study" | "sleep" | "memory" | "profile";
 
@@ -18,7 +17,6 @@ const Index = () => {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const [profileComplete, setProfileComplete] = useState<boolean | null>(null);
-  const [subscribed, setSubscribed] = useState<boolean | null>(null);
   const [activeTab, setActiveTab] = useState<TabId>("home");
   const [selectedCourse, setSelectedCourse] = useState<string | null>(null);
   const [selectedSubject, setSelectedSubject] = useState<string | null>(null);
@@ -41,11 +39,10 @@ const Index = () => {
     return () => subscription.unsubscribe();
   }, []);
 
-  // Check profile completion and subscription when session changes
+  // Check profile completion when session changes
   useEffect(() => {
     if (!session?.user) {
       setProfileComplete(null);
-      setSubscribed(null);
       return;
     }
 
@@ -64,19 +61,7 @@ const Index = () => {
       }
     };
 
-    const checkSubscription = async () => {
-      const { data } = await supabase
-        .from("payment_logs")
-        .select("id")
-        .eq("user_id", session.user.id)
-        .eq("status", "screenshot_uploaded")
-        .limit(1);
-
-      setSubscribed(data && data.length > 0);
-    };
-
     checkProfile();
-    checkSubscription();
   }, [session]);
 
   const handleSubjectStudied = (subject: string) => {
@@ -108,18 +93,13 @@ const Index = () => {
     );
   }
 
-  // Still checking profile/subscription status
-  if (profileComplete === null || subscribed === null) {
+  // Still checking profile status
+  if (profileComplete === null) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="animate-pulse text-muted-foreground font-display">Loading...</div>
       </div>
     );
-  }
-
-  // Show subscription gate if not subscribed
-  if (!subscribed) {
-    return <SubscriptionGate onSubscribed={() => setSubscribed(true)} />;
   }
 
   const renderScreen = () => {
