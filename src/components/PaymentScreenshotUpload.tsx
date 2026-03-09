@@ -1,6 +1,6 @@
 import { useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Camera, Upload, CheckCircle2, Loader2, X } from "lucide-react";
+import { Camera, Upload, CheckCircle2, Loader2, X, ImagePlus } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -79,8 +79,20 @@ const PaymentScreenshotUpload = () => {
         After paying via UPI, upload a screenshot to activate your subscription.
       </p>
 
+      {/* Gallery / file picker */}
       <input
         ref={fileRef}
+        type="file"
+        accept="image/png,image/jpeg,image/jpg,image/webp"
+        className="hidden"
+        onChange={(e) => {
+          const file = e.target.files?.[0];
+          if (file) handleUpload(file);
+        }}
+      />
+      {/* Camera capture */}
+      <input
+        ref={(el) => { (window as any).__camRef = el; }}
         type="file"
         accept="image/*"
         capture="environment"
@@ -128,19 +140,32 @@ const PaymentScreenshotUpload = () => {
             )}
           </motion.div>
         ) : (
-          <motion.button
-            key="upload-btn"
+          <motion.div
+            key="upload-btns"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            onClick={() => fileRef.current?.click()}
-            className="w-full flex flex-col items-center gap-3 py-6 rounded-xl border-2 border-dashed border-primary/30 bg-primary/5 hover:bg-primary/10 transition-colors"
+            className="grid grid-cols-2 gap-3"
           >
-            <Upload size={24} className="text-primary" />
-            <span className="text-xs font-display font-semibold text-muted-foreground">
-              Tap to upload screenshot
-            </span>
-          </motion.button>
+            <button
+              onClick={() => fileRef.current?.click()}
+              className="flex flex-col items-center gap-3 py-6 rounded-xl border-2 border-dashed border-primary/30 bg-primary/5 hover:bg-primary/10 transition-colors"
+            >
+              <ImagePlus size={24} className="text-primary" />
+              <span className="text-xs font-display font-semibold text-muted-foreground">
+                From Gallery
+              </span>
+            </button>
+            <button
+              onClick={() => (window as any).__camRef?.click()}
+              className="flex flex-col items-center gap-3 py-6 rounded-xl border-2 border-dashed border-secondary/30 bg-secondary/5 hover:bg-secondary/10 transition-colors"
+            >
+              <Camera size={24} className="text-secondary" />
+              <span className="text-xs font-display font-semibold text-muted-foreground">
+                Take Photo
+              </span>
+            </button>
+          </motion.div>
         )}
       </AnimatePresence>
     </div>
